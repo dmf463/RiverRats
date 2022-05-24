@@ -175,6 +175,7 @@ public class DealerManager : MonoBehaviour
         {
             Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
         }
+        Debug.Log("actual player now has" + table.players[seatPos].Cards.Count + " cards.");
     }
 
     public void DealCards() //happens on click of the button
