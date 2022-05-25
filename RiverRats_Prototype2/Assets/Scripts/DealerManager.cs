@@ -132,12 +132,17 @@ public class DealerManager : MonoBehaviour
         int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
         Debug.Log("Cheating with Player " + seatPos);
         Player testPlayer = new Player(0, 0, PlayerEmotion.Content, PlayerState.Playing);
-        PokerHand targetHand = PokerHand.OnePair;
+        PokerHand targetHand = PokerHand.ThreeOfKind;
         PokerHand currentHand = PokerHand.HighCard;
         int roundCount = 0;
         while(currentHand <= targetHand)
         {
-            testPlayer.Cards = table.players[seatPos].Cards;
+            testPlayer.Cards.Clear();
+            for (int i = 0; i < table.players[seatPos].Cards.Count; i++)
+            {
+                CardType card = new CardType(table.players[seatPos].Cards[i].rank, table.players[seatPos].Cards[i].suit);
+                testPlayer.Cards.Add(card);
+            }
             Debug.Log("testplayer.card = " + testPlayer.Cards.Count);
             List<CardType> fakeDeck = cardsInDeck;
             Debug.Log("fakeDeck has this many cards " + fakeDeck.Count);
@@ -159,6 +164,7 @@ public class DealerManager : MonoBehaviour
                 if (currentHand >= targetHand) break;
                 else
                 {
+                    Debug.Log("not good enough yet");
                     for(int i = 0; i < cheatCards.Count; i++)
                     {
                         testPlayer.Cards.Remove(cheatCards[i]);
@@ -175,7 +181,6 @@ public class DealerManager : MonoBehaviour
         {
             Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
         }
-        Debug.Log("actual player now has" + table.players[seatPos].Cards.Count + " cards.");
     }
 
     public void DealCards() //happens on click of the button
