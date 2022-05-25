@@ -2494,7 +2494,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842546718}
         m_TargetAssemblyTypeName: DealerManager, Assembly-CSharp
-        m_MethodName: TestCheat_Flop
+        m_MethodName: Cheat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5579,7 +5579,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842546718}
         m_TargetAssemblyTypeName: DealerManager, Assembly-CSharp
-        m_MethodName: TestCheat_Flop
+        m_MethodName: Cheat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6182,7 +6182,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842546718}
         m_TargetAssemblyTypeName: DealerManager, Assembly-CSharp
-        m_MethodName: TestCheat_Flop
+        m_MethodName: Cheat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9228,7 +9228,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842546718}
         m_TargetAssemblyTypeName: DealerManager, Assembly-CSharp
-        m_MethodName: TestCheat_Flop
+        m_MethodName: Cheat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10203,6 +10203,8 @@ MonoBehaviour:
   dealtCardIndex: 0
   EndOfHand_PotAmount: 0
   pauseAutomation: 0
+  minPostFlopHand: 1
+  minPreFlopHand: 10
 --- !u!1 &1847811467
 GameObject:
   m_ObjectHideFlags: 0
@@ -11012,7 +11014,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842546718}
         m_TargetAssemblyTypeName: DealerManager, Assembly-CSharp
-        m_MethodName: TestCheat_Flop
+        m_MethodName: Cheat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

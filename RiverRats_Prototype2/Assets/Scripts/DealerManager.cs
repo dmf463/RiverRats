@@ -22,6 +22,9 @@ public class DealerManager : MonoBehaviour
     public int dealtCardIndex;
     public int EndOfHand_PotAmount;
     public bool pauseAutomation;
+    public PokerHand minPostFlopHand = PokerHand.OnePair;
+    public int minPreFlopHand = 10;
+    public Player cheatingTarget;
     #region forcing card hands
     //private List<CardType> straightFlush;
     //private List<CardType> fullHouse;
@@ -83,7 +86,7 @@ public class DealerManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            TestCheat_Flop();
+            Cheat_PostFlop();
         }
     }
 
@@ -127,30 +130,121 @@ public class DealerManager : MonoBehaviour
         }
     }
 
-    public void TestCheat_Flop()
+    public void Cheat()
+    {
+        if (playerToAct == null)
+        {
+            if (table.gameState == GameState.PreFlop)
+            {
+                Cheat_PreFlop();
+            }
+            else if (table.gameState == GameState.Flop ||
+                     table.gameState == GameState.Turn ||
+                     table.gameState == GameState.River)
+            {
+                Cheat_PostFlop();
+            }
+        }
+    }
+
+    public void Cheat_PreFlop()
     {
         int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+        cheatingTarget = table.players[seatPos];
         Debug.Log("Cheating with Player " + seatPos);
         Player testPlayer = new Player(0, 0, PlayerEmotion.Content, PlayerState.Playing);
-        PokerHand targetHand = PokerHand.ThreeOfKind;
-        PokerHand currentHand = PokerHand.HighCard;
+        List<CardType> fakeDeck = new List<CardType>();
+        int targetHand = minPreFlopHand;
+        int currentHand = 0;
         int roundCount = 0;
-        while(currentHand <= targetHand)
+        while (currentHand <= targetHand)
         {
             testPlayer.Cards.Clear();
+            cheatCards.Clear();
+            fakeDeck.Clear();
             for (int i = 0; i < table.players[seatPos].Cards.Count; i++)
             {
                 CardType card = new CardType(table.players[seatPos].Cards[i].rank, table.players[seatPos].Cards[i].suit);
                 testPlayer.Cards.Add(card);
             }
+            for (int i = 0; i < cardsInDeck.Count; i++)
+            {
+                CardType card = new CardType(cardsInDeck[i].rank, cardsInDeck[i].suit);
+                fakeDeck.Add(card);
+
+            }
             Debug.Log("testplayer.card = " + testPlayer.Cards.Count);
-            List<CardType> fakeDeck = cardsInDeck;
             Debug.Log("fakeDeck has this many cards " + fakeDeck.Count);
+            for (int i = 0; i < 2; i++)
+            {
+                CardType card;
+                int cardPos = Random.Range(0, fakeDeck.Count);
+                card = fakeDeck[cardPos];
+                fakeDeck.Remove(card);
+                testPlayer.Cards.Add(card);
+                cheatCards.Add(card);
+            }
+            testPlayer.EvaluateMyHand(GameState.PreFlop);
+            currentHand = testPlayer.Hand.HandValues.Total;
+            if (currentHand >= targetHand) break;
+            else
+            {
+                Debug.Log("not good enough yet");
+            }
+            Debug.Log("Current hand = " + currentHand + " and targetHand = " + targetHand);
+        }
+        cheating = true;
+        Debug.Log("Roundcount = " + roundCount);
+        Debug.Log("CheatCards.count = " + cheatCards.Count);
+        for (int i = 0; i < cheatCards.Count; i++)
+        {
+            Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
+            TakeCheatCardFromDeck(cheatCards[i]);
+        }
+    }
+    
+    public void Cheat_PostFlop()
+    {
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+        cheatingTarget = table.players[seatPos];
+        Debug.Log("Cheating with Player " + seatPos);
+        Player testPlayer = new Player(0, 0, PlayerEmotion.Content, PlayerState.Playing);
+        List<CardType> fakeDeck = new List<CardType>();
+        PokerHand targetHand = minPostFlopHand;
+        PokerHand currentHand = PokerHand.HighCard;
+        if(cheatingTarget.Hand.HandValues.PokerHand == PokerHand.OnePair & table.gameState == GameState.Flop)
+        {
+            currentHand = PokerHand.OnePair;
+            targetHand = currentHand + 1;
+        }
+        if(table.gameState == GameState.Turn || table.gameState == GameState.River)
+        {
+            currentHand = cheatingTarget.Hand.HandValues.PokerHand;
+            targetHand = currentHand + 1;
+        }
+        int roundCount = 0;
+        while(currentHand <= targetHand)
+        {
+            testPlayer.Cards.Clear();
             cheatCards.Clear();
+            fakeDeck.Clear();
+            for (int i = 0; i < table.players[seatPos].Cards.Count; i++)
+            {
+                CardType card = new CardType(table.players[seatPos].Cards[i].rank, table.players[seatPos].Cards[i].suit);
+                testPlayer.Cards.Add(card);
+            }
+            for(int i = 0; i <cardsInDeck.Count; i++)
+            {
+                CardType card = new CardType(cardsInDeck[i].rank, cardsInDeck[i].suit);
+                fakeDeck.Add(card);
+                
+            }
+            Debug.Log("testplayer.card = " + testPlayer.Cards.Count);
+            Debug.Log("fakeDeck has this many cards " + fakeDeck.Count);
             roundCount++;
             if (table.gameState == GameState.Flop)
             {
-                for(int i = 0; i < 3; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     CardType card;
                     int cardPos = Random.Range(0, fakeDeck.Count);
@@ -165,11 +259,40 @@ public class DealerManager : MonoBehaviour
                 else
                 {
                     Debug.Log("not good enough yet");
-                    for(int i = 0; i < cheatCards.Count; i++)
-                    {
-                        testPlayer.Cards.Remove(cheatCards[i]);
-                        fakeDeck.Add(cheatCards[i]);
-                    }
+                }
+                Debug.Log("Current hand = " + currentHand + " and targetHand = " + targetHand);
+            }
+            else if (table.gameState == GameState.Turn)
+            {
+                CardType card;
+                int cardPos = Random.Range(0, fakeDeck.Count);
+                card = fakeDeck[cardPos];
+                fakeDeck.Remove(card);
+                testPlayer.Cards.Add(card);
+                cheatCards.Add(card);
+                testPlayer.EvaluateMyHand(GameState.Flop);
+                currentHand = testPlayer.Hand.HandValues.PokerHand;
+                if (currentHand >= targetHand) break;
+                else
+                {
+                    Debug.Log("not good enough yet");
+                }
+                Debug.Log("Current hand = " + currentHand + " and targetHand = " + targetHand);
+            }
+            else if (table.gameState == GameState.River)
+            {
+                CardType card;
+                int cardPos = Random.Range(0, fakeDeck.Count);
+                card = fakeDeck[cardPos];
+                fakeDeck.Remove(card);
+                testPlayer.Cards.Add(card);
+                cheatCards.Add(card);
+                testPlayer.EvaluateMyHand(GameState.Flop);
+                currentHand = testPlayer.Hand.HandValues.PokerHand;
+                if (currentHand >= targetHand) break;
+                else
+                {
+                    Debug.Log("not good enough yet");
                 }
                 Debug.Log("Current hand = " + currentHand + " and targetHand = " + targetHand);
             }
@@ -180,6 +303,7 @@ public class DealerManager : MonoBehaviour
         for(int i = 0; i < cheatCards.Count; i++)
         {
             Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
+            TakeCheatCardFromDeck(cheatCards[i]);
         }
     }
 
@@ -200,14 +324,25 @@ public class DealerManager : MonoBehaviour
                 //{
                 if (table.players[i].PlayerState == PlayerState.Playing) //check if the player is still in the game
                 {
-                    //Once we know the player is in the game, we grab two cards from the deck
-                    //and pass them to the player, as well as our UI manager
-                    //then we have the players look at the cards to evaluate their hands
-                    //table.players[i].holeCards = new List<CardType> { TakeCardFromDeck(), TakeCardFromDeck() };
-                    CardType drawnCard = TakeCardFromDeck();
-                    table.players[i].Cards.Add(drawnCard);
-                    table.players[i].holeCards.Add(drawnCard);
-                    Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                    if (table.players[i] == cheatingTarget)
+                    {
+                        CardType cheatCard = cheatCards[cheatingTarget.holeCards.Count];
+                        //TakeCheatCardFromDeck(cheatCard);
+                        table.players[i].Cards.Add(cheatCard);
+                        table.players[i].holeCards.Add(cheatCard);
+                        Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                    }
+                    else
+                    {
+                        //Once we know the player is in the game, we grab two cards from the deck
+                        //and pass them to the player, as well as our UI manager
+                        //then we have the players look at the cards to evaluate their hands
+                        //table.players[i].holeCards = new List<CardType> { TakeCardFromDeck(), TakeCardFromDeck() };
+                        CardType drawnCard = TakeCardFromDeck();
+                        table.players[i].Cards.Add(drawnCard);
+                        table.players[i].holeCards.Add(drawnCard);
+                        Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                    }
                 }
                 //}
                 dealtCardIndex++;
@@ -227,6 +362,7 @@ public class DealerManager : MonoBehaviour
                                 }
                             }
                             dealtCardIndex = 0;
+                            cheatingTarget = null;
                             ChooseNextPlayer();
                         }
                     }
@@ -245,7 +381,7 @@ public class DealerManager : MonoBehaviour
                     if (cheating)
                     {
                         CardType cheatCard = cheatCards[dealtCardIndex - 1];
-                        cardsInDeck.Remove(cheatCard);
+                        //TakeCheatCardFromDeck(cheatCard);
                         List<CardType> flopCard = new List<CardType> { cheatCard };
                         AddCardToBoard(flopCard);
                         Services.UIManager.SetCardImage(Destination.flop, flopCard);
@@ -276,6 +412,7 @@ public class DealerManager : MonoBehaviour
                 if(dealtCardIndex == 4)
                 {
                     cheatCards.Clear();
+                    cheating = false;
                     for(int k = 0; k < table.numActivePlayers; k++)
                     {
                         if(table.players[k].PlayerState == PlayerState.Playing)
@@ -284,81 +421,109 @@ public class DealerManager : MonoBehaviour
                             table.players[k].actedThisRound = false;
                         }
                     }
+                    cheatingTarget = null;
                     ChooseNextPlayer();
                 }
-                //BurnCard();
-                //List<CardType> flop = new List<CardType> { TakeCardFromDeck(), TakeCardFromDeck(), TakeCardFromDeck() };
-                //AddCardToBoard(flop);
-                //for (int i = 0; i < table.numActivePlayers; i++)
-                //{
-                //    if (table.players[i].PlayerState == PlayerState.Playing)
-                //    {
-                //        GiveCardToPlayer(table.playerDestinations[i], flop);
-                //        table.players[i].EvaluateMyHand(table.gameState);
-                //        table.players[i].actedThisRound = false;
-                //    }
-                //}
-                //Services.UIManager.SetCardImage(Destination.flop, flop);
-                //ChooseNextPlayer();
             }
             else if (table.gameState == GameState.Turn)
             {
                 //the turn and the river are both more simplified versions of the above
                 //since they represent only one card
                 BurnCard();
-                List<CardType> turn = new List<CardType> { TakeCardFromDeck() };
-                AddCardToBoard(turn);
-                for (int i = 0; i < table.numActivePlayers; i++)
+                if (cheating)
                 {
-                    if (table.players[i].PlayerState == PlayerState.Playing)
+                    CardType cheatCard = cheatCards[0];
+                    //TakeCheatCardFromDeck(cheatCard);
+                    List<CardType> turn = new List<CardType> { cheatCard };
+                    AddCardToBoard(turn);
+                    Services.UIManager.SetCardImage(Destination.turn, turn);
+                    for (int j = 0; j < table.numActivePlayers; j++)
                     {
-                        GiveCardToPlayer(table.playerDestinations[i], turn);
-                        table.players[i].EvaluateMyHand(table.gameState);
-                        table.players[i].actedThisRound = false;
+                        if (table.players[j].PlayerState == PlayerState.Playing)
+                        {
+                            GiveCardToPlayer(table.playerDestinations[j], turn);
+                            table.players[j].EvaluateMyHand(table.gameState);
+                            table.players[j].actedThisRound = false;
+                        }
                     }
                 }
-                Services.UIManager.SetCardImage(Destination.turn, turn);
+                else
+                {
+                    List<CardType> turn = new List<CardType> { TakeCardFromDeck() };
+                    AddCardToBoard(turn);
+                    for (int i = 0; i < table.numActivePlayers; i++)
+                    {
+                        if (table.players[i].PlayerState == PlayerState.Playing)
+                        {
+                            GiveCardToPlayer(table.playerDestinations[i], turn);
+                        }
+                    }
+                    Services.UIManager.SetCardImage(Destination.turn, turn);
+                }
+                cheatingTarget = null;
                 ChooseNextPlayer();
             }
             else if (table.gameState == GameState.River)
             {
                 BurnCard();
-                List<CardType> river = new List<CardType> { TakeCardFromDeck() };
-                AddCardToBoard(river);
-                for (int i = 0; i < table.numActivePlayers; i++)
+                if (cheating)
                 {
-                    if (table.players[i].PlayerState == PlayerState.Playing)
+                    CardType cheatCard = cheatCards[0];
+                    //TakeCheatCardFromDeck(cheatCard);
+                    List<CardType> river = new List<CardType> { cheatCard };
+                    AddCardToBoard(river);
+                    Services.UIManager.SetCardImage(Destination.flop, river);
+                    for (int j = 0; j < table.numActivePlayers; j++)
                     {
-                        GiveCardToPlayer(table.playerDestinations[i], river);
-                        #region this is me setting hands at the end
-                        //INSERTING BULLSHIT DEBUG CODE HERE
-                        //if(i == 2 || i == 0)
-                        //{
-                        //    table.players[i].Cards.Clear();
-                        //    table.players[i].Cards = straightFlush;
-                        //}
-                        //else if(i == 4)
-                        //{
-                        //    table.players[i].Cards.Clear();
-                        //    table.players[i].Cards = fullHouse;
-                        //}
-                        //else if(i == 500)
-                        //{
-                        //    table.players[i].Cards.Clear();
-                        //    table.players[i].Cards = fullHouse;
-                        //}
-                        //else if(i == 3)
-                        //{
-                        //    table.players[i].Cards.Clear();
-                        //    table.players[i].Cards = trips;
-                        //}
-                        //END BULLSHIT DEBUG CODE
-                        #endregion
-                        table.players[i].EvaluateMyHand(table.gameState);
-                        table.players[i].actedThisRound = false;
+                        if (table.players[j].PlayerState == PlayerState.Playing)
+                        {
+                            GiveCardToPlayer(table.playerDestinations[j], river);
+                            table.players[j].EvaluateMyHand(table.gameState);
+                            table.players[j].actedThisRound = false;
+                        }
                     }
+                    Services.UIManager.SetCardImage(Destination.river, river);
                 }
-                Services.UIManager.SetCardImage(Destination.river, river);
+                else
+                {
+                    List<CardType> river = new List<CardType> { TakeCardFromDeck() };
+                    AddCardToBoard(river);
+                    for (int i = 0; i < table.numActivePlayers; i++)
+                    {
+                        if (table.players[i].PlayerState == PlayerState.Playing)
+                        {
+                            GiveCardToPlayer(table.playerDestinations[i], river);
+                            #region this is me setting hands at the end
+                            //INSERTING BULLSHIT DEBUG CODE HERE
+                            //if(i == 2 || i == 0)
+                            //{
+                            //    table.players[i].Cards.Clear();
+                            //    table.players[i].Cards = straightFlush;
+                            //}
+                            //else if(i == 4)
+                            //{
+                            //    table.players[i].Cards.Clear();
+                            //    table.players[i].Cards = fullHouse;
+                            //}
+                            //else if(i == 500)
+                            //{
+                            //    table.players[i].Cards.Clear();
+                            //    table.players[i].Cards = fullHouse;
+                            //}
+                            //else if(i == 3)
+                            //{
+                            //    table.players[i].Cards.Clear();
+                            //    table.players[i].Cards = trips;
+                            //}
+                            //END BULLSHIT DEBUG CODE
+                            #endregion
+                            table.players[i].EvaluateMyHand(table.gameState);
+                            table.players[i].actedThisRound = false;
+                        }
+                    }
+                    Services.UIManager.SetCardImage(Destination.river, river);
+                }
+                cheatingTarget = null;
                 ChooseNextPlayer();
                 if (playerToAct == null)
                 {
@@ -991,6 +1156,18 @@ public class DealerManager : MonoBehaviour
         card = cardsInDeck[cardPos];
         cardsInDeck.Remove(card);
         return card;
+    }
+
+    public void TakeCheatCardFromDeck(CardType card)
+    {
+        for(int i = 0; i < cardsInDeck.Count; i++)
+        {
+            CardType cardInDeck = cardsInDeck[i];
+            if((cardInDeck.rank == card.rank) & (cardInDeck.suit == card.suit))
+            {
+                cardsInDeck.Remove(cardInDeck);
+            }
+        }
     }
 
     public void BurnCard() //Throw a card into the burn
