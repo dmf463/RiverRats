@@ -86,7 +86,7 @@ public class DealerManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            Cheat_PostFlop();
+            Cheat_Flop();
         }
     }
 
@@ -138,11 +138,17 @@ public class DealerManager : MonoBehaviour
             {
                 Cheat_PreFlop();
             }
-            else if (table.gameState == GameState.Flop ||
-                     table.gameState == GameState.Turn ||
-                     table.gameState == GameState.River)
+            else if (table.gameState == GameState.Flop)
             {
-                Cheat_PostFlop();
+                Cheat_Flop();
+            }
+            else if(table.gameState == GameState.Turn)
+            {
+                Cheat_Turn();
+            }
+            else if(table.gameState == GameState.River)
+            {
+                Cheat_River();
             }
         }
     }
@@ -203,7 +209,7 @@ public class DealerManager : MonoBehaviour
         }
     }
     
-    public void Cheat_PostFlop()
+    public void Cheat_Flop()
     {
         int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
         cheatingTarget = table.players[seatPos];
@@ -270,7 +276,7 @@ public class DealerManager : MonoBehaviour
                 fakeDeck.Remove(card);
                 testPlayer.Cards.Add(card);
                 cheatCards.Add(card);
-                testPlayer.EvaluateMyHand(GameState.Flop);
+                testPlayer.EvaluateMyHand(GameState.Turn);
                 currentHand = testPlayer.Hand.HandValues.PokerHand;
                 if (currentHand >= targetHand) break;
                 else
@@ -287,7 +293,7 @@ public class DealerManager : MonoBehaviour
                 fakeDeck.Remove(card);
                 testPlayer.Cards.Add(card);
                 cheatCards.Add(card);
-                testPlayer.EvaluateMyHand(GameState.Flop);
+                testPlayer.EvaluateMyHand(GameState.River);
                 currentHand = testPlayer.Hand.HandValues.PokerHand;
                 if (currentHand >= targetHand) break;
                 else
@@ -301,6 +307,108 @@ public class DealerManager : MonoBehaviour
         Debug.Log("Roundcount = " + roundCount);
         Debug.Log("CheatCards.count = " + cheatCards.Count);
         for(int i = 0; i < cheatCards.Count; i++)
+        {
+            Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
+            TakeCheatCardFromDeck(cheatCards[i]);
+        }
+    }
+
+    public void Cheat_Turn()
+    {
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+        cheatingTarget = table.players[seatPos];
+        Debug.Log("Cheating with Player " + seatPos);
+        Player testPlayer = new Player(0, 0, PlayerEmotion.Content, PlayerState.Playing);
+        List<CardType> fakeDeck = new List<CardType>();
+
+        PokerHand currentHand = cheatingTarget.Hand.HandValues.PokerHand;
+        PokerHand targetHand = currentHand + 1;
+
+        for(int i = 0; i < 300; i++)
+        {
+            for (int j = 0; j < table.players[seatPos].Cards.Count; j++)
+            {
+                CardType playerCard = new CardType(table.players[seatPos].Cards[j].rank, table.players[seatPos].Cards[j].suit);
+                testPlayer.Cards.Add(playerCard);
+            }
+            for (int k = 0; k < cardsInDeck.Count; k++)
+            {
+                CardType deckCard = new CardType(cardsInDeck[k].rank, cardsInDeck[k].suit);
+                fakeDeck.Add(deckCard);
+
+            }
+            CardType card = cardsInDeck[Random.Range(0, cardsInDeck.Count)];
+            testPlayer.Cards.Add(card);
+            cheatCards.Add(card);
+            testPlayer.EvaluateMyHand(GameState.Turn);
+            currentHand = testPlayer.Hand.HandValues.PokerHand;
+            if (currentHand >= targetHand) break;
+            else
+            {
+                testPlayer.Cards.Clear();
+                cheatCards.Clear();
+                fakeDeck.Clear();
+            }
+        }
+        if (cheatCards.Count == 0)
+        {
+            Debug.Log("No possible card to cheat with");
+            cheating = false;
+        }
+        else cheating = true;
+        Debug.Log("CheatCards.count = " + cheatCards.Count);
+        for (int i = 0; i < cheatCards.Count; i++)
+        {
+            Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
+            TakeCheatCardFromDeck(cheatCards[i]);
+        }
+    }
+
+    public void Cheat_River()
+    {
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+        cheatingTarget = table.players[seatPos];
+        Debug.Log("Cheating with Player " + seatPos);
+        Player testPlayer = new Player(0, 0, PlayerEmotion.Content, PlayerState.Playing);
+        List<CardType> fakeDeck = new List<CardType>();
+
+        PokerHand currentHand = cheatingTarget.Hand.HandValues.PokerHand;
+        PokerHand targetHand = currentHand + 1;
+
+        for (int i = 0; i < 500; i++)
+        {
+            for (int j = 0; j < table.players[seatPos].Cards.Count; j++)
+            {
+                CardType playerCard = new CardType(table.players[seatPos].Cards[j].rank, table.players[seatPos].Cards[j].suit);
+                testPlayer.Cards.Add(playerCard);
+            }
+            for (int k = 0; k < cardsInDeck.Count; k++)
+            {
+                CardType deckCard = new CardType(cardsInDeck[k].rank, cardsInDeck[k].suit);
+                fakeDeck.Add(deckCard);
+
+            }
+            CardType card = cardsInDeck[Random.Range(0, cardsInDeck.Count)];
+            testPlayer.Cards.Add(card);
+            cheatCards.Add(card);
+            testPlayer.EvaluateMyHand(GameState.River);
+            currentHand = testPlayer.Hand.HandValues.PokerHand;
+            if (currentHand >= targetHand) break;
+            else
+            {
+                testPlayer.Cards.Clear();
+                cheatCards.Clear();
+                fakeDeck.Clear();
+            }
+        }
+        if (cheatCards.Count == 0)
+        {
+            Debug.Log("No possible card to cheat with");
+            cheating = false;
+        }
+        else cheating = true;
+        Debug.Log("CheatCards.count = " + cheatCards.Count);
+        for (int i = 0; i < cheatCards.Count; i++)
         {
             Debug.Log("Cheat cards " + i + " is a " + cheatCards[i].rank + " of " + cheatCards[i].suit + "s");
             TakeCheatCardFromDeck(cheatCards[i]);
@@ -472,7 +580,7 @@ public class DealerManager : MonoBehaviour
                     //TakeCheatCardFromDeck(cheatCard);
                     List<CardType> river = new List<CardType> { cheatCard };
                     AddCardToBoard(river);
-                    Services.UIManager.SetCardImage(Destination.flop, river);
+                    Services.UIManager.SetCardImage(Destination.river, river);
                     for (int j = 0; j < table.numActivePlayers; j++)
                     {
                         if (table.players[j].PlayerState == PlayerState.Playing)

@@ -587,7 +587,8 @@ public class PlayerBehaviour
         public override bool Update(Player player)
         {
             //Debug.Log("Player " + player.SeatPos + " is going all in");
-            player.AllIn();
+            player.amountToRaise = player.ChipCount;
+            player.Raise();
             //player.turnComplete = true;
             player.actedThisRound = true;
             return true;
