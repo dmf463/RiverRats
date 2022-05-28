@@ -322,7 +322,6 @@ public class DealerManager : MonoBehaviour
         List<CardType> fakeDeck = new List<CardType>();
        
         int roundCount = 0;
-        bool bestHand = false;
         for(int possibleCard = 0; possibleCard < cardsInDeck.Count; possibleCard++)
         {
             Debug.Log("possibleCard = " + possibleCard);
@@ -386,7 +385,6 @@ public class DealerManager : MonoBehaviour
             if (sortedPlayers[0].SeatPos == seatPos)
             {
                 Debug.Log("HERE?");
-                bestHand = true;
                 break;
             }
             //else if(sortedPlayers[0].Hand.HandValues.Total == sortedPlayers[1].Hand.HandValues.Total)
@@ -429,7 +427,6 @@ public class DealerManager : MonoBehaviour
         List<CardType> fakeDeck = new List<CardType>();
 
         int roundCount = 0;
-        bool bestHand = false;
         for (int possibleCard = 0; possibleCard < cardsInDeck.Count; possibleCard++)
         {
             Debug.Log("possibleCard = " + possibleCard);
@@ -493,7 +490,6 @@ public class DealerManager : MonoBehaviour
             if (sortedPlayers[0].SeatPos == seatPos)
             {
                 Debug.Log("HERE?");
-                bestHand = true;
                 break;
             }
             //else if (sortedPlayers[0].Hand.HandValues.Total == sortedPlayers[1].Hand.HandValues.Total)
@@ -537,8 +533,6 @@ public class DealerManager : MonoBehaviour
 
         PokerHand currentHand = cheatingTarget.Hand.HandValues.PokerHand;
         PokerHand targetHand = currentHand + 1;
-
-        bool bestHand = false;
 
         for(int i = 0; i < cardsInDeck.Count; i++)
         {
@@ -707,6 +701,8 @@ public class DealerManager : MonoBehaviour
                             }
                             dealtCardIndex = 0;
                             cheatingTarget = null;
+                            cheating = false;
+                            cheatCards.Clear();
                             ChooseNextPlayer();
                         }
                     }
@@ -765,7 +761,10 @@ public class DealerManager : MonoBehaviour
                             table.players[k].actedThisRound = false;
                         }
                     }
+                    dealtCardIndex = 0;
                     cheatingTarget = null;
+                    cheating = false;
+                    cheatCards.Clear();
                     ChooseNextPlayer();
                 }
             }
@@ -804,7 +803,10 @@ public class DealerManager : MonoBehaviour
                     }
                     Services.UIManager.SetCardImage(Destination.turn, turn);
                 }
+                dealtCardIndex = 0;
                 cheatingTarget = null;
+                cheating = false;
+                cheatCards.Clear();
                 ChooseNextPlayer();
             }
             else if (table.gameState == GameState.River)
@@ -867,7 +869,10 @@ public class DealerManager : MonoBehaviour
                     }
                     Services.UIManager.SetCardImage(Destination.river, river);
                 }
+                dealtCardIndex = 0;
                 cheatingTarget = null;
+                cheating = false;
+                cheatCards.Clear();
                 ChooseNextPlayer();
                 if (playerToAct == null)
                 {
@@ -990,6 +995,8 @@ public class DealerManager : MonoBehaviour
             PlayerRank.Clear();
             raisesInRound = 0;
             dealtCardIndex = 0;
+            cheating = false;
+            cheatCards.Clear();
             int eliminatedPlayers = 0;
             for (int i = 0; i < table.players.Length; i++)
             {
@@ -1199,7 +1206,7 @@ public class DealerManager : MonoBehaviour
 
     public void InsultPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject) - 1;
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
         if (table.players[seatPos].PlayerEmotion == PlayerEmotion.OnTilt)
         {
             table.players[seatPos].PlayerEmotion = PlayerEmotion.OnTilt;
@@ -1209,7 +1216,7 @@ public class DealerManager : MonoBehaviour
 
     public void FlatterPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject) - 1;
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
         if (table.players[seatPos].PlayerEmotion == PlayerEmotion.Joyous)
         {
             table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;

@@ -622,14 +622,22 @@ public class HandEvaluator {
         //0 = 1, 2 = 3 = 4
         if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[2].rank == incomingCards[3].rank && incomingCards[2].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total = (int)(incomingCards[0].rank) + 
+                              (int)(incomingCards[1].rank) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              ((int)(incomingCards[4].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 3 = 4
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[3].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) + 
+                              ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              (int)(incomingCards[3].rank) + 
+                              (int)(incomingCards[4].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
@@ -981,42 +989,66 @@ public class HandEvaluator {
         //0 = 1, 2 = 3 = 4
         if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[2].rank == incomingCards[3].rank && incomingCards[2].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total =  (int)(incomingCards[0].rank) +
+                               (int)(incomingCards[1].rank) +
+                              ((int)(incomingCards[2].rank) * 5) +
+                              ((int)(incomingCards[3].rank) * 5) +
+                              ((int)(incomingCards[4].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1, 3 = 4 = 5
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[3].rank == incomingCards[4].rank && incomingCards[3].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total =  (int)(incomingCards[0].rank) +
+                               (int)(incomingCards[1].rank) +
+                              ((int)(incomingCards[3].rank) * 5) +
+                              ((int)(incomingCards[4].rank) * 5) + 
+                              ((int)(incomingCards[5].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //1 = 2, 3 = 4 = 5
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[3].rank == incomingCards[4].rank && incomingCards[3].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total =  (int)(incomingCards[1].rank) + 
+                               (int)(incomingCards[2].rank) +
+                              ((int)(incomingCards[3].rank) * 5) +
+                              ((int)(incomingCards[4].rank) * 5) +
+                              ((int)(incomingCards[5].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 3 = 4
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[3].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) + 
+                              ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                               (int)(incomingCards[3].rank) + 
+                               (int)(incomingCards[4].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 4 = 5
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[4].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) +
+                              ((int)(incomingCards[1].rank) * 5) +
+                              ((int)(incomingCards[2].rank) * 5) +
+                               (int)(incomingCards[4].rank) + 
+                               (int)(incomingCards[5].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //1 = 2 = 3, 4 = 5
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[1].rank == incomingCards[3].rank && incomingCards[4].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total = ((int)(incomingCards[1].rank) * 5) +
+                              ((int)(incomingCards[2].rank) * 5) +
+                              ((int)(incomingCards[3].rank) * 5) + 
+                               (int)(incomingCards[4].rank) + 
+                               (int)(incomingCards[5].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
@@ -1491,7 +1523,11 @@ public class HandEvaluator {
         //0 = 1, 4 = 5 = 6
         if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[4].rank == incomingCards[5].rank && incomingCards[4].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total =  (int)(incomingCards[0].rank) + 
+                               (int)(incomingCards[1].rank) + 
+                              ((int)(incomingCards[4].rank) * 5) + 
+                              ((int)(incomingCards[5].rank) * 5) + 
+                              ((int)(incomingCards[6].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
@@ -1499,77 +1535,121 @@ public class HandEvaluator {
         //1 = 2, 4 = 5 = 6
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[4].rank == incomingCards[5].rank && incomingCards[4].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total =  (int)(incomingCards[1].rank) + 
+                               (int)(incomingCards[2].rank) +
+                              ((int)(incomingCards[4].rank) * 5) +
+                              ((int)(incomingCards[5].rank) * 5) +
+                              ((int)(incomingCards[6].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //2 = 3, 4 =  5 = 6
         else if (incomingCards[2].rank == incomingCards[3].rank && incomingCards[4].rank == incomingCards[5].rank && incomingCards[4].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total = (int)(incomingCards[2].rank) + 
+                              (int)(incomingCards[3].rank) +
+                              ((int)(incomingCards[4].rank) * 5) +
+                              ((int)(incomingCards[5].rank) * 5) +
+                              ((int)(incomingCards[6].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1, 3 = 4 = 5
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[3].rank == incomingCards[4].rank && incomingCards[3].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total =  (int)(incomingCards[0].rank) + 
+                               (int)(incomingCards[1].rank) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              ((int)(incomingCards[4].rank) * 5) + 
+                              ((int)(incomingCards[5].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //1 = 2, 3 = 4 = 5
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[3].rank == incomingCards[4].rank && incomingCards[3].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total =  (int)(incomingCards[1].rank) + 
+                               (int)(incomingCards[2].rank) +
+                              ((int)(incomingCards[3].rank) * 5) +
+                              ((int)(incomingCards[4].rank) * 5) +
+                              ((int)(incomingCards[5].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1, 2 = 3 = 4
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[2].rank == incomingCards[3].rank && incomingCards[2].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total = (int)(incomingCards[0].rank) + 
+                              (int)(incomingCards[1].rank) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              ((int)(incomingCards[4].rank) * 5);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 3 = 4
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[3].rank == incomingCards[4].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) + 
+                              ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              (int)(incomingCards[3].rank) + 
+                              (int)(incomingCards[4].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //2 = 3 = 4, 5 = 6
         else if (incomingCards[2].rank == incomingCards[3].rank && incomingCards[2].rank == incomingCards[4].rank && incomingCards[5].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total = ((int)(incomingCards[2].rank) * 5) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              ((int)(incomingCards[4].rank) * 5) + 
+                              (int)(incomingCards[5].rank) + 
+                              (int)(incomingCards[6].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //1 = 2 = 3, 5 = 6
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[1].rank == incomingCards[3].rank && incomingCards[5].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total = ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              (int)(incomingCards[5].rank) + 
+                              (int)(incomingCards[6].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 5 = 6
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[5].rank == incomingCards[6].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[5].rank) + (int)(incomingCards[6].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) + 
+                              ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              (int)(incomingCards[5].rank) + 
+                              (int)(incomingCards[6].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //1 = 2 = 3, 4 = 5
         else if (incomingCards[1].rank == incomingCards[2].rank && incomingCards[1].rank == incomingCards[3].rank && incomingCards[4].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[3].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total = ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              ((int)(incomingCards[3].rank) * 5) + 
+                              (int)(incomingCards[4].rank) + 
+                              (int)(incomingCards[5].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
         //0 = 1 = 2, 4 = 5
         else if (incomingCards[0].rank == incomingCards[1].rank && incomingCards[0].rank == incomingCards[2].rank && incomingCards[4].rank == incomingCards[5].rank)
         {
-            handValue.Total = (int)(incomingCards[0].rank) + (int)(incomingCards[1].rank) + (int)(incomingCards[2].rank) + (int)(incomingCards[4].rank) + (int)(incomingCards[5].rank);
+            handValue.Total = ((int)(incomingCards[0].rank) * 5) + 
+                              ((int)(incomingCards[1].rank) * 5) + 
+                              ((int)(incomingCards[2].rank) * 5) + 
+                              (int)(incomingCards[4].rank) + 
+                              (int)(incomingCards[5].rank);
             handValue.PokerHand = PokerHand.FullHouse;
             return true;
         }
