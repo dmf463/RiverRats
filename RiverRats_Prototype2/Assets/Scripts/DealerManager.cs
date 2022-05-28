@@ -25,6 +25,7 @@ public class DealerManager : MonoBehaviour
     public PokerHand minPostFlopHand = PokerHand.OnePair;
     public int minPreFlopHand = 10;
     public Player cheatingTarget;
+    public int cheatCount = 0;
     #region forcing card hands
     //private List<CardType> straightFlush;
     //private List<CardType> fullHouse;
@@ -134,6 +135,7 @@ public class DealerManager : MonoBehaviour
     {
         if (playerToAct == null)
         {
+            cheatCount++;
             if (table.gameState == GameState.PreFlop)
             {
                 Cheat_PreFlop();

@@ -46,6 +46,7 @@ public class UIManager : MonoBehaviour
     {
         new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>()
     };//these visualize each of the players 2 cards
+    public GameObject cheatCounter;
 
     
     void Start()
@@ -122,6 +123,7 @@ public class UIManager : MonoBehaviour
         gameState.GetComponent<Text>().text = table.gameState.ToString();
         blinds.GetComponent<Text>().text = table.blindRound.ToString();
         potSize.GetComponent<Text>().text = table.pot.ToString();
+        cheatCounter.GetComponent<Text>().text = Services.DealerManager.cheatCount.ToString();
     }
     
     public void SetDealerPositionUI(int pos)
