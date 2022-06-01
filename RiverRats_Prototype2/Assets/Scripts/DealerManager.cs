@@ -801,6 +801,8 @@ public class DealerManager : MonoBehaviour
                         if (table.players[i].PlayerState == PlayerState.Playing)
                         {
                             GiveCardToPlayer(table.playerDestinations[i], turn);
+                            table.players[i].EvaluateMyHand(table.gameState);
+                            table.players[i].actedThisRound = false;
                         }
                     }
                     Services.UIManager.SetCardImage(Destination.turn, turn);
@@ -1135,14 +1137,14 @@ public class DealerManager : MonoBehaviour
                 //so now we go through each player and check: Have they acted, or do they need to act? Are the playing? CAN they play? and not everyone is all in, correct?
                 nextPlayer = table.players[(currentPlayerSeatPos + i) % table.players.Length];
                 #region //debug scripts
-                //if (nextPlayer.PlayerState == PlayerState.Playing)
-                //{
-                //    Debug.Log("nextPlayer = " + nextPlayer.SeatPos);
-                //    Debug.Log("nextPlayer.actedThisRound = " + nextPlayer.actedThisRound);
-                //    Debug.Log("nextPlayer.currentBet = " + nextPlayer.currentBet + " and lastBet = " + lastBet);
-                //    Debug.Log("nextPlayer.chipCount = " + nextPlayer.ChipCount);
-                //    Debug.Log("nextPlayer.PlayerState = " + nextPlayer.PlayerState);
-                //}
+                if (nextPlayer.PlayerState == PlayerState.Playing)
+                {
+                    Debug.Log("nextPlayer = " + nextPlayer.SeatPos);
+                    Debug.Log("nextPlayer.actedThisRound = " + nextPlayer.actedThisRound);
+                    Debug.Log("nextPlayer.currentBet = " + nextPlayer.currentBet + " and lastBet = " + lastBet);
+                    Debug.Log("nextPlayer.chipCount = " + nextPlayer.ChipCount);
+                    Debug.Log("nextPlayer.PlayerState = " + nextPlayer.PlayerState);
+                }
                 #endregion 
                 if ((!nextPlayer.actedThisRound || nextPlayer.currentBet < lastBet) 
                     && nextPlayer.PlayerState == PlayerState.Playing 

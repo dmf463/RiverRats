@@ -83,7 +83,7 @@ public class Player
             lastAction = PlayerAction.Call;
             if (ChipCount - betToCall <= 0)
             {
-                AllIn();
+                playerIsAllIn = true;
                 Debug.Log("Player " + SeatPos + " calls, going all in for " + ChipCount);
                 currentBet = ChipCount + currentBet;
                 Bet(ChipCount);
@@ -140,7 +140,7 @@ public class Player
             }
             if (ChipCount - betToRaise <= 0)
             {
-                AllIn();
+                playerIsAllIn = true;
                 //Debug.Log("Player " + SeatPos + " didn't have enough chips and went all in for " + chipCount);
                 Debug.Log("player " + SeatPos + " raises " + ChipCount);
                 currentBet+= ChipCount; //made the change here
@@ -170,11 +170,6 @@ public class Player
         }
     }
 
-    public void AllIn()
-    {
-        playerIsAllIn = true;
-    }
-
     public void Bet(int betAmount)
     {
         ChipCount -= betAmount;
@@ -199,7 +194,9 @@ public class Player
         }
         else
         {
-            Services.PlayerBehaviour.FCR(player);
+            Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
+            Services.PlayerBehaviour.FCR_V2(player, returnRate);
+            //Services.PlayerBehaviour.FCR(player);
             Services.DealerManager.SetNextPlayer();
         }
         Services.DealerManager.pauseAutomation = false;
@@ -524,13 +521,9 @@ public class Player
         //else, we need to write another function that determines what the possible bet will be
         amountToRaise = DetermineRaiseAmount(this);
         float potSize = Services.TableManager.pot;
-        int lastBet = Services.DealerManager.lastBet;
-        if (lastBet == 0) lastBet = Services.TableManager.bigBlind;
         float potOdds = amountToRaise / (amountToRaise + potSize);
-        //Debug.Log(gameObject.name + " has an HS of " + HandStrength + " and pot odds of " + potOdds + " in round " + Table.gameState);
-        if (Services.TableManager.gameState > GameState.PreFlop/* && Services.TableManager.gameState != GameState.Misdeal*/) Debug.Assert(HandStrength <= 1);
+        if (Services.TableManager.gameState > GameState.PreFlop) Debug.Assert(HandStrength <= 1);
         float returnRate = HandStrength / potOdds;
-        //Debug.Log(gameObject.name + " has a return rate of " + returnRate);
         return returnRate;
     }
 

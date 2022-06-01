@@ -137,20 +137,20 @@ public class PlayerBehaviour
 
           //PROTECT YOUR STACK
           new Sequence<Player>(
-              new Not<Player>(new HasEnoughMoney()),
+              //new Not<Player>(new NeedToProtectStack()),
               new HasAGreatHand_PreFlop(),
               new AllIn()
               ),
           //RAISE ON A GOOD HAND
           new Sequence<Player>(
-              new HasEnoughMoney(),
+              //new NeedToProtectStack(),
               new HasAGreatHand_PreFlop(),
               new Not<Player>(new RaisedAlready()),
               new Raise()
               ),
           //CALL ON DECENT HAND OR IF SMALL BLIND OR BIG BLIND
           new Sequence<Player>(
-              new HasEnoughMoney(),
+              //new NeedToProtectStack(),
               new Selector<Player>(
                   new Sequence<Player>(
                       new IsSmallBlind(),
@@ -182,6 +182,119 @@ public class PlayerBehaviour
           ));
         preflop_FCR_Tree.Update(player);
     }
+
+    public void FCR_V2(Player player, float returnRate)
+    {
+        FCR_Tree = new Tree<Player>(new Selector<Player>(
+            //LOW RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 0.8),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 5), //BLUFF
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+            //MEDIUM RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.0),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 5),
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 15), //BLUFF
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+            //HIGH RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.3),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 40),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+            //VERY RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate >= 1.3),
+                new Selector<Player>(
+                        new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 30),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+            //FALL BACK SEQUENCE
+             new Sequence<Player>(
+                  new Selector<Player>(
+                      new Sequence<Player>(
+                          new BetIsZero(),
+                          new Call()
+                      ),
+                  new Sequence<Player>(
+                      new Not<Player>(new BetIsZero()),
+                      new Fold()
+                      )
+                  )
+              )
+            ));
+        FCR_Tree.Update(player);
+    }
+    
     public void FCR(Player player)
     {
         FCR_Tree = new Tree<Player>(new Selector<Player>(
@@ -375,6 +488,14 @@ public class PlayerBehaviour
                 //Debug.Log("Doesn't have enough money");
             }
             return (player.ChipCount - Services.DealerManager.lastBet) > Services.TableManager.bigBlind * 4;
+        }
+    }
+
+    private class HasHighChanceOfWinning : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            return (player.HandStrength > 0.5);
         }
     }
 
