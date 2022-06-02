@@ -185,13 +185,14 @@ public class PlayerBehaviour
 
     public void FCR_V2(Player player, float returnRate)
     {
+        int randomNum = UnityEngine.Random.Range(0, 100);
         FCR_Tree = new Tree<Player>(new Selector<Player>(
             //LOW RETURN RATE
             new Sequence<Player>(
                 new Condition<Player>(context => returnRate < 0.8),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 5), //BLUFF
+                        new Condition<Player>(context => randomNum < 5), //BLUFF
                         new HasEnoughMoney(),
                         new Raise()
                         ),
@@ -209,12 +210,12 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.0),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 5),
+                        new Condition<Player>(context => randomNum < 5),
                         new HasEnoughMoney(),
                         new Call()
                         ),
                     new Sequence<Player>(
-                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 15), //BLUFF
+                        new Condition<Player>(context => randomNum < 15), //BLUFF
                         new HasEnoughMoney(),
                         new Raise()
                         ),
@@ -232,7 +233,7 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.3),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 40),
+                        new Condition<Player>(context => randomNum < 40),
                         new Raise()
                         ),
                     new Sequence<Player>(
@@ -263,7 +264,7 @@ public class PlayerBehaviour
                         new Fold()
                         ),
                     new Sequence<Player>(
-                        new Condition<Player>(context => UnityEngine.Random.Range(0, 100) < 30),
+                        new Condition<Player>(context => randomNum < 30),
                         new Call()
                         ),
                     new Sequence<Player>(
