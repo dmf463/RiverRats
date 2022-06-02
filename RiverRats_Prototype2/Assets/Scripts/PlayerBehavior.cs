@@ -248,7 +248,7 @@ public class PlayerBehaviour
                         )
                     )
                 ),
-            //VERY RETURN RATE
+            //VERY HIGH RETURN RATE
             new Sequence<Player>(
                 new Condition<Player>(context => returnRate >= 1.3),
                 new Selector<Player>(
