@@ -26,6 +26,7 @@ public class DealerManager : MonoBehaviour
     public int minPreFlopHand = 10;
     public Player cheatingTarget;
     public int cheatCount = 0;
+    public bool influencingTable = false;
     #region forcing card hands
     //private List<CardType> straightFlush;
     //private List<CardType> fullHouse;
@@ -133,8 +134,9 @@ public class DealerManager : MonoBehaviour
 
     public void Cheat()
     {
-        if (playerToAct == null)
+        if (playerToAct == null & !influencingTable)
         {
+            influencingTable = true;
             cheatCount++;
             if (table.gameState == GameState.PreFlop)
             {
@@ -704,6 +706,7 @@ public class DealerManager : MonoBehaviour
                             dealtCardIndex = 0;
                             cheatingTarget = null;
                             cheating = false;
+                            influencingTable = false;
                             cheatCards.Clear();
                             ChooseNextPlayer();
                         }
@@ -766,6 +769,7 @@ public class DealerManager : MonoBehaviour
                     dealtCardIndex = 0;
                     cheatingTarget = null;
                     cheating = false;
+                    influencingTable = false;
                     cheatCards.Clear();
                     ChooseNextPlayer();
                 }
@@ -810,6 +814,7 @@ public class DealerManager : MonoBehaviour
                 dealtCardIndex = 0;
                 cheatingTarget = null;
                 cheating = false;
+                influencingTable = false;
                 cheatCards.Clear();
                 ChooseNextPlayer();
             }
@@ -876,6 +881,7 @@ public class DealerManager : MonoBehaviour
                 dealtCardIndex = 0;
                 cheatingTarget = null;
                 cheating = false;
+                influencingTable = false;
                 cheatCards.Clear();
                 ChooseNextPlayer();
                 if (playerToAct == null)
@@ -1000,6 +1006,7 @@ public class DealerManager : MonoBehaviour
             raisesInRound = 0;
             dealtCardIndex = 0;
             cheating = false;
+            influencingTable = false;
             cheatCards.Clear();
             int eliminatedPlayers = 0;
             for (int i = 0; i < table.players.Length; i++)
@@ -1210,22 +1217,46 @@ public class DealerManager : MonoBehaviour
 
     public void InsultPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
-        if (table.players[seatPos].PlayerEmotion == PlayerEmotion.OnTilt)
+        if (!influencingTable)
         {
-            table.players[seatPos].PlayerEmotion = PlayerEmotion.OnTilt;
+            influencingTable = true;
+            int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+            if (table.players[seatPos].PlayerEmotion == PlayerEmotion.OnTilt)
+            {
+                table.players[seatPos].PlayerEmotion = PlayerEmotion.OnTilt;
+            }
+            else
+            {
+                int randomNum = Random.Range(1, 4);
+                table.players[seatPos].PlayerEmotion += randomNum;
+                if (table.players[seatPos].PlayerEmotion >= PlayerEmotion.OnTilt)
+                {
+                    table.players[seatPos].PlayerEmotion = PlayerEmotion.OnTilt;
+                }
+            }
         }
-        else table.players[seatPos].PlayerEmotion += 1;
     }
 
     public void FlatterPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
-        if (table.players[seatPos].PlayerEmotion == PlayerEmotion.Joyous)
+        if (!influencingTable)
         {
-            table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;
+            influencingTable = true;
+            int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+            if (table.players[seatPos].PlayerEmotion == PlayerEmotion.Joyous)
+            {
+                table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;
+            }
+            else
+            {
+                int randomNum = Random.Range(1, 4);
+                table.players[seatPos].PlayerEmotion -= randomNum;
+                if (table.players[seatPos].PlayerEmotion == PlayerEmotion.Joyous)
+                {
+                    table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;
+                }
+            }
         }
-        else table.players[seatPos].PlayerEmotion -= 1;
     }
 
     public void ChangeEmotions()
