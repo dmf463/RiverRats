@@ -195,7 +195,7 @@ public class Player
         else
         {
             Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
-            Services.PlayerBehaviour.FCR_V2(player, returnRate);
+            Services.PlayerBehaviour.FCR(player, returnRate);
             //Services.PlayerBehaviour.FCR(player);
             Services.DealerManager.SetNextPlayer();
         }

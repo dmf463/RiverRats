@@ -7,5 +7,6 @@ public static class Services
     public static UIManager UIManager { get; set; }
     public static DealerManager DealerManager { get; set; }
     public static PlayerBehaviour PlayerBehaviour { get; set; }
+    public static PlayerBehaviorController PlayerBehaviorController { get; set; }
 
 }

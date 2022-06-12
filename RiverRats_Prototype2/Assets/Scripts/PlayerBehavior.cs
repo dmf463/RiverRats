@@ -183,7 +183,7 @@ public class PlayerBehaviour
         preflop_FCR_Tree.Update(player);
     }
 
-    public void FCR_V2(Player player, float returnRate)
+    public void FCR(Player player, float returnRate)
     {
         int randomNum = UnityEngine.Random.Range(0, 100);
         FCR_Tree = new Tree<Player>(new Selector<Player>(
@@ -192,9 +192,12 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 0.8),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 5), //BLUFF
+                        new Condition<Player>(context => randomNum < 5), //RAISE 
                         new HasEnoughMoney(),
                         new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0) //CALL
                         ),
                     new Sequence<Player>(
                         new BetIsZero(),
@@ -210,12 +213,12 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.0),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 5),
+                        new Condition<Player>(context => randomNum < 5), //CALL
                         new HasEnoughMoney(),
                         new Call()
                         ),
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 15), //BLUFF
+                        new Condition<Player>(context => randomNum < 15), //RAISE
                         new HasEnoughMoney(),
                         new Raise()
                         ),
@@ -233,10 +236,11 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.3),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 40),
+                        new Condition<Player>(context => randomNum < 40), //RAISE
                         new Raise()
                         ),
                     new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 100), //CALL
                         new Call()
                         ),
                     new Sequence<Player>(
@@ -252,6 +256,18 @@ public class PlayerBehaviour
             new Sequence<Player>(
                 new Condition<Player>(context => returnRate >= 1.3),
                 new Selector<Player>(
+                        new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //CALL
+                        new Call()
+                        ),
+                        new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0),//RAISE
+                        new Raise()
+                        ),
+                        new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0),//FOLD
+                        new Fold()
+                        ),
                         new Sequence<Player>(
                         new Not<Player>(new HasEnoughMoney()),
                         new Not<Player>(new HasHighChanceOfWinning()),
@@ -296,7 +312,7 @@ public class PlayerBehaviour
         FCR_Tree.Update(player);
     }
     
-    public void FCR(Player player)
+    public void FCR_Old(Player player)
     {
         FCR_Tree = new Tree<Player>(new Selector<Player>(
               //BLUFF
