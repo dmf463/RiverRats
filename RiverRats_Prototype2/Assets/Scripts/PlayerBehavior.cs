@@ -131,22 +131,22 @@ public class PlayerBehaviour
     //    player.actedThisRound = true;
     //}
 
-    public void Preflop_FCR(Player player)
+    public void Preflop_FCR_Neutral(Player player)
     {
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
 
           //PROTECT YOUR STACK
           new Sequence<Player>(
-              //new Not<Player>(new NeedToProtectStack()),
+              new Not<Player>(new HasEnoughMoney()),
               new HasAGreatHand_PreFlop(),
-              new AllIn()
+              new AllIn() //ACTION
               ),
           //RAISE ON A GOOD HAND
           new Sequence<Player>(
               //new NeedToProtectStack(),
               new HasAGreatHand_PreFlop(),
               new Not<Player>(new RaisedAlready()),
-              new Raise()
+              new Raise() //ACTION
               ),
           //CALL ON DECENT HAND OR IF SMALL BLIND OR BIG BLIND
           new Sequence<Player>(
@@ -154,7 +154,7 @@ public class PlayerBehaviour
               new Selector<Player>(
                   new Sequence<Player>(
                       new IsSmallBlind(),
-                      new Call()
+                      new Call()//ACTION
                       ),
                   new Sequence<Player>(
                       new IsBigBlind(),
@@ -183,7 +183,126 @@ public class PlayerBehaviour
         preflop_FCR_Tree.Update(player);
     }
 
-    public void FCR(Player player, float returnRate)
+    public void PreFlop_FCR_Neutral_V2(Player player)
+    {
+        /*
+         * Bad Hand <= 4
+           Decent Hand > 4 <12
+           Great Hand >= 12
+         */
+        int randomNum = UnityEngine.Random.Range(0, 100);
+        preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
+        #region bad hand
+            new Sequence<Player>(
+                new HasABadHand_PreFlop(),//BAD HANDS
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 5),//RAISE, BLUFE
+                        new HasEnoughMoney(),
+                        new Not<Player>(new SomeoneHasRaised()),
+                        new Raise()
+                         )
+                    ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //CALL. No way we're calling 
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new IsBigBlind(),
+                        new Call() //I mean, we'll check it on the big blind. 
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 40),
+                        new HasEnoughMoney(),
+                        new IsSmallBlind(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    ),
+        #endregion
+        #region Decent hand    
+            new Sequence<Player>(
+                    new HasADecentHand_Preflop(), //DECENT HAND
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 5), //RAISE, BLUFF
+                        new HasEnoughMoney(),
+                        new Not<Player>(new SomeoneHasRaised()),
+                        new Raise()
+                        ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 40), //CALL FOR SHITS AND GIGLES
+                            new HasEnoughMoney(),
+                            new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) != 0),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new IsSmallBlind(),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Fold()
+                            )
+                        )
+                    ),
+        #region good hand
+            new Sequence<Player>(
+                new HasAGoodHand_Preflop(),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new AllIn()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 40),
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new Call()
+                        )
+                    )
+                ),
+        #endregion
+        #endregion
+        #region great hand
+                new Sequence<Player>(
+                    new HasAGreatHand_PreFlop(),
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new AllIn()
+                        ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 30),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Not<Player>(new RaisedAlready()),
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 70),
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Call()
+                            )
+                        )
+                    )
+        #endregion
+                ));
+        preflop_FCR_Tree.Update(player);
+    }
+
+    public void FCR_Neutral(Player player, float returnRate)
     {
         int randomNum = UnityEngine.Random.Range(0, 100);
         FCR_Tree = new Tree<Player>(new Selector<Player>(
@@ -192,7 +311,7 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 0.8),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 5), //RAISE 
+                        new Condition<Player>(context => randomNum < 5), //RAISE, BLUFF
                         new HasEnoughMoney(),
                         new Raise()
                         ),
@@ -403,9 +522,6 @@ public class PlayerBehaviour
         FCR_Tree.Update(player);
     }
 
-
-  
-
     ///////////////////////////////
     ///////////NODES///////////////
     ///////////////////////////////
@@ -526,26 +642,39 @@ public class PlayerBehaviour
         }
     }
 
+    private class HasADecentHand_Preflop : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            if (player.HandStrength > 4 && player.HandStrength <= 10)
+            {
+                //Debug.Log("has a decent hand pre flop");
+            }
+            //else Debug.Log("Does not have a decent hand pre flop");
+            return player.HandStrength > 4 && player.HandStrength <= 10;
+        }
+    }
+
+    private class HasAGoodHand_Preflop : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            if (player.HandStrength > 10 && player.HandStrength < 14)
+            {
+                //Debug.Log("has a decent hand pre flop");
+            }
+            //else Debug.Log("Does not have a decent hand pre flop");
+            return player.HandStrength > 10 && player.HandStrength < 14;
+        }
+    }
+
     private class HasAGreatHand_PreFlop : Node<Player>
     {
         public override bool Update(Player player)
         {
             //if (player.HandStrength >= 12) Debug.Log("Has a great hand");
             //else Debug.Log("doesn't have a GREAT hand");
-            return player.HandStrength >= 12;
-        }
-    }
-
-    private class HasADecentHand_Preflop : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            if (player.HandStrength > 4 && player.HandStrength < 12)
-            {
-                //Debug.Log("has a decent hand pre flop");
-            }
-            //else Debug.Log("Does not have a decent hand pre flop");
-            return player.HandStrength > 4 && player.HandStrength < 12;
+            return player.HandStrength >= 14;
         }
     }
 

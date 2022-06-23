@@ -189,13 +189,13 @@ public class Player
     {
         if (Services.TableManager.gameState == GameState.PreFlop)
         {
-            Services.PlayerBehaviour.Preflop_FCR(player);
+            Services.PlayerBehaviour.Preflop_FCR_Neutral(player);
             Services.DealerManager.SetNextPlayer();
         }
         else
         {
             Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
-            Services.PlayerBehaviour.FCR(player, returnRate);
+            Services.PlayerBehaviour.FCR_Neutral(player, returnRate);
             //Services.PlayerBehaviour.FCR(player);
             Services.DealerManager.SetNextPlayer();
         }
