@@ -190,6 +190,9 @@ public class Player
         if (Services.TableManager.gameState == GameState.PreFlop)
         {
             Services.PlayerBehaviour.Preflop_FCR_Neutral(player);
+            Services.DealerManager.preFlopHandCount++;
+            Services.DealerManager.accumulatedHS += HandStrength;
+            Services.DealerManager.averageHS = (Services.DealerManager.accumulatedHS / Services.DealerManager.preFlopHandCount);
             Services.DealerManager.SetNextPlayer();
         }
         else

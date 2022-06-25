@@ -33,6 +33,9 @@ public class DealerManager : MonoBehaviour
     //private List<CardType> trips;
     #endregion
     //public bool roundFinished;
+    public float preFlopHandCount = 0;
+    public float accumulatedHS = 0;
+    public float averageHS = 0;
 
     void Start()
     {

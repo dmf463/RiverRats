@@ -189,8 +189,24 @@ public class PlayerBehaviour
          * Bad Hand <= 4
            Decent Hand > 4 <12
            Great Hand >= 12
+           IsChipLeader
+           InPosition
+           BeforeRiver
+           BetIsZero
+           BetPreflop
+           RaisedAlready
+           SomeoneHasRaised
          */
+
         int randomNum = UnityEngine.Random.Range(0, 100);
+        randomNum += IsInPosition_Mod(player, 10);
+        randomNum += IsChipLeader_Mod(player, 10);
+        randomNum += BeforeRiver_Mod(player, 10);
+        randomNum += BetIsZero_Mod(player, 10);
+        randomNum += BetPreFlop_Mod(player, 10);
+        randomNum += RaisedAlready_Mod(player, 10);
+        randomNum -= SomeoneHasRaise_Mod(player, 10);
+
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
         #region bad hand
             new Sequence<Player>(
@@ -223,7 +239,7 @@ public class PlayerBehaviour
                         )
                     ),
         #endregion
-        #region Decent hand    
+        #region Decent hand: The Average Hand. MAKES SENSE. 
             new Sequence<Player>(
                     new HasADecentHand_Preflop(), //DECENT HAND
                     new Selector<Player>(
@@ -234,7 +250,7 @@ public class PlayerBehaviour
                         new Raise()
                         ),
                         new Sequence<Player>(
-                            new Condition<Player>(context => randomNum < 40), //CALL FOR SHITS AND GIGLES
+                            new Condition<Player>(context => randomNum < 20), //CALL FOR SHITS AND GIGLES
                             new HasEnoughMoney(),
                             new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) != 0),
                             new Call()
@@ -534,24 +550,240 @@ public class PlayerBehaviour
             return player.lossCount > 5;
         }
     }
+    #region IsChipLeader
+    private class IsChipLeader : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            for (int i = 0; i < Services.TableManager.players.Length; i++)
+            {
+                if (player != Services.TableManager.players[i] && player.ChipCount < Services.TableManager.players[i].ChipCount)
+                    //Debug.Log("Is not chip leader");
+                    return false;
+            }
+            //Debug.Log("Is chip leader");
+            return true;
+        }
+    }
 
-    //private class LostManyHandsToOpponent : Node<Player>
-    //{
-    //    public override bool Update(Player player)
-    //    {
-    //        if (Services.DealerManager.ActivePlayerCount() == 2)
-    //        {
-    //            for (int i = 0; i < Services.TableManager.players.Length; i++)
-    //            {
-    //                if (Services.TableManager.players[i] != player && Services.TableManager.players[i].PlayerState == PlayerState.Playing)
-    //                {
-    //                    if (player.playersLostAgainst[Services.TableManager.players[i].SeatPos] > 10) return true;
-    //                }
-    //            }
-    //        }
-    //        return false;
-    //    }
-    //}
+    private bool IsChipLeader_Bool(Player player)
+    {
+        for (int i = 0; i < Services.TableManager.players.Length; i++)
+        {
+            if (player != Services.TableManager.players[i] && player.ChipCount < Services.TableManager.players[i].ChipCount)
+                //Debug.Log("Is not chip leader");
+                return false;
+        }
+        //Debug.Log("Is chip leader");
+        return true;
+    }
+
+    private int IsChipLeader_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (IsChipLeader_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
+
+    #region InPosition?
+    private class IsInPosition : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            bool inPosition;
+            if (Services.DealerManager.PlayerSeatsAwayFromDealerAmongstLivePlayers(Services.DealerManager.ActivePlayerCount() - 1) == player ||
+                Services.TableManager.players[Services.TableManager.DealerPosition] == player)
+            {
+                //Debug.Log("Player " + player.SeatPos + " is in position");
+                inPosition = true;
+            }
+            else
+            {
+                //Debug.Log("not in position");
+                inPosition = false;
+            }
+            return inPosition;
+        }
+    }
+
+    public bool IsInPosition_Bool(Player player)
+    {
+        bool inPosition;
+        if (Services.DealerManager.PlayerSeatsAwayFromDealerAmongstLivePlayers(Services.DealerManager.ActivePlayerCount() - 1) == player ||
+            Services.TableManager.players[Services.TableManager.DealerPosition] == player)
+        {
+            //Debug.Log("Player " + player.SeatPos + " is in position");
+            inPosition = true;
+        }
+        else
+        {
+            //Debug.Log("not in position");
+            inPosition = false;
+        }
+        return inPosition;
+    }
+
+    public int IsInPosition_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (IsInPosition_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
+
+    #region BeforeRiver
+    private class BeforeRiver : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            //if (Services.TableManager.gameState < GameState.River) Debug.Log("before river");
+            //else Debug.Log("not before river");
+            return Services.TableManager.gameState < GameState.River;
+        }
+    }
+
+    private bool BeforeRiver_Bool(Player player)
+    {
+        return Services.TableManager.gameState < GameState.River;
+    }
+
+    private int BeforeRiver_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (BeforeRiver_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
+
+    #region BetIsZero
+    private class BetIsZero : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            //if (Services.DealerManager.lastBet == 0) Debug.Log("best is zero");
+            // else Debug.Log("Bet is not zero");
+            return Services.DealerManager.lastBet == 0;
+        }
+    }
+
+    private bool BetIsZero_Bool(Player player)
+    {
+        return Services.DealerManager.lastBet == 0;
+    }
+
+    private int BetIsZero_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if(BetIsZero_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
+
+    #region BetPreflop
+    private class BetPreFlop : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            if (Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise)
+            {
+                //Debug.Log("has best pre flop");
+            }
+            //else Debug.Log("has not bet preflop");
+            return Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise;
+        }
+    }
+
+    public bool BetPreFlop_Bool(Player player)
+    {
+        if (Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise)
+        {
+            //Debug.Log("has best pre flop");
+        }
+        //else Debug.Log("has not bet preflop");
+        return Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise;
+    }
+
+    private int BetPreFlop_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (BetPreFlop_Bool(player)) mod += modAmount;
+        return mod;
+    }
+
+    #endregion
+
+    #region RaisedAlready
+    private class RaisedAlready : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            if (player.lastAction == PlayerAction.Raise)
+            {
+                //Debug.Log("has raised already");
+            }
+            //else Debug.Log("has not raised"); 
+            return player.lastAction == PlayerAction.Raise;
+        }
+    }
+
+    private bool RaisedAlready_Bool(Player player)
+    {
+        if (player.lastAction == PlayerAction.Raise)
+        {
+            //Debug.Log("has raised already");
+        }
+        //else Debug.Log("has not raised"); 
+        return player.lastAction == PlayerAction.Raise;
+    }
+
+    private int RaisedAlready_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (RaisedAlready_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
+
+    #region SomeoneHasRaise
+    private class SomeoneHasRaised : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            foreach (Player p in Services.TableManager.players)
+            {
+                if (p != player && p.lastAction == PlayerAction.Raise)
+                {
+                    //Debug.Log("Someone has raised already");
+                    return true;
+                }
+            }
+            //Debug.Log("Nobody has raised");
+            return false;
+        }
+    }
+
+    private bool SomeoneHasRaised_Bool(Player player)
+    {
+        foreach (Player p in Services.TableManager.players)
+        {
+            if (p != player && p.lastAction == PlayerAction.Raise)
+            {
+                //Debug.Log("Someone has raised already");
+                return true;
+            }
+        }
+        //Debug.Log("Nobody has raised");
+        return false;
+    }
+
+    private int SomeoneHasRaise_Mod(Player player, int modAmount)
+    {
+        int mod = 0;
+        if (SomeoneHasRaised_Bool(player)) mod += modAmount;
+        return mod;
+    }
+    #endregion
 
     private class HasMoreMoneyThanOpponent : Node<Player>
     {
@@ -570,21 +802,6 @@ public class PlayerBehaviour
             }
             //Debug.Log("Does not have more money than oppoent");
             return false;
-        }
-    }
-
-    private class IsChipLeader : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            for (int i = 0; i < Services.TableManager.players.Length; i++)
-            {
-                if (player != Services.TableManager.players[i] && player.ChipCount < Services.TableManager.players[i].ChipCount)
-                    //Debug.Log("Is not chip leader");
-                    return false;
-            }
-            //Debug.Log("Is chip leader");
-            return true;
         }
     }
 
@@ -646,12 +863,12 @@ public class PlayerBehaviour
     {
         public override bool Update(Player player)
         {
-            if (player.HandStrength > 4 && player.HandStrength <= 10)
+            if (player.HandStrength > 4 && player.HandStrength <= 8)
             {
                 //Debug.Log("has a decent hand pre flop");
             }
             //else Debug.Log("Does not have a decent hand pre flop");
-            return player.HandStrength > 4 && player.HandStrength <= 10;
+            return player.HandStrength > 4 && player.HandStrength <= 8;
         }
     }
 
@@ -659,12 +876,12 @@ public class PlayerBehaviour
     {
         public override bool Update(Player player)
         {
-            if (player.HandStrength > 10 && player.HandStrength < 14)
+            if (player.HandStrength > 8 && player.HandStrength < 12)
             {
                 //Debug.Log("has a decent hand pre flop");
             }
             //else Debug.Log("Does not have a decent hand pre flop");
-            return player.HandStrength > 10 && player.HandStrength < 14;
+            return player.HandStrength > 9 && player.HandStrength < 12;
         }
     }
 
@@ -674,7 +891,7 @@ public class PlayerBehaviour
         {
             //if (player.HandStrength >= 12) Debug.Log("Has a great hand");
             //else Debug.Log("doesn't have a GREAT hand");
-            return player.HandStrength >= 14;
+            return player.HandStrength >= 12;
         }
     }
 
@@ -729,90 +946,26 @@ public class PlayerBehaviour
         }
     }
 
-    private class IsInPosition : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            bool inPosition;
-            if (Services.DealerManager.PlayerSeatsAwayFromDealerAmongstLivePlayers(Services.DealerManager.ActivePlayerCount() - 1) == player ||
-                Services.TableManager.players[Services.TableManager.DealerPosition] == player)
-            {
-                //Debug.Log("Player " + player.SeatPos + " is in position");
-                inPosition = true;
-            }
-            else
-            {
-                //Debug.Log("not in position");
-                inPosition = false;
-            }
-            return inPosition;
-        }
-    }
-
-    private class BeforeRiver : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            //if (Services.TableManager.gameState < GameState.River) Debug.Log("before river");
-            //else Debug.Log("not before river");
-            return Services.TableManager.gameState < GameState.River;
-        }
-    }
-
-    private class BetIsZero : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            //if (Services.DealerManager.lastBet == 0) Debug.Log("best is zero");
-           // else Debug.Log("Bet is not zero");
-            return Services.DealerManager.lastBet == 0;
-        }
-    }
-
-    private class BetPreFlop : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            if (Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise)
-            {
-                //Debug.Log("has best pre flop");
-            }
-            //else Debug.Log("has not bet preflop");
-            return Services.TableManager.gameState == GameState.Flop && player.lastAction == PlayerAction.Raise;
-        }
-    }
-
-    private class RaisedAlready : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            if (player.lastAction == PlayerAction.Raise)
-            {
-                //Debug.Log("has raised already");
-            }
-            //else Debug.Log("has not raised"); 
-            return player.lastAction == PlayerAction.Raise;
-        }
-    }
-
-    private class SomeoneHasRaised : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            foreach (Player p in Services.TableManager.players)
-            {
-                if (p != player && p.lastAction == PlayerAction.Raise)
-                {
-                    //Debug.Log("Someone has raised already");
-                    return true;
-                }
-            }
-            //Debug.Log("Nobody has raised");
-            return false;
-        }
-    }
+    //private class LostManyHandsToOpponent : Node<Player>
+    //{
+    //    public override bool Update(Player player)
+    //    {
+    //        if (Services.DealerManager.ActivePlayerCount() == 2)
+    //        {
+    //            for (int i = 0; i < Services.TableManager.players.Length; i++)
+    //            {
+    //                if (Services.TableManager.players[i] != player && Services.TableManager.players[i].PlayerState == PlayerState.Playing)
+    //                {
+    //                    if (player.playersLostAgainst[Services.TableManager.players[i].SeatPos] > 10) return true;
+    //                }
+    //            }
+    //        }
+    //        return false;
+    //    }
+    //}
 
     //////////ACTIONS//////////
+  
     private class Fold : Node<Player>
     {
         public override bool Update(Player player)

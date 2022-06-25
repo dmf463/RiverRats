@@ -393,23 +393,33 @@ public class HandEvaluator {
 
         if (incomingCards[1].rank != RankType.Ace)
         {
-            if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 0) handScore += 1;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 1) handScore -= 1;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 2) handScore -= 3;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 3) handScore -= 5;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank >= 4) handScore -= 6;
+            if ((int)incomingCards[1].rank >= 11)
+            {
+                if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 0) handScore += 3;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 1) handScore += 1;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 2) handScore -= 1;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 3) handScore -= 3;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank >= 4) handScore -= 6;
+            }
+            else
+            {
+                if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 0) handScore += 3;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 1) handScore -= 1;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 2) handScore -= 3;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 3) handScore -= 5;
+                else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank >= 4) handScore -= 6;
+            }
         }
         else
         {
-            if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 12) handScore += 3;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 11) handScore += 3;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 10) handScore += 3;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 9) handScore += 3;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 1) handScore += 5;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 2) handScore += 5;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 3) handScore += 5;
-            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 4) handScore += 5;
-
+            if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 12) handScore += 2;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 11) handScore += 2;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 10) handScore += 2;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 9) handScore += 2;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 1) handScore += 4;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 2) handScore += 4;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 3) handScore += 4;
+            else if ((int)incomingCards[1].rank - (int)incomingCards[0].rank == 4) handScore += 4;
         }
 
         if((int)incomingCards[0].rank < (int)RankType.Queen && 
