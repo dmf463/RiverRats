@@ -930,6 +930,7 @@ public class DealerManager : MonoBehaviour
         if (table.gameState == GameState.Showdown)
         {
             DetermineWinner();
+            RevealCards();
             foreach (Player player in table.players)
             {
                 if (player.PlayerState == PlayerState.Winner)
@@ -1149,11 +1150,11 @@ public class DealerManager : MonoBehaviour
                 #region //debug scripts
                 if (nextPlayer.PlayerState == PlayerState.Playing)
                 {
-                    Debug.Log("nextPlayer = " + nextPlayer.SeatPos);
-                    Debug.Log("nextPlayer.actedThisRound = " + nextPlayer.actedThisRound);
-                    Debug.Log("nextPlayer.currentBet = " + nextPlayer.currentBet + " and lastBet = " + lastBet);
-                    Debug.Log("nextPlayer.chipCount = " + nextPlayer.ChipCount);
-                    Debug.Log("nextPlayer.PlayerState = " + nextPlayer.PlayerState);
+                    //Debug.Log("nextPlayer = " + nextPlayer.SeatPos);
+                    //Debug.Log("nextPlayer.actedThisRound = " + nextPlayer.actedThisRound);
+                    //Debug.Log("nextPlayer.currentBet = " + nextPlayer.currentBet + " and lastBet = " + lastBet);
+                    //Debug.Log("nextPlayer.chipCount = " + nextPlayer.ChipCount);
+                    //Debug.Log("nextPlayer.PlayerState = " + nextPlayer.PlayerState);
                 }
                 #endregion 
                 if ((!nextPlayer.actedThisRound || nextPlayer.currentBet < lastBet) 
@@ -1190,7 +1191,25 @@ public class DealerManager : MonoBehaviour
                 else if(table.gameState == GameState.River)
                 {
                     table.gameState = GameState.Showdown;
+                    //if players are in hand, reveal their cards
+                    RevealCards();
                     ChooseWinner();
+                }
+            }
+        }
+    }
+
+    public void RevealCards()
+    {
+        Debug.Log("REVEALING");
+        for (int i = 0; i < table.players.Length; i++)
+        {
+            if (table.players[i].PlayerState == PlayerState.Winner || table.players[i].PlayerState == PlayerState.Loser)
+            {
+                for (int j = 0; j < table.players[i].holeCards.Count; j++)
+                {
+                    Debug.Log("Calling Set Card Image");
+                    Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
                 }
             }
         }

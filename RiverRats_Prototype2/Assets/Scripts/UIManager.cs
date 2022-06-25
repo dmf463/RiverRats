@@ -173,6 +173,20 @@ public class UIManager : MonoBehaviour
                 {
                     for (int card = 0; card < table.players[player].holeCards.Count; card++)
                     {
+                        playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack; //GetCardImage(cards[card]);
+                        playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
+                    }
+                }
+            }
+        }
+        else if(round == GameState.CleanUp || round == GameState.Showdown)
+        {
+            for (int player = 0; player < table.players.Length; player++)
+            {
+                if (des == table.playerDestinations[player])
+                {
+                    for (int card = 0; card < table.players[player].holeCards.Count; card++)
+                    {
                         playerHoleCards[player][card].GetComponent<Image>().sprite = GetCardImage(cards[card]);
                         playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
                     }

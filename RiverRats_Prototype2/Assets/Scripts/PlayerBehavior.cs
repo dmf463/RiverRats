@@ -107,88 +107,13 @@ public class PlayerBehaviour
         return mod;
     }
 
-    //public void PreFlopFoldCallRaise(Player player)
-    //{
-    //    if (((player.ChipCount - Services.DealerManager.lastBet) < (Services.TableManager.bigBlind * 4)) && player.HandStrength > 12)
-    //    {
-    //        player.AllIn();
-    //    }
-    //    else if (player.HandStrength > 12 && player.timesRaisedThisRound == 0) player.Raise();
-    //    else if (player.HandStrength < 4)
-    //    {
-    //        if ((Services.DealerManager.lastBet - player.currentBet == 0) ||
-    //            ((Services.DealerManager.lastBet - player.currentBet == Services.TableManager.smallBlind) &&
-    //               Services.DealerManager.ActivePlayerCount() == 2) &&
-    //               ((player.ChipCount - Services.DealerManager.lastBet) > (Services.TableManager.bigBlind * 4))) player.Call();
-    //        else player.Fold();
-    //    }
-    //    else
-    //    {
-    //        if (Services.DealerManager.raisesInRound > 1 && player.HandStrength < 8) player.Fold();
-    //        else player.Call();
-    //    }
-    //    //player.turnComplete = true;
-    //    player.actedThisRound = true;
-    //}
-
-    public void Preflop_FCR_Neutral(Player player)
-    {
-        preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
-
-          //PROTECT YOUR STACK
-          new Sequence<Player>(
-              new Not<Player>(new HasEnoughMoney()),
-              new HasAGreatHand_PreFlop(),
-              new AllIn() //ACTION
-              ),
-          //RAISE ON A GOOD HAND
-          new Sequence<Player>(
-              //new NeedToProtectStack(),
-              new HasAGreatHand_PreFlop(),
-              new Not<Player>(new RaisedAlready()),
-              new Raise() //ACTION
-              ),
-          //CALL ON DECENT HAND OR IF SMALL BLIND OR BIG BLIND
-          new Sequence<Player>(
-              //new NeedToProtectStack(),
-              new Selector<Player>(
-                  new Sequence<Player>(
-                      new IsSmallBlind(),
-                      new Call()//ACTION
-                      ),
-                  new Sequence<Player>(
-                      new IsBigBlind(),
-                      new Call()
-                      ),
-                  new Sequence<Player>(
-                      //new Not<Player>(new HasAGreatHand_PreFlop()),
-                      new Not<Player>(new HasABadHand_PreFlop()),
-                      new Call()
-                      )
-                  )
-              ),
-          //SOMEONE RAISED AND YOU DONT HAVE A GREAT HAND
-          new Sequence<Player>(
-              new SomeoneHasRaised(),
-              new Condition<Player>(p => player.HandStrength > 6),
-              new Call()
-              ),
-          //CALL ON BIG BLIND EVEN IF LOW STACK IF NO ONE RAISED
-          new Sequence<Player>(
-              new IsBigBlind(),
-              new Call()
-              ),
-          new Fold()
-          ));
-        preflop_FCR_Tree.Update(player);
-    }
-
-    public void PreFlop_FCR_Neutral_V2(Player player)
+    public void PreFlop_FCR_Neutral(Player player)
     {
         /*
          * Bad Hand <= 4
-           Decent Hand > 4 <12
-           Great Hand >= 12
+           Decent Hand >4 && <=8
+           Good Hand >8 && <12
+           Great Hand >=12
            IsChipLeader
            InPosition
            BeforeRiver
@@ -205,7 +130,6 @@ public class PlayerBehaviour
         randomNum += BetIsZero_Mod(player, 10);
         randomNum += BetPreFlop_Mod(player, 10);
         randomNum += RaisedAlready_Mod(player, 10);
-        randomNum -= SomeoneHasRaise_Mod(player, 10);
 
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
         #region bad hand
@@ -217,8 +141,7 @@ public class PlayerBehaviour
                         new HasEnoughMoney(),
                         new Not<Player>(new SomeoneHasRaised()),
                         new Raise()
-                         )
-                    ),
+                        ),
                     new Sequence<Player>(
                         new Condition<Player>(context => randomNum < 0), //CALL. No way we're calling 
                         new HasEnoughMoney(),
@@ -237,7 +160,8 @@ public class PlayerBehaviour
                     new Sequence<Player>(
                         new Fold()
                         )
-                    ),
+                    )
+                ),
         #endregion
         #region Decent hand: The Average Hand. MAKES SENSE. 
             new Sequence<Player>(
@@ -264,6 +188,7 @@ public class PlayerBehaviour
                             )
                         )
                     ),
+        #endregion
         #region good hand
             new Sequence<Player>(
                 new HasAGoodHand_Preflop(),
@@ -271,6 +196,10 @@ public class PlayerBehaviour
                     new Sequence<Player>(
                         new Not<Player>(new HasEnoughMoney()),
                         new AllIn()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) <= 0),
+                        new Fold()
                         ),
                     new Sequence<Player>(
                         new Condition<Player>(context => randomNum < 40),
@@ -286,7 +215,6 @@ public class PlayerBehaviour
                         )
                     )
                 ),
-        #endregion
         #endregion
         #region great hand
                 new Sequence<Player>(
@@ -321,6 +249,7 @@ public class PlayerBehaviour
     public void FCR_Neutral(Player player, float returnRate)
     {
         int randomNum = UnityEngine.Random.Range(0, 100);
+
         FCR_Tree = new Tree<Player>(new Selector<Player>(
             //LOW RETURN RATE
             new Sequence<Player>(
@@ -348,12 +277,17 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.0),
                 new Selector<Player>(
                     new Sequence<Player>(
+                        new BeingPutAllIn(),
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
                         new Condition<Player>(context => randomNum < 5), //CALL
                         new HasEnoughMoney(),
                         new Call()
                         ),
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 15), //RAISE
+                        new Condition<Player>(context => randomNum < 20), //RAISE
                         new HasEnoughMoney(),
                         new Raise()
                         ),
@@ -371,7 +305,17 @@ public class PlayerBehaviour
                 new Condition<Player>(context => returnRate < 1.3),
                 new Selector<Player>(
                     new Sequence<Player>(
-                        new Condition<Player>(context => randomNum < 40), //RAISE
+                        new BeingPutAllIn(),
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(),
+                        new Condition<Player>(context => randomNum < 60),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 60), //RAISE
                         new Raise()
                         ),
                     new Sequence<Player>(
@@ -410,12 +354,22 @@ public class PlayerBehaviour
                         new Call()
                         ),
                     new Sequence<Player>(
+                        new BeingPutAllIn(),
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
                         new Not<Player>(new HasEnoughMoney()),
                         new Not<Player>(new HasHighChanceOfWinning()),
                         new Fold()
                         ),
                     new Sequence<Player>(
                         new Condition<Player>(context => randomNum < 30),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(),
+                        new Condition<Player>(context => randomNum < 70),
                         new Call()
                         ),
                     new Sequence<Player>(
@@ -430,7 +384,7 @@ public class PlayerBehaviour
                         )
                     )
                 ),
-            //FALL BACK SEQUENCE
+             //FALL BACK SEQUENCE
              new Sequence<Player>(
                   new Selector<Player>(
                       new Sequence<Player>(
@@ -446,82 +400,276 @@ public class PlayerBehaviour
             ));
         FCR_Tree.Update(player);
     }
-    
-    public void FCR_Old(Player player)
+
+    public void PreFlop_FCR_Conservative(Player player)
     {
-        FCR_Tree = new Tree<Player>(new Selector<Player>(
-              //BLUFF
-              new Sequence<Player>(
-                  new HasABadHand(),
-                  new HasEnoughMoney(),
-                  new BetIsZero(),
-                  new IsInPosition(),
-                  new Raise()
-                  ),
-              //CONTINUATION
-              new Sequence<Player>(
-                  new BetPreFlop(),
-                  new Condition<Player>(context => player.Hand.HandValues.PokerHand <= PokerHand.OnePair),
-                  new BetIsZero(),
-                  new HasEnoughMoney(),
-                  new Raise()
-                  ),
-              //SLOW PLAY
-              new Sequence<Player>(
-                  new HasAGreathand(),
-                  new Condition<Player>(context => Services.DealerManager.ActivePlayerCount() <= 3),
-                  new BeforeRiver(),
-                  new Selector<Player>(
-                      new Sequence<Player>(
-                          new BetIsZero(),
-                          new Raise()
-                          ),
-                      new Sequence<Player>(
-                          new Not<Player>(new BetIsZero()),
-                          new Call()
-                          )
-                      )
-                  ),
-              //POSITION PLAY
-              new Sequence<Player>(
-                  new IsInPosition(),
-                  new Selector<Player>(
-                      new Sequence<Player>(
-                          new BetIsZero(),
-                          new Raise()
-                      ),
-                      new Sequence<Player>(
-                          new Not<Player>(new BetIsZero()),
-                          new HasAGoodHand(),
-                          new Call()
-                      )
-                  )
-              ),
-              //RAISE
-              new Sequence<Player>(
-                  //new HasEnoughMoney(),
-                  new Not<Player>(new RaisedAlready()),
-                  new HasAGreathand(),
-                  new Raise()
-              ),
-               //CALL
-               new Sequence<Player>(
-                   //new HasEnoughMoney(),
-                   new Selector<Player>(
-                       new Sequence<Player>(
-                           new HasAGoodHand(),
-                           new Not<Player>(new BetIsZero()),
-                           new Call()
-                           ),
-                       new Sequence<Player>(
-                           new HasAGreathand(),
-                           new Not<Player>(new BetIsZero()),
-                           new Call()
-                           )
+        /*
+         * Bad Hand <= 4
+           Decent Hand >4 && <=8
+           Good Hand >8 && <12
+           Great Hand >=12
+           IsChipLeader
+           InPosition
+           BeforeRiver
+           BetIsZero
+           BetPreflop
+           RaisedAlready
+           SomeoneHasRaised
+         */
+
+        int randomNum = UnityEngine.Random.Range(0, 100);
+        randomNum += IsInPosition_Mod(player, 10);
+        randomNum += IsChipLeader_Mod(player, 10);
+        randomNum += BeforeRiver_Mod(player, 10);
+        randomNum += BetIsZero_Mod(player, 10);
+        randomNum += BetPreFlop_Mod(player, 10);
+        randomNum += RaisedAlready_Mod(player, 10);
+
+        preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
+        #region bad hand
+            new Sequence<Player>(
+                new HasABadHand_PreFlop(),//BAD HANDS
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0),//RAISE, BLUFE
+                        new HasEnoughMoney(),
+                        new Not<Player>(new SomeoneHasRaised()),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //CALL. No way we're calling 
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new IsBigBlind(),
+                        new Call() //I mean, we'll check it on the big blind. 
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 10),
+                        new HasEnoughMoney(),
+                        new IsSmallBlind(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
                     )
-               ),
-              //FOLD
-              new Sequence<Player>(
+                ),
+        #endregion
+        #region Decent hand: The Average Hand. MAKES SENSE. 
+            new Sequence<Player>(
+                    new HasADecentHand_Preflop(), //DECENT HAND
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 0), //no way we're bluffing
+                            new HasEnoughMoney(),
+                            new Not<Player>(new SomeoneHasRaised()),
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 0), //Hell no not calling
+                            new HasEnoughMoney(),
+                            new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) != 0),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 30), //MAYBE we'll call
+                            new IsSmallBlind(),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Fold()
+                            )
+                        )
+                    ),
+        #endregion
+        #region good hand
+            new Sequence<Player>(
+                new HasAGoodHand_Preflop(),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new AllIn()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) <= 0),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 10), //MAYBE we'll raise with this hand, but idk luck has been bad.
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //this is the first time I've gotten a hand in forever, I'm not throwing it away unless someone raised
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new Call()
+                        )
+                    )
+                ),
+        #endregion
+        #region great hand
+                new Sequence<Player>(
+                    new HasAGreatHand_PreFlop(),
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), //no money? great hand? ALL IN. 
+                        new AllIn()
+                        ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 10), //FINALLY, a good hand. I'm probably going to raise this
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Not<Player>(new RaisedAlready()), //if I haven't raised once. I'M DEFINITELY RAISING
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 80), //Oh you raised on me? FUCK YOU. Raise you back. 
+                            new Raise()
+                            ),
+                        new Sequence<Player>( //Fine, let's see the flop. 
+                            new Call()
+                            )
+                        )
+                    )
+        #endregion
+                ));
+        preflop_FCR_Tree.Update(player);
+    }
+
+    public void FCR_Conservative(Player player, float returnRate)
+    {
+        int randomNum = UnityEngine.Random.Range(0, 100);
+
+        FCR_Tree = new Tree<Player>(new Selector<Player>(
+            //LOW RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 0.8),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //No fucking way we're bluffing
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //Absolutely not calling with this trash
+                        new Call()
+                        ),
+                    new Sequence<Player>( //I mean fine, the bet is zero and I'm in the hand, I guess I'll call. 
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>( //get this shit out of here. 
+                        new Fold()
+                        )
+                    )
+                ),
+            //MEDIUM RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.0),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new BeingPutAllIn(), //you're gonna put me all in?
+                        new Not<Player>(new HasHighChanceOfWinning()), //with this shit?
+                        new Fold() //fuck you dealer
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //I keep missing the fucking flop
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //Hell no I'm not raising
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(), //I mean fine. You wanna check? I'll check. 
+                        new Call()
+                        ),
+                    new Sequence<Player>( //fuck off with these cards.  
+                        new Fold()
+                        )
+                    )
+                ),
+            //HIGH RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.3),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new BeingPutAllIn(), //you're putting me all in
+                        new Not<Player>(new HasHighChanceOfWinning()), //with THIS hand?
+                        new Fold() //gtfo of here
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(), //you raised?
+                        new Condition<Player>(context => randomNum < 30), //man idk with this hand
+                        new Call() //sure why not, maybe this time I'll hit
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0), //No fucking way I'm raising. Not with the hands I'm getting. 
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 70), //Best hand I've gotten in a while, but what if I lose again?
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),//you check to me? thank god, I get to see another card! CHECK CHECK CHECK
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold() //I fucking hate my life
+                        )
+                    )
+                ),
+            //VERY HIGH RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate >= 1.3),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), //fuck, I have no money... 
+                        new Not<Player>(new HasHighChanceOfWinning()),//my cards are trash..
+                        new BetIsZero(),//but you're checking, so sure, I'll check
+                        new Call() //CHECK
+                        ),
+                    new Sequence<Player>( 
+                        new BeingPutAllIn(), //you're putting me all in...
+                        new Not<Player>(new HasHighChanceOfWinning()), //with this fucking hand
+                        new Fold() //yeah, I'm out
+                        ),
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), //I'm so broke...
+                        new Not<Player>(new HasHighChanceOfWinning()), //My cards suck
+                        new Fold() //I'm out of here
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(), //you people keep RAISING
+                        new Condition<Player>(context => randomNum < 40), //god I just need to see this hand through
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 60), //I guess I'll just fucking call, this is my only good hand
+                        new Call()
+                        ),
+                    new Sequence<Player>( //FINALLY Dealer, you give me SOMETHING. I raise, you freaking donkeys. 
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+             //FALL BACK SEQUENCE
+             new Sequence<Player>(
                   new Selector<Player>(
                       new Sequence<Player>(
                           new BetIsZero(),
@@ -532,24 +680,309 @@ public class PlayerBehaviour
                       new Fold()
                       )
                   )
-              ),
-              new Fold()
-              ));
+              )
+            ));
         FCR_Tree.Update(player);
     }
+
+    public void PreFlop_FCR_Liberal(Player player)
+    {
+        /*
+         * Liberal players are having fun and seeing a shit ton of hands
+         * 
+         * Bad Hand <= 4
+           Decent Hand >4 && <=8
+           Good Hand >8 && <12
+           Great Hand >=12
+           IsChipLeader
+           InPosition
+           BeforeRiver
+           BetIsZero
+           BetPreflop
+           RaisedAlready
+           SomeoneHasRaised
+         */
+
+        int randomNum = UnityEngine.Random.Range(0, 100);
+        randomNum += IsInPosition_Mod(player, 10);
+        randomNum += IsChipLeader_Mod(player, 10);
+        randomNum += BeforeRiver_Mod(player, 10);
+        randomNum += BetIsZero_Mod(player, 10);
+        randomNum += BetPreFlop_Mod(player, 10);
+        randomNum += RaisedAlready_Mod(player, 10);
+
+        preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
+        #region bad hand
+            new Sequence<Player>(
+                new HasABadHand_PreFlop(),//BAD HANDS
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 10),//Fuck it, bad hand, let's have fun
+                        new HasEnoughMoney(),
+                        new Not<Player>(new SomeoneHasRaised()),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 20), //hell yeah, let's see the flop 
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new IsBigBlind(),
+                        new Call() //I mean, we'll check it on the big blind. 
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 100),
+                        new HasEnoughMoney(),
+                        new IsSmallBlind(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+        #endregion
+        #region Decent hand: The Average Hand. MAKES SENSE. 
+            new Sequence<Player>(
+                    new HasADecentHand_Preflop(), //DECENT HAND
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 20), //hell yeah, let's bluff
+                            new HasEnoughMoney(),
+                            new Not<Player>(new RaisedAlready()),
+                            new Not<Player>(new SomeoneHasRaised()),
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 50), //let's see these hands
+                            new HasEnoughMoney(),
+                            new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) != 0),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 100), //MAYBE we'll call
+                            new IsSmallBlind(),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Fold()
+                            )
+                        )
+                    ),
+        #endregion
+        #region good hand
+            new Sequence<Player>(
+                new HasAGoodHand_Preflop(),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()),
+                        new AllIn()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => (player.ChipCount - Services.DealerManager.lastBet) <= 0),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 50), //LOL PAY TO PLAYYYY
+                        new Not<Player>(new RaisedAlready()),
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 0),
+                        new Fold()
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(),
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Call()
+                        )
+                    )
+                ),
+        #endregion
+        #region great hand
+                new Sequence<Player>(
+                    new HasAGreatHand_PreFlop(),
+                    new Selector<Player>(
+                        new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), //no money? great hand? ALL IN. 
+                        new AllIn()
+                        ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 20),
+                            new Call()
+                            ),
+                        new Sequence<Player>(
+                            new Not<Player>(new RaisedAlready()), //if I haven't raised once. I'M DEFINITELY RAISING
+                            new Raise()
+                            ),
+                        new Sequence<Player>(
+                            new Condition<Player>(context => randomNum < 50), //Oh you raised on me? FUCK YOU. Raise you back. 
+                            new HasHighChanceOfWinning(),
+                            new Raise()
+                            ),
+                        new Sequence<Player>( //Fine, let's see the flop. 
+                            new Call()
+                            )
+                        )
+                    )
+        #endregion
+                ));
+        preflop_FCR_Tree.Update(player);
+    }
+
+    public void FCR_Liberal(Player player, float returnRate)
+    {
+        int randomNum = UnityEngine.Random.Range(0, 100);
+
+        FCR_Tree = new Tree<Player>(new Selector<Player>(
+            //LOW RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 0.8),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 10), //maybe a little bluff, as a treat
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 30), //let's play poker, I call
+                        new Call()
+                        ),
+                    new Sequence<Player>( //free money
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>( //eh, maybe next time
+                        new Fold()
+                        )
+                    )
+                ),
+            //MEDIUM RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.0),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new BeingPutAllIn(), //you're gonna put me all in?
+                        new Not<Player>(new HasHighChanceOfWinning()), //ugh fine
+                        new Fold() //love you dealer, but no
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 30), //let's see them cards
+                        new HasEnoughMoney(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 50), //Hell yeah I'm raising
+                        new HasEnoughMoney(),
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(), //I mean fine. You wanna check? I'll check. 
+                        new Call()
+                        ),
+                    new Sequence<Player>( //fuck off with these cards.  
+                        new Fold()
+                        )
+                    )
+                ),
+            //HIGH RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate < 1.3),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new BeingPutAllIn(), //you're putting me all in
+                        new Not<Player>(new HasHighChanceOfWinning()), //again?!
+                        new Fold() //fine, fold
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(), //you raised?
+                        new Condition<Player>(context => randomNum < 40), //I love poker
+                        new Call() //LES PLAYYYY
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 70), //Pay to play. 
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 100), //Best hand I've gotten in a while, but what if I lose again?
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new BetIsZero(),
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Fold() 
+                        )
+                    )
+                ),
+            //VERY HIGH RETURN RATE
+            new Sequence<Player>(
+                new Condition<Player>(context => returnRate >= 1.3),
+                new Selector<Player>(
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), 
+                        new Not<Player>(new HasHighChanceOfWinning()),
+                        new BetIsZero(),
+                        new Call() //CHECK
+                        ),
+                    new Sequence<Player>(
+                        new BeingPutAllIn(), //you're putting me all in...
+                        new Not<Player>(new HasHighChanceOfWinning()), 
+                        new Fold() 
+                        ),
+                    new Sequence<Player>(
+                        new Not<Player>(new HasEnoughMoney()), 
+                        new Not<Player>(new HasHighChanceOfWinning()), 
+                        new Fold() //I'm out of here
+                        ),
+                    new Sequence<Player>(
+                        new SomeoneHasRaised(), 
+                        new Condition<Player>(context => randomNum < 20), 
+                        new Call()
+                        ),
+                    new Sequence<Player>(
+                        new Condition<Player>(context => randomNum < 30), //I guess I'll just fucking call, this is my only good hand
+                        new Call()
+                        ),
+                    new Sequence<Player>( //FINALLY Dealer, you give me SOMETHING. I raise, you freaking donkeys. 
+                        new Raise()
+                        ),
+                    new Sequence<Player>(
+                        new Fold()
+                        )
+                    )
+                ),
+             //FALL BACK SEQUENCE
+             new Sequence<Player>(
+                  new Selector<Player>(
+                      new Sequence<Player>(
+                          new BetIsZero(),
+                          new Call()
+                      ),
+                  new Sequence<Player>(
+                      new Not<Player>(new BetIsZero()),
+                      new Fold()
+                      )
+                  )
+              )
+            ));
+        FCR_Tree.Update(player);
+    }
+
+
 
     ///////////////////////////////
     ///////////NODES///////////////
     ///////////////////////////////
 
     /////////CONDITIONS///////////
-    private class IsOnALoseStreak : Node<Player>
-    {
-        public override bool Update(Player player)
-        {
-            return player.lossCount > 5;
-        }
-    }
+
     #region IsChipLeader
     private class IsChipLeader : Node<Player>
     {
@@ -785,6 +1218,14 @@ public class PlayerBehaviour
     }
     #endregion
 
+    private class IsOnALoseStreak : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            return player.lossCount > 5;
+        }
+    }
+
     private class HasMoreMoneyThanOpponent : Node<Player>
     {
         public override bool Update(Player player)
@@ -838,6 +1279,14 @@ public class PlayerBehaviour
                 //Debug.Log("Doesn't have enough money");
             }
             return (player.ChipCount - Services.DealerManager.lastBet) > Services.TableManager.bigBlind * 4;
+        }
+    }
+
+    private class BeingPutAllIn : Node<Player>
+    {
+        public override bool Update(Player player)
+        {
+            return (player.ChipCount - Services.DealerManager.lastBet) <= 0;
         }
     }
 
@@ -1014,4 +1463,173 @@ public class PlayerBehaviour
             return true;
         }
     }
+
+    public void FCR_Old(Player player)
+    {
+        FCR_Tree = new Tree<Player>(new Selector<Player>(
+              //BLUFF
+              new Sequence<Player>(
+                  new HasABadHand(),
+                  new HasEnoughMoney(),
+                  new BetIsZero(),
+                  new IsInPosition(),
+                  new Raise()
+                  ),
+              //CONTINUATION
+              new Sequence<Player>(
+                  new BetPreFlop(),
+                  new Condition<Player>(context => player.Hand.HandValues.PokerHand <= PokerHand.OnePair),
+                  new BetIsZero(),
+                  new HasEnoughMoney(),
+                  new Raise()
+                  ),
+              //SLOW PLAY
+              new Sequence<Player>(
+                  new HasAGreathand(),
+                  new Condition<Player>(context => Services.DealerManager.ActivePlayerCount() <= 3),
+                  new BeforeRiver(),
+                  new Selector<Player>(
+                      new Sequence<Player>(
+                          new BetIsZero(),
+                          new Raise()
+                          ),
+                      new Sequence<Player>(
+                          new Not<Player>(new BetIsZero()),
+                          new Call()
+                          )
+                      )
+                  ),
+              //POSITION PLAY
+              new Sequence<Player>(
+                  new IsInPosition(),
+                  new Selector<Player>(
+                      new Sequence<Player>(
+                          new BetIsZero(),
+                          new Raise()
+                      ),
+                      new Sequence<Player>(
+                          new Not<Player>(new BetIsZero()),
+                          new HasAGoodHand(),
+                          new Call()
+                      )
+                  )
+              ),
+              //RAISE
+              new Sequence<Player>(
+                  //new HasEnoughMoney(),
+                  new Not<Player>(new RaisedAlready()),
+                  new HasAGreathand(),
+                  new Raise()
+              ),
+               //CALL
+               new Sequence<Player>(
+                   //new HasEnoughMoney(),
+                   new Selector<Player>(
+                       new Sequence<Player>(
+                           new HasAGoodHand(),
+                           new Not<Player>(new BetIsZero()),
+                           new Call()
+                           ),
+                       new Sequence<Player>(
+                           new HasAGreathand(),
+                           new Not<Player>(new BetIsZero()),
+                           new Call()
+                           )
+                    )
+               ),
+              //FOLD
+              new Sequence<Player>(
+                  new Selector<Player>(
+                      new Sequence<Player>(
+                          new BetIsZero(),
+                          new Call()
+                      ),
+                  new Sequence<Player>(
+                      new Not<Player>(new BetIsZero()),
+                      new Fold()
+                      )
+                  )
+              ),
+              new Fold()
+              ));
+        FCR_Tree.Update(player);
+    }
+
+    //public void PreFlopFoldCallRaise(Player player)
+    //{
+    //    if (((player.ChipCount - Services.DealerManager.lastBet) < (Services.TableManager.bigBlind * 4)) && player.HandStrength > 12)
+    //    {
+    //        player.AllIn();
+    //    }
+    //    else if (player.HandStrength > 12 && player.timesRaisedThisRound == 0) player.Raise();
+    //    else if (player.HandStrength < 4)
+    //    {
+    //        if ((Services.DealerManager.lastBet - player.currentBet == 0) ||
+    //            ((Services.DealerManager.lastBet - player.currentBet == Services.TableManager.smallBlind) &&
+    //               Services.DealerManager.ActivePlayerCount() == 2) &&
+    //               ((player.ChipCount - Services.DealerManager.lastBet) > (Services.TableManager.bigBlind * 4))) player.Call();
+    //        else player.Fold();
+    //    }
+    //    else
+    //    {
+    //        if (Services.DealerManager.raisesInRound > 1 && player.HandStrength < 8) player.Fold();
+    //        else player.Call();
+    //    }
+    //    //player.turnComplete = true;
+    //    player.actedThisRound = true;
+    //}
+
+    public void Preflop_FCR_Neutral_Old(Player player)
+    {
+        preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
+
+          //PROTECT YOUR STACK
+          new Sequence<Player>(
+              new Not<Player>(new HasEnoughMoney()),
+              new HasAGreatHand_PreFlop(),
+              new AllIn() //ACTION
+              ),
+          //RAISE ON A GOOD HAND
+          new Sequence<Player>(
+              //new NeedToProtectStack(),
+              new HasAGreatHand_PreFlop(),
+              new Not<Player>(new RaisedAlready()),
+              new Raise() //ACTION
+              ),
+          //CALL ON DECENT HAND OR IF SMALL BLIND OR BIG BLIND
+          new Sequence<Player>(
+              //new NeedToProtectStack(),
+              new Selector<Player>(
+                  new Sequence<Player>(
+                      new IsSmallBlind(),
+                      new Call()//ACTION
+                      ),
+                  new Sequence<Player>(
+                      new IsBigBlind(),
+                      new Call()
+                      ),
+                  new Sequence<Player>(
+                      //new Not<Player>(new HasAGreatHand_PreFlop()),
+                      new Not<Player>(new HasABadHand_PreFlop()),
+                      new Call()
+                      )
+                  )
+              ),
+          //SOMEONE RAISED AND YOU DONT HAVE A GREAT HAND
+          new Sequence<Player>(
+              new SomeoneHasRaised(),
+              new Condition<Player>(p => player.HandStrength > 6),
+              new Call()
+              ),
+          //CALL ON BIG BLIND EVEN IF LOW STACK IF NO ONE RAISED
+          new Sequence<Player>(
+              new IsBigBlind(),
+              new Call()
+              ),
+          new Fold()
+          ));
+        preflop_FCR_Tree.Update(player);
+    }
 }
+
+

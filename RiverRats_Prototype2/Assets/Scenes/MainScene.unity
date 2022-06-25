@@ -4358,11 +4358,11 @@ MonoBehaviour:
   playerDestinations: 0000000001000000020000000300000004000000
   numActivePlayers: 5
   blindRound: 0
-  smallBlind: 100
-  bigBlind: 200
+  smallBlind: 25
+  bigBlind: 50
   pot: 0
   DealerPosition: 0
-  lowestChipDenomination: 0
+  lowestChipDenomination: 5
   gameState: 0
 --- !u!4 &787771489
 Transform:
@@ -10622,7 +10622,7 @@ GameObject:
   - component: {fileID: 1871261439}
   - component: {fileID: 1871261438}
   m_Layer: 5
-  m_Name: CollectMoney
+  m_Name: PromptPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

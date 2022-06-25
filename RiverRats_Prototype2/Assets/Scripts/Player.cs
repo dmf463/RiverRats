@@ -67,6 +67,7 @@ public class Player
                     //Debug.Log("We are getting into the fold and the chipCountToCheckWhenWinning = " + ChipCountToCheckWhenWinning);
                     Services.TableManager.gameState = GameState.CleanUp;
                     Services.DealerManager.SetAwardPlayer_Amount();
+                    Services.DealerManager.RevealCards();
                 }
             }
         }
@@ -189,7 +190,30 @@ public class Player
     {
         if (Services.TableManager.gameState == GameState.PreFlop)
         {
-            Services.PlayerBehaviour.Preflop_FCR_Neutral(player);
+            switch (PlayerEmotion)
+            {
+                case PlayerEmotion.Joyous:
+                    Services.PlayerBehaviour.PreFlop_FCR_Liberal(player);
+                    break;
+                case PlayerEmotion.Happy:
+                    Services.PlayerBehaviour.PreFlop_FCR_Liberal(player);
+                    break;
+                case PlayerEmotion.Amused:
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player);
+                    break;
+                case PlayerEmotion.Content:
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player);
+                    break;
+                case PlayerEmotion.Annoyed:
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player);
+                    break;
+                case PlayerEmotion.Angry:
+                    Services.PlayerBehaviour.PreFlop_FCR_Conservative(player);
+                    break;
+                case PlayerEmotion.OnTilt:
+                    Services.PlayerBehaviour.PreFlop_FCR_Conservative(player);
+                    break;
+            }
             Services.DealerManager.preFlopHandCount++;
             Services.DealerManager.accumulatedHS += HandStrength;
             Services.DealerManager.averageHS = (Services.DealerManager.accumulatedHS / Services.DealerManager.preFlopHandCount);
@@ -198,7 +222,30 @@ public class Player
         else
         {
             Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
-            Services.PlayerBehaviour.FCR_Neutral(player, returnRate);
+            switch (PlayerEmotion)
+            {
+                case PlayerEmotion.Joyous:
+                    Services.PlayerBehaviour.FCR_Liberal(player, returnRate);
+                    break;
+                case PlayerEmotion.Happy:
+                    Services.PlayerBehaviour.FCR_Liberal(player, returnRate);
+                    break;
+                case PlayerEmotion.Amused:
+                    Services.PlayerBehaviour.FCR_Neutral(player, returnRate);
+                    break;
+                case PlayerEmotion.Content:
+                    Services.PlayerBehaviour.FCR_Neutral(player, returnRate);
+                    break;
+                case PlayerEmotion.Annoyed:
+                    Services.PlayerBehaviour.FCR_Neutral(player, returnRate);
+                    break;
+                case PlayerEmotion.Angry:
+                    Services.PlayerBehaviour.FCR_Conservative(player, returnRate);
+                    break;
+                case PlayerEmotion.OnTilt:
+                    Services.PlayerBehaviour.FCR_Conservative(player, returnRate);
+                    break;
+            }
             //Services.PlayerBehaviour.FCR(player);
             Services.DealerManager.SetNextPlayer();
         }
