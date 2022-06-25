@@ -248,55 +248,25 @@ public class Scale : TimedGOTask
     }
 }
 
-public class DealCards_PulseUp : TimedTask
+public class LerpObjectColor_Image : TimedTask
 {
     private GameObject obj;
     private Color startColor;
     private Color endColor;
     private Easing.FunctionType easingType;
 
-    public DealCards_PulseUp(GameObject _obj, Color _start, Color _end, Easing.FunctionType _easingType, float duration) : base(duration)
+    public LerpObjectColor_Image(GameObject _obj, Color _start, Color _end, Easing.FunctionType _easingType, float duration) : base(duration)
     {
         obj = _obj;
         startColor = _start;
         endColor = _end;
         easingType = _easingType;
-        Services.UIManager.dealPulseReady = true;
     }
 
     protected override void OnTick(float t)
     {
         Easing.Function easingFunction = Easing.GetFunctionWithTypeEnum(easingType);
         obj.GetComponent<Image>().color = Color.Lerp(startColor, endColor, easingFunction(t));
-    }
-}
-
-public class DealCards_PulseDown : TimedTask
-{
-    private GameObject obj;
-    private Color startColor;
-    private Color endColor;
-    private Easing.FunctionType easingType;
-
-    public DealCards_PulseDown(GameObject _obj, Color _start, Color _end, Easing.FunctionType _easingType, float duration) : base(duration)
-    {
-        obj = _obj;
-        startColor = _start;
-        endColor = _end;
-        easingType = _easingType;
-        Services.UIManager.dealPulseReady = true;
-    }
-
-    protected override void OnTick(float t)
-    {
-        Easing.Function easingFunction = Easing.GetFunctionWithTypeEnum(easingType);
-        obj.GetComponent<Image>().color = Color.Lerp(startColor, endColor, easingFunction(t));
-    }
-
-    protected override void OnSuccess()
-    {
-        Services.UIManager.dealPulseReady = false;
-        Debug.Log("FINISHED");
     }
 }
 

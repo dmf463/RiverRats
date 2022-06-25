@@ -23,7 +23,7 @@ public class PlayerBehaviour
         int modifier = 0;
 
         if (minimumRaise == 0) minimumRaise = Services.TableManager.bigBlind;
-        if (Services.TableManager.gameState >= GameState.Turn) minimumRaise = Services.TableManager.pot / 4;
+        if (Services.TableManager.gameState >= GameState.Turn) minimumRaise = Services.TableManager.pot / (UnityEngine.Random.Range(3, 6));
         int remainder = minimumRaise % (int)Services.TableManager.lowestChipDenomination;
         if (remainder > 0)
         {
@@ -124,12 +124,12 @@ public class PlayerBehaviour
          */
 
         int randomNum = UnityEngine.Random.Range(0, 100);
-        randomNum += IsInPosition_Mod(player, 10);
-        randomNum += IsChipLeader_Mod(player, 10);
-        randomNum += BeforeRiver_Mod(player, 10);
-        randomNum += BetIsZero_Mod(player, 10);
-        randomNum += BetPreFlop_Mod(player, 10);
-        randomNum += RaisedAlready_Mod(player, 10);
+        //randomNum += IsInPosition_Mod(player, 10);
+        //randomNum += IsChipLeader_Mod(player, 10);
+        //randomNum += BeforeRiver_Mod(player, 10);
+        //randomNum += BetIsZero_Mod(player, 10);
+        //randomNum += BetPreFlop_Mod(player, 10);
+        //randomNum += RaisedAlready_Mod(player, 10);
 
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
         #region bad hand
@@ -418,12 +418,12 @@ public class PlayerBehaviour
          */
 
         int randomNum = UnityEngine.Random.Range(0, 100);
-        randomNum += IsInPosition_Mod(player, 10);
-        randomNum += IsChipLeader_Mod(player, 10);
-        randomNum += BeforeRiver_Mod(player, 10);
-        randomNum += BetIsZero_Mod(player, 10);
-        randomNum += BetPreFlop_Mod(player, 10);
-        randomNum += RaisedAlready_Mod(player, 10);
+        //randomNum += IsInPosition_Mod(player, 10);
+        //randomNum += IsChipLeader_Mod(player, 10);
+        //randomNum += BeforeRiver_Mod(player, 10);
+        //randomNum += BetIsZero_Mod(player, 10);
+        //randomNum += BetPreFlop_Mod(player, 10);
+        //randomNum += RaisedAlready_Mod(player, 10);
 
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
         #region bad hand
@@ -704,12 +704,12 @@ public class PlayerBehaviour
          */
 
         int randomNum = UnityEngine.Random.Range(0, 100);
-        randomNum += IsInPosition_Mod(player, 10);
-        randomNum += IsChipLeader_Mod(player, 10);
-        randomNum += BeforeRiver_Mod(player, 10);
-        randomNum += BetIsZero_Mod(player, 10);
-        randomNum += BetPreFlop_Mod(player, 10);
-        randomNum += RaisedAlready_Mod(player, 10);
+        //randomNum += IsInPosition_Mod(player, 10);
+        //randomNum += IsChipLeader_Mod(player, 10);
+        //randomNum += BeforeRiver_Mod(player, 10);
+        //randomNum += BetIsZero_Mod(player, 10);
+        //randomNum += BetPreFlop_Mod(player, 10);
+        //randomNum += RaisedAlready_Mod(player, 10);
 
         preflop_FCR_Tree = new Tree<Player>(new Selector<Player>(
         #region bad hand

@@ -48,6 +48,9 @@ public class UIManager : MonoBehaviour
     };//these visualize each of the players 2 cards
     public GameObject cheatCounter;
     public GameObject avgScore_HS;
+    public List<GameObject> playerToActBorder;
+    private Color borderColor_on;
+    private Color borderColor_off;
 
     
     void Start()
@@ -63,13 +66,20 @@ public class UIManager : MonoBehaviour
         PlayerToActUI();
     }
 
+    public void SetBorderImage()
+    {
+        borderColor_on = playerToActBorder[0].GetComponent<Image>().color;
+        borderColor_off = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, 0);
+
+        foreach(GameObject obj in playerToActBorder)
+        {
+            obj.GetComponent<Image>().color = borderColor_off;
+        }
+    }
+
     public void DealPulse()
     {
-        DealCards_PulseUp lerpUp = new DealCards_PulseUp(dealButton, Color.white, Color.red, Easing.FunctionType.Linear, 1f);
-        DealCards_PulseDown lerpDown = new DealCards_PulseDown(dealButton, Color.red, Color.white, Easing.FunctionType.Linear, 1f);
-
-        lerpUp.
-            Then(lerpDown);
+        LerpObjectColor_Image lerpUp = new LerpObjectColor_Image(dealButton, Color.white, Color.red, Easing.FunctionType.Linear, 1f);
 
         tm.Do(lerpUp);
     }
@@ -100,6 +110,7 @@ public class UIManager : MonoBehaviour
         }
         FindAllCardGameObjects(turn);
         FindAllCardGameObjects(river);
+        SetBorderImage();
     }
 
     private void UpdateTextOnScreen() //for all the things that need to update, keep them updated
@@ -173,7 +184,8 @@ public class UIManager : MonoBehaviour
                 {
                     for (int card = 0; card < table.players[player].holeCards.Count; card++)
                     {
-                        playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack; //GetCardImage(cards[card]);
+                        //playerHoleCards[player][card].GetComponent<Image>().sprite = GetCardImage(cards[card]);
+                        playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack;
                         playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
                     }
                 }
@@ -232,10 +244,22 @@ public class UIManager : MonoBehaviour
                 if (i == Services.DealerManager.playerToAct.SeatPos)
                 {
                     chipHolders[Services.DealerManager.playerToAct.SeatPos].GetComponent<Text>().color = Color.red;
+                    playerToActBorder[Services.DealerManager.playerToAct.SeatPos].GetComponent<Image>().color = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, borderColor_on.a);
+                    //LerpObjectColor_Image lerpUp = new LerpObjectColor_Image(playerToActBorder[i], borderColor_off, borderColor_on, Easing.FunctionType.Linear, .25f);
+
+                    //tm.Do(lerpUp);
                 }
                 else
                 {
                     chipHolders[i].GetComponent<Text>().color = Color.white;
+                    playerToActBorder[i].GetComponent<Image>().color = new Color(borderColor_off.r, borderColor_off.g, borderColor_off.b, borderColor_off.a);
+
+                    //if (playerToActBorder[i].GetComponent<Image>().color == borderColor_on)
+                    //{
+                    //    LerpObjectColor_Image lerpDown = new LerpObjectColor_Image(playerToActBorder[i], borderColor_on, borderColor_off, Easing.FunctionType.Linear, .05f);
+
+                    //    tm.Do(lerpDown);
+                    //}
                 }
             }
         }
@@ -244,6 +268,10 @@ public class UIManager : MonoBehaviour
             foreach(GameObject obj in chipHolders)
             {
                 obj.GetComponent<Text>().color = Color.white;
+            }
+            foreach(GameObject obj in playerToActBorder)
+            {
+                obj.GetComponent<Image>().color = new Color(borderColor_off.r, borderColor_off.g, borderColor_off.b, borderColor_off.a);
             }
         }
     }

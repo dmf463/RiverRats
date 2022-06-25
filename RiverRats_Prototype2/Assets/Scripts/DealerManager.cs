@@ -1074,7 +1074,6 @@ public class DealerManager : MonoBehaviour
         EvaluatePlayersOnShowdown(playersInHand);
     }
 
-
     public void EvaluatePlayersOnShowdown(List<Player> playersToEvaluate)
     {
         List<Player> sortedPlayers = new List<Player>(playersToEvaluate.
@@ -1167,6 +1166,7 @@ public class DealerManager : MonoBehaviour
                     break;
                 }
             }
+            if (OnlyAllInPlayersLeft()) RevealCards();
             if (roundFinished)
             {
                 //Debug.Log("round finished no one should do anything anymore, setting playerToAct = null");
@@ -1201,14 +1201,12 @@ public class DealerManager : MonoBehaviour
 
     public void RevealCards()
     {
-        Debug.Log("REVEALING");
         for (int i = 0; i < table.players.Length; i++)
         {
-            if (table.players[i].PlayerState == PlayerState.Winner || table.players[i].PlayerState == PlayerState.Loser)
+            if (table.players[i].PlayerState == PlayerState.Winner || table.players[i].PlayerState == PlayerState.Loser || table.players[i].PlayerState == PlayerState.Playing)
             {
                 for (int j = 0; j < table.players[i].holeCards.Count; j++)
                 {
-                    Debug.Log("Calling Set Card Image");
                     Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
                 }
             }
