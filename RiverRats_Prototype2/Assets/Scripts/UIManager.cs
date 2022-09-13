@@ -51,8 +51,10 @@ public class UIManager : MonoBehaviour
     public List<GameObject> playerToActBorder;
     private Color borderColor_on;
     private Color borderColor_off;
+    private Color targetPlayerColor;
 
-    
+
+
     void Start()
     {
         tm = new TaskManager();
@@ -70,6 +72,7 @@ public class UIManager : MonoBehaviour
     {
         borderColor_on = playerToActBorder[0].GetComponent<Image>().color;
         borderColor_off = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, 0);
+        targetPlayerColor = Color.blue;
 
         foreach(GameObject obj in playerToActBorder)
         {
@@ -243,23 +246,21 @@ public class UIManager : MonoBehaviour
             {
                 if (i == Services.DealerManager.playerToAct.SeatPos)
                 {
-                    chipHolders[Services.DealerManager.playerToAct.SeatPos].GetComponent<Text>().color = Color.red;
-                    playerToActBorder[Services.DealerManager.playerToAct.SeatPos].GetComponent<Image>().color = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, borderColor_on.a);
-                    //LerpObjectColor_Image lerpUp = new LerpObjectColor_Image(playerToActBorder[i], borderColor_off, borderColor_on, Easing.FunctionType.Linear, .25f);
-
-                    //tm.Do(lerpUp);
+                    if (i != Services.GameRules.targetPlayer.SeatPos)
+                    {
+                        chipHolders[Services.DealerManager.playerToAct.SeatPos].GetComponent<Text>().color = Color.red;
+                        playerToActBorder[Services.DealerManager.playerToAct.SeatPos].GetComponent<Image>().color = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, borderColor_on.a);
+                    }
+                    else
+                    {
+                        chipHolders[Services.DealerManager.playerToAct.SeatPos].GetComponent<Text>().color = Color.red;
+                        playerToActBorder[Services.DealerManager.playerToAct.SeatPos].GetComponent<Image>().color = new Color(targetPlayerColor.r, targetPlayerColor.g, targetPlayerColor.b, borderColor_on.a);
+                    }
                 }
                 else
                 {
                     chipHolders[i].GetComponent<Text>().color = Color.white;
                     playerToActBorder[i].GetComponent<Image>().color = new Color(borderColor_off.r, borderColor_off.g, borderColor_off.b, borderColor_off.a);
-
-                    //if (playerToActBorder[i].GetComponent<Image>().color == borderColor_on)
-                    //{
-                    //    LerpObjectColor_Image lerpDown = new LerpObjectColor_Image(playerToActBorder[i], borderColor_on, borderColor_off, Easing.FunctionType.Linear, .05f);
-
-                    //    tm.Do(lerpDown);
-                    //}
                 }
             }
         }
