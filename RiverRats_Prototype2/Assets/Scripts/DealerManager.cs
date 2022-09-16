@@ -1271,7 +1271,7 @@ public class DealerManager : MonoBehaviour
             {
                 int randomNum = Random.Range(1, 4);
                 table.players[seatPos].PlayerEmotion -= randomNum;
-                if (table.players[seatPos].PlayerEmotion == PlayerEmotion.Joyous)
+                if (table.players[seatPos].PlayerEmotion >= PlayerEmotion.Joyous)
                 {
                     table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;
                 }

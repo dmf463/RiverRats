@@ -41,6 +41,7 @@ public class GameRules : MonoBehaviour
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
+                Debug.Log("Rule Completed: " + rule.RuleText);
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
