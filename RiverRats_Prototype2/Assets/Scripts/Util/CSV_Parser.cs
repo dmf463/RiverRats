@@ -10,17 +10,13 @@ public class CSV_Parser : MonoBehaviour
     private char fieldSeperator = ',';
     private char lineSeperator = '\n';
     public string[] rawRules;
-    public List<Rule> Rules = new List<Rule>();
+    public List<Rule> OrganizedRules = new List<Rule>();
     
     // Start is called before the first frame update
     void Start()
     {
         ReadData();
         CreateRules();
-        for(int i = 0; i < Rules.Count; i++)
-        {
-            Debug.Log("rule = " + Rules[i].RuleName + " and target players are " + Rules[i].TargetPlayer0 + " and " + Rules[i].TargetPlayer1);
-        }
     }
 
     // Update is called once per frame
@@ -45,26 +41,50 @@ public class CSV_Parser : MonoBehaviour
             }
             if (ruleTargets.Count == 0)
             {
-                Rules.Add(new Rule(rule));
+                OrganizedRules.Add(new Rule(GetRuleName(rule)));
             }
             else if (ruleTargets.Count == 1)
             {
-                Rules.Add(new Rule(rule, ruleTargets[0]));
+                OrganizedRules.Add(new Rule(GetRuleName(rule), ruleTargets[0]));
             }
             else if (ruleTargets.Count == 2)
             {
-                Rules.Add(new Rule(rule, ruleTargets[0], ruleTargets[1]));
+                OrganizedRules.Add(new Rule(GetRuleName(rule), ruleTargets[0], ruleTargets[1]));
             }
         }
+
+        //for (int i = 0; i < OrganizedRules.Count; i++)
+        //{
+        //    Debug.Log("rule = " + OrganizedRules[i].RuleName + " and target players are " + OrganizedRules[i].TargetPlayer0 + " and " + OrganizedRules[i].TargetPlayer1);
+        //}
     }
 
     private void ReadData()
     {
         rawRules = rulesCSV.text.Split(lineSeperator, fieldSeperator);
-        for (int i = 0; i < rawRules.Length; i++)
+        //for (int i = 0; i < rawRules.Length; i++)
+        //{
+        //    Debug.Log(rawRules[i]);
+        //}
+    }
+
+    private RuleNames GetRuleName(string text)
+    {
+        RuleNames rule = RuleNames.NULL;
+
+        switch (text)
         {
-            Debug.Log(rawRules[i]);
+            case "HATE":
+                rule = RuleNames.Hate;
+                break;
+            case "LIKE":
+                rule = RuleNames.Like;
+                break;
+            default:
+                break;
         }
+
+        return rule;
     }
 
     private int GetSeatPos(char c)
