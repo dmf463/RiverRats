@@ -68,17 +68,17 @@ public class CSV_Parser : MonoBehaviour
         //}
     }
 
-    private RuleNames GetRuleName(string text)
+    private RuleType GetRuleName(string text)
     {
-        RuleNames rule = RuleNames.NULL;
+        RuleType rule = RuleType.NULL;
 
         switch (text)
         {
             case "HATE":
-                rule = RuleNames.Hate;
+                rule = RuleType.Hate;
                 break;
             case "LIKE":
-                rule = RuleNames.Like;
+                rule = RuleType.Like;
                 break;
             default:
                 break;
