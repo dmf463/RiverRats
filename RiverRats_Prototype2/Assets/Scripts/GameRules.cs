@@ -18,6 +18,7 @@ public class GameRules : MonoBehaviour
         AddRuleDescription();
         targetPlayer = Services.TableManager.players[Random.Range(0, 5)];
         Debug.Log("VIP = Player" + targetPlayer.SeatPos);
+        Debug.Log("rules list count = " + RulesList.Count);
         ChooseRules();
     }
 
@@ -38,7 +39,6 @@ public class GameRules : MonoBehaviour
     {
         foreach (Rule rule in ChosenRules)
         {
-            Debug.Log("Rules are in state: " + rule.RuleState);
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
@@ -57,8 +57,9 @@ public class GameRules : MonoBehaviour
 
         if(rule.RuleName == RuleType.Hate)
         {
-            if (Services.TableManager.players[rule.TargetPlayer0].PlayerEmotion == PlayerEmotion.OnTilt &&
-                Services.TableManager.players[rule.TargetPlayer1].PlayerEmotion == PlayerEmotion.Joyous)
+            Debug.Log("Target0 playeremotion = " + rule.TargetPlayer0.PlayerEmotion);
+            if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt &&
+                rule.TargetPlayer1.PlayerEmotion == PlayerEmotion.Joyous)
             {
                 rule.RuleState = RuleState.Successful;
             }
@@ -69,7 +70,7 @@ public class GameRules : MonoBehaviour
 
     private void ChooseRules()
     {
-        while(ChosenRules.Count < 2)
+        while (ChosenRules.Count < 2)
         {
             int randomNum = Random.Range(0, RulesList.Count);
             for(int i = 0; i < RulesList.Count; i++)
@@ -97,14 +98,14 @@ public class GameRules : MonoBehaviour
             if (RulesList[i].RuleName == RuleType.Hate)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0 +
-                     " should hate player " + RulesList[i].TargetPlayer1);
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should hate player " + RulesList[i].TargetPlayer1.SeatPos);
             }
             else if (RulesList[i].RuleName == RuleType.Like)
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0 +
-                     " should like player " + RulesList[i].TargetPlayer1);
+                     " should like player " + RulesList[i].TargetPlayer1.SeatPos);
             }
         }
     }

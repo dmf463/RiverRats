@@ -143,8 +143,11 @@ public class UIManager : MonoBehaviour
         potSize.GetComponent<Text>().text = table.pot.ToString();
         cheatCounter.GetComponent<Text>().text = Services.DealerManager.cheatCount.ToString();
         avgScore_HS.GetComponent<Text>().text = Services.DealerManager.averageHS.ToString();
-        rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
-        rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
+        if (Services.GameRules.ChosenRules.Count != 0)
+        {
+            rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
+            rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
+        }
     }
     
     public void SetDealerPositionUI(int pos)

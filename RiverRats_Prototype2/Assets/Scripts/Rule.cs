@@ -11,12 +11,11 @@ public class Rule
     public string RuleText;
     public RuleState RuleState;
     public bool TargetPlayerProhibited;
-    public int NoTargetPlayer;
-    public int TargetPlayer0;
-    public int TargetPlayer1;
-    public int TargetPlayer2;
-    public int TargetPlayer3;
-    public int TargetPlayer4;
+    public Player TargetPlayer0;
+    public Player TargetPlayer1;
+    public Player TargetPlayer2;
+    public Player TargetPlayer3;
+    public Player TargetPlayer4;
 
     public Rule(RuleType ruleName)
     {
@@ -24,14 +23,14 @@ public class Rule
         RuleState = RuleState.Active;
     }
     
-    public Rule(RuleType ruleName, int targetPlayer0)
+    public Rule(RuleType ruleName, Player targetPlayer0)
     {
         RuleName = ruleName;
         TargetPlayer0 = targetPlayer0;
         RuleState = RuleState.Active;
     }
 
-    public Rule(RuleType ruleName, int targetPlayer0, int targetPlayer1)
+    public Rule(RuleType ruleName, Player targetPlayer0, Player targetPlayer1)
     {
         RuleName = ruleName;
         TargetPlayer0 = targetPlayer0;

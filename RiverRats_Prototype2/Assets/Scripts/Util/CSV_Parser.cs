@@ -31,12 +31,13 @@ public class CSV_Parser : MonoBehaviour
         {
             char[] text = rawRules[rulesIndex].ToCharArray();
             string rule = rawRules[rulesIndex].Remove(rawRules[rulesIndex].IndexOf('('));
-            List<int> ruleTargets = new List<int>();
+            List<Player> ruleTargets = new List<Player>();
             for (int charIndex = 0; charIndex < text.Length; charIndex++)
             {
                 if (text[charIndex] == '0' || text[charIndex] == '1' || text[charIndex] == '2' || text[charIndex] == '3' || text[charIndex] == '4')
                 {
-                    ruleTargets.Add(GetSeatPos(text[charIndex]));
+                    //ruleTargets.Add(GetSeatPos(text[charIndex]));
+                    ruleTargets.Add(Services.TableManager.players[GetSeatPos(text[charIndex])]);
                 }
             }
             if (ruleTargets.Count == 0)
@@ -51,6 +52,7 @@ public class CSV_Parser : MonoBehaviour
             {
                 OrganizedRules.Add(new Rule(GetRuleName(rule), ruleTargets[0], ruleTargets[1]));
             }
+            Debug.Log("Organized Rule Count = " + OrganizedRules.Count);
         }
 
         //for (int i = 0; i < OrganizedRules.Count; i++)
