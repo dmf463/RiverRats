@@ -38,6 +38,7 @@ public class GameRules : MonoBehaviour
     {
         foreach (Rule rule in ChosenRules)
         {
+            Debug.Log("Rules are in state: " + rule.RuleState);
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
