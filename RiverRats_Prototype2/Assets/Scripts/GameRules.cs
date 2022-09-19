@@ -42,7 +42,9 @@ public class GameRules : MonoBehaviour
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
-                //Debug.Log("Rule Completed: " + rule.RuleText);
+                if (rule == ChosenRules[0]) Services.UIManager.ruleOneCheck.SetActive(true);
+                else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoCheck.SetActive(true);
+                Debug.Log("Rule Completed: " + rule.RuleText);
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
@@ -54,22 +56,71 @@ public class GameRules : MonoBehaviour
     private RuleState CheckRuleState(Rule rule)
     {
         RuleState state = RuleState.Active;
+        PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
+        PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
 
         if(rule.RuleName == RuleType.Hate)
         {
-            if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt &&
-                rule.TargetPlayer1.PlayerEmotion == PlayerEmotion.Joyous)
+            if (target0 == PlayerEmotion.OnTilt && target1 == PlayerEmotion.Joyous)
             {
                 state = RuleState.Successful;
             }
+            else if (target0 == PlayerEmotion.Angry && target1 == PlayerEmotion.Happy)
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Annoyed && target1 == PlayerEmotion.Amused)
+            {
+                state = RuleState.Successful;
+            }
+            else state = RuleState.Active;
         }
-
+        else if(rule.RuleName == RuleType.Like)
+        {
+            if (target0 == PlayerEmotion.Amused && target1 == PlayerEmotion.Amused) //Ammused:Amused
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Amused && target1 == PlayerEmotion.Happy) //Amused:Happy
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Amused && target1 == PlayerEmotion.Joyous) //Amused:Joyous
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Happy && target1 == PlayerEmotion.Amused) //Happy:Amused
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Happy && target1 == PlayerEmotion.Happy) //Happy:Happy
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Happy && target1 == PlayerEmotion.Joyous) //Happy:Joyous
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Joyous && target1 == PlayerEmotion.Amused) //Joyous:Amused
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Joyous && target1 == PlayerEmotion.Happy) //Joyous:Happy
+            {
+                state = RuleState.Successful;
+            }
+            else if (target0 == PlayerEmotion.Joyous && target1 == PlayerEmotion.Joyous) //Joyous:Joyous
+            {
+                state = RuleState.Successful;
+            }
+            else state = RuleState.Active;
+        }
         return state;
     }
 
     private void ChooseRules()
     {
-        while (ChosenRules.Count < 1)
+        while (ChosenRules.Count < 2)
         {
             int randomNum = Random.Range(0, RulesList.Count);
             for(int i = 0; i < RulesList.Count; i++)
