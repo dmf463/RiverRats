@@ -42,7 +42,7 @@ public class GameRules : MonoBehaviour
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
-                Debug.Log("Rule Completed: " + rule.RuleText);
+                //Debug.Log("Rule Completed: " + rule.RuleText);
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
@@ -57,11 +57,10 @@ public class GameRules : MonoBehaviour
 
         if(rule.RuleName == RuleType.Hate)
         {
-            Debug.Log("Target0 playeremotion = " + rule.TargetPlayer0.PlayerEmotion);
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt &&
                 rule.TargetPlayer1.PlayerEmotion == PlayerEmotion.Joyous)
             {
-                rule.RuleState = RuleState.Successful;
+                state = RuleState.Successful;
             }
         }
 
@@ -70,7 +69,7 @@ public class GameRules : MonoBehaviour
 
     private void ChooseRules()
     {
-        while (ChosenRules.Count < 2)
+        while (ChosenRules.Count < 1)
         {
             int randomNum = Random.Range(0, RulesList.Count);
             for(int i = 0; i < RulesList.Count; i++)
@@ -104,7 +103,7 @@ public class GameRules : MonoBehaviour
             else if (RulesList[i].RuleName == RuleType.Like)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0 +
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should like player " + RulesList[i].TargetPlayer1.SeatPos);
             }
         }

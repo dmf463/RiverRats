@@ -146,7 +146,7 @@ public class UIManager : MonoBehaviour
         if (Services.GameRules.ChosenRules.Count != 0)
         {
             rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
-            rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
+            //rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
         }
     }
     
