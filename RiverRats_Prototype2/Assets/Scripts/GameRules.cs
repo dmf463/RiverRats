@@ -44,15 +44,15 @@ public class GameRules : MonoBehaviour
             {
                 CompletedRules.Add(rule);
                 if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
-                else if (rule == ChosenRules[0]) Services.UIManager.ruleOneCheck.SetActive(true);
-                else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoCheck.SetActive(true);
+                else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroCheck.SetActive(true);
+                else if (rule == ChosenRules[1]) Services.UIManager.ruleOneCheck.SetActive(true);
                 Debug.Log("Rule Completed: " + rule.RuleText);
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
                 if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
-                else if (rule == ChosenRules[0]) Services.UIManager.ruleOneFail.SetActive(true);
-                else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoFail.SetActive(true);
+                else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroFail.SetActive(true);
+                else if (rule == ChosenRules[1]) Services.UIManager.ruleOneFail.SetActive(true);
                 Debug.Log("Rule Failed: " + rule.RuleText);
                 FailedRules.Add(rule);
             }
@@ -267,7 +267,10 @@ public class GameRules : MonoBehaviour
 
     private void ChooseRules()
     {
-        while (ChosenRules.Count < 2)
+        Rule VIP = new Rule(RuleType.TargetPlayer);
+        VIP.RuleText = "Player " + targetPlayer.SeatPos + " Must Win the Game";
+        ChosenRules.Add(VIP);
+        while (ChosenRules.Count < 4)
         {
             int randomNum = Random.Range(0, RulesList.Count);
             for(int i = 0; i < RulesList.Count; i++)
@@ -279,14 +282,12 @@ public class GameRules : MonoBehaviour
                         if (!RulesList[randomNum].TargetPlayerProhibited)
                         {
                             ChosenRules.Add(RulesList[randomNum]);
+                            BanRules(randomNum);
                         }
                     }
                 }
             }
         }
-        Rule VIP = new Rule(RuleType.TargetPlayer);
-        VIP.RuleText = "VIP Player Must Win the Game";
-        ChosenRules.Add(VIP);
         for (int i = 0; i < ChosenRules.Count; i++)
         {
             Debug.Log("Rule" + i + " = " + ChosenRules[i].RuleText);
@@ -319,7 +320,7 @@ public class GameRules : MonoBehaviour
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should never be in a posituve emotional state");
+                     " should never be in a positive emotional state");
             }
             else if (RulesList[i].RuleName == RuleType.OutNegative)
             {
@@ -352,6 +353,58 @@ public class GameRules : MonoBehaviour
                 if (RulesList[i].TargetPlayer0.SeatPos == target.SeatPos)
                 {
                     RulesList[i].TargetPlayerProhibited = true;
+                }
+            }
+        }
+    }
+
+    private void BanRules(int randomNum)
+    {
+        //if we get a rule for a player to never be positive, we don't want to also get a rule saying to never be negative
+        if (RulesList[randomNum].RuleName == RuleType.NoPositive)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.NoNegative &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we get a rule for a player to never be negative, we don't want to also get a rule saying to never be posiyive
+        else if (RulesList[randomNum].RuleName == RuleType.NoNegative)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.NoPositive &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we ask for a player to go out on a negative, we can't ask them to go out on a positive!
+        else if (RulesList[randomNum].RuleName == RuleType.OutNegative)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.OutPositive &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we ask for a player to go out on a positive, we can't ask them to go out on a negative!
+        else if (RulesList[randomNum].RuleName == RuleType.OutPositive)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.OutNegative &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
                 }
             }
         }

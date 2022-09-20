@@ -58,8 +58,11 @@ public class UIManager : MonoBehaviour
     public GameObject VIPFail;
     public GameObject rule0;
     public GameObject rule1;
+    public GameObject rule2;
+    public GameObject ruleZeroCheck;
     public GameObject ruleOneCheck;
     public GameObject ruleTwoCheck;
+    public GameObject ruleZeroFail;
     public GameObject ruleOneFail;
     public GameObject ruleTwoFail;
 
@@ -69,12 +72,14 @@ public class UIManager : MonoBehaviour
     {
         tm = new TaskManager();
         InitializeBoardUI();
-        ruleOneCheck.SetActive(false);
-        ruleTwoCheck.SetActive(false);
-        ruleOneFail.SetActive(false);
-        ruleTwoFail.SetActive(false);
         VIPSuccess.SetActive(false);
         VIPFail.SetActive(false);
+        ruleZeroCheck.SetActive(false);
+        ruleOneCheck.SetActive(false);
+        ruleZeroFail.SetActive(false);
+        ruleOneFail.SetActive(false);
+        ruleTwoCheck.SetActive(false);
+        ruleTwoFail.SetActive(false);
     }
 
     void Update()
@@ -158,8 +163,10 @@ public class UIManager : MonoBehaviour
         avgScore_HS.GetComponent<Text>().text = Services.DealerManager.averageHS.ToString();
         if (Services.GameRules.ChosenRules.Count != 0)
         {
-            rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
-            rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
+            VIP.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
+            rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
+            rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[2].RuleText;
+            rule2.GetComponent<Text>().text = Services.GameRules.ChosenRules[3].RuleText;
         }
     }
     
