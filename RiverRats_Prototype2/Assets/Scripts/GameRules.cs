@@ -48,6 +48,9 @@ public class GameRules : MonoBehaviour
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
+                if (rule == ChosenRules[0]) Services.UIManager.ruleOneFail.SetActive(true);
+                else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoFail.SetActive(true);
+                Debug.Log("Rule Failed: " + rule.RuleText);
                 FailedRules.Add(rule);
             }
         }
@@ -56,11 +59,12 @@ public class GameRules : MonoBehaviour
     private RuleState CheckRuleState(Rule rule)
     {
         RuleState state = RuleState.Active;
-        PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
-        PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
 
         if(rule.RuleName == RuleType.Hate)
         {
+            PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
+            PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
+
             if (target0 == PlayerEmotion.OnTilt && target1 == PlayerEmotion.Joyous)
             {
                 state = RuleState.Successful;
@@ -77,6 +81,8 @@ public class GameRules : MonoBehaviour
         }
         else if(rule.RuleName == RuleType.Like)
         {
+            PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
+            PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
             if (target0 == PlayerEmotion.Amused && target1 == PlayerEmotion.Amused) //Ammused:Amused
             {
                 state = RuleState.Successful;
@@ -112,6 +118,106 @@ public class GameRules : MonoBehaviour
             else if (target0 == PlayerEmotion.Joyous && target1 == PlayerEmotion.Joyous) //Joyous:Joyous
             {
                 state = RuleState.Successful;
+            }
+            else state = RuleState.Active;
+        }
+        else if(rule.RuleName == RuleType.NoNegative)
+        {
+            Debug.Log("Checking Neg");
+            //if they hit a neg state, FAIL
+            if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
+               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+            {
+                state = RuleState.Failed;
+            }
+            //if they get eliminated...
+            else if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                //but they're in a good mood, SUCCESS!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                {
+                    state = RuleState.Successful;
+                }
+                //but they're in a bad mood, FAIL!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
+                {
+                    state = RuleState.Failed;
+                }
+            }
+            //if the game ENDS...
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                //but they're in a good mood, SUCCESS!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                {
+                    state = RuleState.Successful;
+                }
+                //but they're in a bad mood, FAIL!
+                else if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
+                {
+                    state = RuleState.Failed;
+                }
+            }
+            else state = RuleState.Active;
+        }
+        else if (rule.RuleName == RuleType.NoPositive)
+        {
+            Debug.Log("Checking pos");
+            //if they hit a POS state, FAIL
+            if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+            {
+                state = RuleState.Failed;
+            }
+            //if they get eliminated...
+            else if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                //but they're in a bad mood, SUCCESS!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+                {
+                    state = RuleState.Successful;
+                }
+                //but they're in a good mood, FAIL!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                {
+                    state = RuleState.Failed;
+                }
+            }
+            //if the game ENDS...
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                //but they're in a bad mood, SUCCESS!
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
+                {
+                    state = RuleState.Successful;
+                }
+                //but they're in a good mood, FAIL!
+                else if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy)
+                {
+                    state = RuleState.Failed;
+                }
             }
             else state = RuleState.Active;
         }
@@ -156,6 +262,18 @@ public class GameRules : MonoBehaviour
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should like player " + RulesList[i].TargetPlayer1.SeatPos);
+            }
+            else if (RulesList[i].RuleName == RuleType.NoNegative)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should never be in a negative emotional state");
+            }
+            else if (RulesList[i].RuleName == RuleType.NoPositive)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should never be in a posituve emotional state");
             }
         }
     }

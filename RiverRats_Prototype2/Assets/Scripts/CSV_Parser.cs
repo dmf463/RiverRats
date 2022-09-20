@@ -82,6 +82,12 @@ public class CSV_Parser : MonoBehaviour
             case "LIKE":
                 rule = RuleType.Like;
                 break;
+            case "NO_POS":
+                rule = RuleType.NoPositive;
+                break;
+            case "NO_NEG":
+                rule = RuleType.NoNegative;
+                break;
             default:
                 break;
         }

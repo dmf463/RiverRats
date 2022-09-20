@@ -57,6 +57,8 @@ public class UIManager : MonoBehaviour
     public GameObject rule1;
     public GameObject ruleOneCheck;
     public GameObject ruleTwoCheck;
+    public GameObject ruleOneFail;
+    public GameObject ruleTwoFail;
 
 
 
@@ -66,6 +68,8 @@ public class UIManager : MonoBehaviour
         InitializeBoardUI();
         ruleOneCheck.SetActive(false);
         ruleTwoCheck.SetActive(false);
+        ruleOneFail.SetActive(false);
+        ruleTwoFail.SetActive(false);
     }
 
     void Update()
