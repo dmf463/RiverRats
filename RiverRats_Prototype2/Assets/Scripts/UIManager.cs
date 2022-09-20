@@ -48,6 +48,7 @@ public class UIManager : MonoBehaviour
     };//these visualize each of the players 2 cards
     public GameObject cheatCounter;
     public GameObject avgScore_HS;
+    public GameObject roundCount;
     public List<GameObject> playerToActBorder;
     private Color borderColor_on;
     private Color borderColor_off;
@@ -161,6 +162,7 @@ public class UIManager : MonoBehaviour
         potSize.GetComponent<Text>().text = table.pot.ToString();
         cheatCounter.GetComponent<Text>().text = Services.DealerManager.cheatCount.ToString();
         avgScore_HS.GetComponent<Text>().text = Services.DealerManager.averageHS.ToString();
+        roundCount.GetComponent<Text>().text = Services.DealerManager.roundCount.ToString();
         if (Services.GameRules.ChosenRules.Count != 0)
         {
             VIP.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;

@@ -36,6 +36,7 @@ public class DealerManager : MonoBehaviour
     public float preFlopHandCount = 0;
     public float accumulatedHS = 0;
     public float averageHS = 0;
+    public int roundCount = 1;
 
     void Start()
     {
@@ -999,6 +1000,7 @@ public class DealerManager : MonoBehaviour
     {
         if (table.gameState == GameState.CleanUp && table.pot == 0)
         {
+            roundCount++;
             cardsInDeck.Clear();
             PopulateCardDeck();
             table.gameState = GameState.PreFlop;

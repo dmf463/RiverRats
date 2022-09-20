@@ -40,21 +40,26 @@ public class GameRules : MonoBehaviour
     {
         foreach (Rule rule in ChosenRules)
         {
-            if(CheckRuleState(rule) == RuleState.Successful)
+            if (CheckRuleState(rule) == RuleState.Active)
             {
-                CompletedRules.Add(rule);
-                if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
-                else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroCheck.SetActive(true);
-                else if (rule == ChosenRules[1]) Services.UIManager.ruleOneCheck.SetActive(true);
-                Debug.Log("Rule Completed: " + rule.RuleText);
-            }
-            else if(CheckRuleState(rule) == RuleState.Failed)
-            {
-                if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
-                else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroFail.SetActive(true);
-                else if (rule == ChosenRules[1]) Services.UIManager.ruleOneFail.SetActive(true);
-                Debug.Log("Rule Failed: " + rule.RuleText);
-                FailedRules.Add(rule);
+                if (CheckRuleState(rule) == RuleState.Successful)
+                {
+                    CompletedRules.Add(rule);
+                    if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
+                    else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroCheck.SetActive(true);
+                    else if (rule == ChosenRules[1]) Services.UIManager.ruleOneCheck.SetActive(true);
+                    else if (rule == ChosenRules[2]) Services.UIManager.ruleTwoCheck.SetActive(true);
+                    Debug.Log("Rule Completed: " + rule.RuleText);
+                }
+                else if (CheckRuleState(rule) == RuleState.Failed)
+                {
+                    if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
+                    else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroFail.SetActive(true);
+                    else if (rule == ChosenRules[1]) Services.UIManager.ruleOneFail.SetActive(true);
+                    else if (rule == ChosenRules[2]) Services.UIManager.ruleTwoFail.SetActive(true);
+                    Debug.Log("Rule Failed: " + rule.RuleText);
+                    FailedRules.Add(rule);
+                }
             }
         }
     }
@@ -262,6 +267,38 @@ public class GameRules : MonoBehaviour
                 else state = RuleState.Failed;
             }
         }
+        else if (rule.RuleName == RuleType.RoundFiveChips)
+        {
+            if(Services.DealerManager.roundCount == 6)
+            {
+                if (rule.TargetPlayer0.ChipCount >= 3000 && rule.TargetPlayer0.ChipCount <= 4000)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+        }
+        else if (rule.RuleName == RuleType.RoundTenChips)
+        {
+            if (Services.DealerManager.roundCount == 6)
+            {
+                if (rule.TargetPlayer0.ChipCount >= 3000 && rule.TargetPlayer0.ChipCount <= 4000)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+        }
+        else if (rule.RuleName == RuleType.ShortToBig)
+        {
+            /*
+             * Okay so basicaly I have to check
+             *      was the player shortstack at some point
+             *      are they now bigstack?
+             *      if so yes.
+             * once the rule is completed, reset the bools to false
+             */
+        }
         return state;
     }
 
@@ -302,13 +339,13 @@ public class GameRules : MonoBehaviour
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should hate player " + RulesList[i].TargetPlayer1.SeatPos);
+                     " should hate player " + RulesList[i].TargetPlayer1.SeatPos + " at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.Like)
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should like player " + RulesList[i].TargetPlayer1.SeatPos);
+                     " should like player " + RulesList[i].TargetPlayer1.SeatPos + " at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.NoNegative)
             {
@@ -334,6 +371,30 @@ public class GameRules : MonoBehaviour
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should be eliminated while in a positive emotional state");
             }
+            else if (RulesList[i].RuleName == RuleType.RoundFiveChips)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should have between 3000-4000 chips by the end of ROUND 5");
+            }
+            else if (RulesList[i].RuleName == RuleType.RoundTenChips)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should have between 3000-4000 chips by the end of  ROUND 10");
+            }
+            else if (RulesList[i].RuleName == RuleType.ShortToBig)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should go from Short Stack to Big Stack at some point in the game");
+            }
+            else if (RulesList[i].RuleName == RuleType.BigToShort)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should go from Big Stack to Short Stack at some point in the game");
+            }
         }
     }
 
@@ -344,7 +405,11 @@ public class GameRules : MonoBehaviour
             if (RulesList[i].RuleName == RuleType.Hate ||
                 RulesList[i].RuleName == RuleType.Like ||
                 RulesList[i].RuleName == RuleType.NoNegative ||
-                RulesList[i].RuleName == RuleType.NoPositive)
+                RulesList[i].RuleName == RuleType.NoPositive ||
+                RulesList[i].RuleName == RuleType.BigToShort ||
+                RulesList[i].RuleName == RuleType.ShortToBig ||
+                RulesList[i].RuleName == RuleType.RoundFiveChips ||
+                RulesList[i].RuleName == RuleType.RoundTenChips)
             {
                 RulesList[i].TargetPlayerProhibited = false;
             }

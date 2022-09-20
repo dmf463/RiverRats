@@ -25,6 +25,8 @@ public class Player
     public HandEvaluator Hand { get; set; } //what is their Poker Hand, not their cards, their hand value
     public List<CardType> Cards = new List<CardType>(); //raw list of cards they're holding.
     public List<CardType> holeCards = new List<CardType>();
+    public bool shortStack = false;
+    public bool bigStack = false;
 
     public float HandStrength;
     public float percievedHandStrength;

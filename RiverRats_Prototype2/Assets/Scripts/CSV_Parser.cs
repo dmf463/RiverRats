@@ -94,6 +94,18 @@ public class CSV_Parser : MonoBehaviour
             case "OUT_POS":
                 rule = RuleType.OutPositive;
                 break;
+            case "SHORT_BIG":
+                rule = RuleType.ShortToBig;
+                break;
+            case "BIG_SHORT":
+                rule = RuleType.BigToShort;
+                break;
+            case "CHIP_FIVE":
+                rule = RuleType.RoundFiveChips;
+                break;
+            case "CHIP_10":
+                rule = RuleType.RoundTenChips;
+                break;
             default:
                 break;
         }
