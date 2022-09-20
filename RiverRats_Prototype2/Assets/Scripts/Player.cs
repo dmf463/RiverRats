@@ -195,10 +195,10 @@ public class Player
             switch (PlayerEmotion)
             {
                 case PlayerEmotion.Joyous:
-                    Services.PlayerBehaviour.PreFlop_FCR_Liberal(player);
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player); //used to liberal
                     break;
                 case PlayerEmotion.Happy:
-                    Services.PlayerBehaviour.PreFlop_FCR_Liberal(player);
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player); //used to liberal
                     break;
                 case PlayerEmotion.Amused:
                     Services.PlayerBehaviour.PreFlop_FCR_Neutral(player);
@@ -210,10 +210,10 @@ public class Player
                     Services.PlayerBehaviour.PreFlop_FCR_Neutral(player);
                     break;
                 case PlayerEmotion.Angry:
-                    Services.PlayerBehaviour.PreFlop_FCR_Conservative(player);
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player); //used to be conservative
                     break;
                 case PlayerEmotion.OnTilt:
-                    Services.PlayerBehaviour.PreFlop_FCR_Conservative(player);
+                    Services.PlayerBehaviour.PreFlop_FCR_Neutral(player); //used to be conservative
                     break;
             }
             Services.DealerManager.preFlopHandCount++;

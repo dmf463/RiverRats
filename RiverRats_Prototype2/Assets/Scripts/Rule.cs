@@ -10,6 +10,7 @@ public class Rule
     public RuleType RuleName;
     public string RuleText;
     public RuleState RuleState;
+    public bool RuleCompleted;
     public bool TargetPlayerProhibited;
     public Player TargetPlayer0;
     public Player TargetPlayer1;
@@ -21,6 +22,7 @@ public class Rule
     {
         RuleName = ruleName;
         RuleState = RuleState.Active;
+        RuleCompleted = false;
     }
     
     public Rule(RuleType ruleName, Player targetPlayer0)
@@ -28,6 +30,8 @@ public class Rule
         RuleName = ruleName;
         TargetPlayer0 = targetPlayer0;
         RuleState = RuleState.Active;
+        RuleCompleted = false;
+
     }
 
     public Rule(RuleType ruleName, Player targetPlayer0, Player targetPlayer1)
@@ -36,5 +40,6 @@ public class Rule
         TargetPlayer0 = targetPlayer0;
         TargetPlayer1 = targetPlayer1;
         RuleState = RuleState.Active;
+        RuleCompleted = false;
     }
 }

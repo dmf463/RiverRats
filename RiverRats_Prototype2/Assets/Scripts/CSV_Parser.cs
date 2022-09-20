@@ -103,7 +103,7 @@ public class CSV_Parser : MonoBehaviour
             case "CHIP_FIVE":
                 rule = RuleType.RoundFiveChips;
                 break;
-            case "CHIP_10":
+            case "CHIP_TEN":
                 rule = RuleType.RoundTenChips;
                 break;
             default:

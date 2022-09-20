@@ -26,6 +26,7 @@ public class DealerManager : MonoBehaviour
     public int minPreFlopHand = 10;
     public Player cheatingTarget;
     public int cheatCount = 0;
+    public int talkCount = 0;
     public bool influencingTable = false;
     #region forcing card hands
     //private List<CardType> straightFlush;
@@ -1027,6 +1028,7 @@ public class DealerManager : MonoBehaviour
                 table.players[i].playerIsAllIn = false;
                 table.players[i].amountToRaise = 0;
                 table.players[i].HandStrength = 0;
+                EndOfRoundRuleChecks(i);
                 if (table.players[i].PlayerState != PlayerState.Eliminated)
                 {
                     table.players[i].PlayerState = PlayerState.Playing;
@@ -1060,6 +1062,23 @@ public class DealerManager : MonoBehaviour
                 SetBlinds();
                 playerToAct = null;
             }
+        }
+    }
+
+    public void EndOfRoundRuleChecks(int seatPos)
+    {
+        //checking short to big
+        if (table.players[seatPos].ChipCount < 500) table.players[seatPos].shortStack = true;
+        else if (table.players[seatPos].shortStack)
+        {
+            if (table.players[seatPos].ChipCount > 6000) table.players[seatPos].bigStack = true;
+        }
+
+        //checking big to short
+        if (table.players[seatPos].ChipCount > 6000) table.players[seatPos].bigStack = true;
+        else if (table.players[seatPos].bigStack)
+        {
+            if (table.players[seatPos].ChipCount < 500) table.players[seatPos].shortStack = true;
         }
     }
 
@@ -1249,8 +1268,9 @@ public class DealerManager : MonoBehaviour
             }
             else
             {
-                int randomNum = Random.Range(1, 4);
-                table.players[seatPos].PlayerEmotion += randomNum;
+                //int randomNum = Random.Range(1, 4);
+                talkCount++;
+                table.players[seatPos].PlayerEmotion += 1;
                 if (table.players[seatPos].PlayerEmotion >= PlayerEmotion.OnTilt)
                 {
                     table.players[seatPos].PlayerEmotion = PlayerEmotion.OnTilt;
@@ -1271,9 +1291,10 @@ public class DealerManager : MonoBehaviour
             }
             else
             {
-                int randomNum = Random.Range(1, 4);
-                table.players[seatPos].PlayerEmotion -= randomNum;
-                if (table.players[seatPos].PlayerEmotion >= PlayerEmotion.Joyous)
+                talkCount++;
+                //int randomNum = Random.Range(1, 4);
+                table.players[seatPos].PlayerEmotion -= 1;
+                if (table.players[seatPos].PlayerEmotion <= PlayerEmotion.Joyous)
                 {
                     table.players[seatPos].PlayerEmotion = PlayerEmotion.Joyous;
                 }
@@ -1761,4 +1782,5 @@ public class DealerManager : MonoBehaviour
         //    lastBet = bet;
         //}
     }
+
 }

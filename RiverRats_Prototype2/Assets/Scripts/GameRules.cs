@@ -40,23 +40,25 @@ public class GameRules : MonoBehaviour
     {
         foreach (Rule rule in ChosenRules)
         {
-            if (CheckRuleState(rule) == RuleState.Active)
+            if (!rule.RuleCompleted)
             {
                 if (CheckRuleState(rule) == RuleState.Successful)
                 {
                     CompletedRules.Add(rule);
+                    rule.RuleCompleted = true;
                     if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
-                    else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroCheck.SetActive(true);
-                    else if (rule == ChosenRules[1]) Services.UIManager.ruleOneCheck.SetActive(true);
-                    else if (rule == ChosenRules[2]) Services.UIManager.ruleTwoCheck.SetActive(true);
+                    else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroCheck.SetActive(true);
+                    else if (rule == ChosenRules[2]) Services.UIManager.ruleOneCheck.SetActive(true);
+                    else if (rule == ChosenRules[3]) Services.UIManager.ruleTwoCheck.SetActive(true);
                     Debug.Log("Rule Completed: " + rule.RuleText);
                 }
                 else if (CheckRuleState(rule) == RuleState.Failed)
                 {
+                    rule.RuleCompleted = true;
                     if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
-                    else if (rule == ChosenRules[0]) Services.UIManager.ruleZeroFail.SetActive(true);
-                    else if (rule == ChosenRules[1]) Services.UIManager.ruleOneFail.SetActive(true);
-                    else if (rule == ChosenRules[2]) Services.UIManager.ruleTwoFail.SetActive(true);
+                    else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroFail.SetActive(true);
+                    else if (rule == ChosenRules[2]) Services.UIManager.ruleOneFail.SetActive(true);
+                    else if (rule == ChosenRules[3]) Services.UIManager.ruleTwoFail.SetActive(true);
                     Debug.Log("Rule Failed: " + rule.RuleText);
                     FailedRules.Add(rule);
                 }
@@ -192,7 +194,7 @@ public class GameRules : MonoBehaviour
             }
             else state = RuleState.Active;
         }
-        else if (rule.RuleName == RuleType.NoPositive)
+        else if(rule.RuleName == RuleType.NoPositive)
         {
             //if they hit a POS state, FAIL
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
@@ -254,7 +256,7 @@ public class GameRules : MonoBehaviour
                 else state = RuleState.Failed;
             }
         }
-        else if (rule.RuleName == RuleType.OutPositive)
+        else if(rule.RuleName == RuleType.OutPositive)
         {
             if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
@@ -267,7 +269,7 @@ public class GameRules : MonoBehaviour
                 else state = RuleState.Failed;
             }
         }
-        else if (rule.RuleName == RuleType.RoundFiveChips)
+        else if(rule.RuleName == RuleType.RoundFiveChips)
         {
             if(Services.DealerManager.roundCount == 6)
             {
@@ -278,7 +280,7 @@ public class GameRules : MonoBehaviour
                 else state = RuleState.Failed;
             }
         }
-        else if (rule.RuleName == RuleType.RoundTenChips)
+        else if(rule.RuleName == RuleType.RoundTenChips)
         {
             if (Services.DealerManager.roundCount == 6)
             {
@@ -289,23 +291,50 @@ public class GameRules : MonoBehaviour
                 else state = RuleState.Failed;
             }
         }
-        else if (rule.RuleName == RuleType.ShortToBig)
+        else if(rule.RuleName == RuleType.ShortToBig)
         {
-            /*
-             * Okay so basicaly I have to check
-             *      was the player shortstack at some point
-             *      are they now bigstack?
-             *      if so yes.
-             * once the rule is completed, reset the bools to false
-             */
+            if(rule.TargetPlayer0.shortStack && rule.TargetPlayer0.bigStack)
+            {
+                state = RuleState.Successful;
+                rule.TargetPlayer0.shortStack = false;
+                rule.TargetPlayer0.bigStack = false;
+            }
+            else if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+            }
+            else if(Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
+        else if(rule.RuleName == RuleType.BigToShort)
+        {
+            if (rule.TargetPlayer0.bigStack && rule.TargetPlayer0.shortStack)
+            {
+                state = RuleState.Successful;
+                rule.TargetPlayer0.shortStack = false;
+                rule.TargetPlayer0.bigStack = false;
+            }
+            else if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+            }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
+        }
+        
         return state;
     }
 
     private void ChooseRules()
     {
-        Rule VIP = new Rule(RuleType.TargetPlayer);
-        VIP.RuleText = "Player " + targetPlayer.SeatPos + " Must Win the Game";
+        Rule VIP = new Rule(RuleType.TargetPlayer)
+        {
+            RuleText = "Player " + targetPlayer.SeatPos + " Must Win the Game"
+        };
         ChosenRules.Add(VIP);
         while (ChosenRules.Count < 4)
         {
@@ -327,6 +356,7 @@ public class GameRules : MonoBehaviour
         }
         for (int i = 0; i < ChosenRules.Count; i++)
         {
+            Debug.Log("Rule " + i + " is " + ChosenRules[i].RuleName);
             Debug.Log("Rule" + i + " = " + ChosenRules[i].RuleText);
         }
     }
@@ -381,19 +411,19 @@ public class GameRules : MonoBehaviour
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should have between 3000-4000 chips by the end of  ROUND 10");
+                     " should have between 3000-4000 chips by the end of ROUND 10");
             }
             else if (RulesList[i].RuleName == RuleType.ShortToBig)
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should go from Short Stack to Big Stack at some point in the game");
+                     " should go from having less than 500 chips to more than 6000 at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.BigToShort)
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should go from Big Stack to Short Stack at some point in the game");
+                     " should go from more than 6000 to less than 500 chips at some point in the game");
             }
         }
     }
