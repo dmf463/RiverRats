@@ -53,6 +53,9 @@ public class UIManager : MonoBehaviour
     private Color borderColor_off;
     private Color targetPlayerColor;
 
+    public GameObject VIP;
+    public GameObject VIPSuccess;
+    public GameObject VIPFail;
     public GameObject rule0;
     public GameObject rule1;
     public GameObject ruleOneCheck;
@@ -70,6 +73,8 @@ public class UIManager : MonoBehaviour
         ruleTwoCheck.SetActive(false);
         ruleOneFail.SetActive(false);
         ruleTwoFail.SetActive(false);
+        VIPSuccess.SetActive(false);
+        VIPFail.SetActive(false);
     }
 
     void Update()

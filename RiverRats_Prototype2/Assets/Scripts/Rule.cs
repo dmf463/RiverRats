@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RuleType { NULL, Hate, Like, NoPositive, NoNegative }
+public enum RuleType { TargetPlayer, Hate, Like, NoPositive, NoNegative, OutNegative, OutPositive }
 public enum RuleState { Active, Successful, Failed}
 
 public class Rule

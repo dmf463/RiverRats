@@ -72,7 +72,7 @@ public class CSV_Parser : MonoBehaviour
 
     private RuleType GetRuleName(string text)
     {
-        RuleType rule = RuleType.NULL;
+        RuleType rule = RuleType.TargetPlayer;
 
         switch (text)
         {
@@ -87,6 +87,12 @@ public class CSV_Parser : MonoBehaviour
                 break;
             case "NO_NEG":
                 rule = RuleType.NoNegative;
+                break;
+            case "OUT_NEG":
+                rule = RuleType.OutNegative;
+                break;
+            case "OUT_POS":
+                rule = RuleType.OutPositive;
                 break;
             default:
                 break;

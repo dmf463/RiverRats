@@ -17,6 +17,7 @@ public class GameRules : MonoBehaviour
         RulesList = this.gameObject.GetComponent<CSV_Parser>().OrganizedRules;
         AddRuleDescription();
         targetPlayer = Services.TableManager.players[Random.Range(0, 5)];
+        ProhibitTargePlayerRules(targetPlayer);
         Debug.Log("VIP = Player" + targetPlayer.SeatPos);
         Debug.Log("rules list count = " + RulesList.Count);
         ChooseRules();
@@ -42,13 +43,15 @@ public class GameRules : MonoBehaviour
             if(CheckRuleState(rule) == RuleState.Successful)
             {
                 CompletedRules.Add(rule);
-                if (rule == ChosenRules[0]) Services.UIManager.ruleOneCheck.SetActive(true);
+                if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
+                else if (rule == ChosenRules[0]) Services.UIManager.ruleOneCheck.SetActive(true);
                 else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoCheck.SetActive(true);
                 Debug.Log("Rule Completed: " + rule.RuleText);
             }
             else if(CheckRuleState(rule) == RuleState.Failed)
             {
-                if (rule == ChosenRules[0]) Services.UIManager.ruleOneFail.SetActive(true);
+                if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
+                else if (rule == ChosenRules[0]) Services.UIManager.ruleOneFail.SetActive(true);
                 else if (rule == ChosenRules[1]) Services.UIManager.ruleTwoFail.SetActive(true);
                 Debug.Log("Rule Failed: " + rule.RuleText);
                 FailedRules.Add(rule);
@@ -60,7 +63,21 @@ public class GameRules : MonoBehaviour
     {
         RuleState state = RuleState.Active;
 
-        if(rule.RuleName == RuleType.Hate)
+        if(rule.RuleName == RuleType.TargetPlayer)
+        {
+            if(targetPlayer.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+            }
+            else if(Services.TableManager.gameState == GameState.GameOver)
+            {
+                if(targetPlayer.PlayerState != PlayerState.Eliminated)
+                {
+                    state = RuleState.Successful;
+                }
+            }
+        }
+        else if(rule.RuleName == RuleType.Hate)
         {
             PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
             PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
@@ -123,7 +140,6 @@ public class GameRules : MonoBehaviour
         }
         else if(rule.RuleName == RuleType.NoNegative)
         {
-            Debug.Log("Checking Neg");
             //if they hit a neg state, FAIL
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
@@ -173,7 +189,6 @@ public class GameRules : MonoBehaviour
         }
         else if (rule.RuleName == RuleType.NoPositive)
         {
-            Debug.Log("Checking pos");
             //if they hit a POS state, FAIL
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
@@ -221,6 +236,32 @@ public class GameRules : MonoBehaviour
             }
             else state = RuleState.Active;
         }
+        else if(rule.RuleName == RuleType.OutNegative)
+        {
+            if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
+                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+        }
+        else if (rule.RuleName == RuleType.OutPositive)
+        {
+            if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+        }
         return state;
     }
 
@@ -235,12 +276,17 @@ public class GameRules : MonoBehaviour
                 {
                     if (!ChosenRules.Contains(RulesList[randomNum]))
                     {
-                        ChosenRules.Add(RulesList[randomNum]);
+                        if (!RulesList[randomNum].TargetPlayerProhibited)
+                        {
+                            ChosenRules.Add(RulesList[randomNum]);
+                        }
                     }
                 }
             }
         }
-
+        Rule VIP = new Rule(RuleType.TargetPlayer);
+        VIP.RuleText = "VIP Player Must Win the Game";
+        ChosenRules.Add(VIP);
         for (int i = 0; i < ChosenRules.Count; i++)
         {
             Debug.Log("Rule" + i + " = " + ChosenRules[i].RuleText);
@@ -275,17 +321,38 @@ public class GameRules : MonoBehaviour
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should never be in a posituve emotional state");
             }
+            else if (RulesList[i].RuleName == RuleType.OutNegative)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should be eliminated while in a negative emotional state");
+            }
+            else if (RulesList[i].RuleName == RuleType.OutPositive)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should be eliminated while in a positive emotional state");
+            }
         }
     }
 
-    private void ProhibitTargePlayerRules()
+    private void ProhibitTargePlayerRules(Player target)
     {
         for(int i = 0; i < RulesList.Count; i++)
         {
             if (RulesList[i].RuleName == RuleType.Hate ||
-                RulesList[i].RuleName == RuleType.Like)
+                RulesList[i].RuleName == RuleType.Like ||
+                RulesList[i].RuleName == RuleType.NoNegative ||
+                RulesList[i].RuleName == RuleType.NoPositive)
             {
                 RulesList[i].TargetPlayerProhibited = false;
+            }
+            else if (RulesList[i].RuleName == RuleType.OutNegative || RulesList[i].RuleName == RuleType.OutPositive)
+            {
+                if (RulesList[i].TargetPlayer0.SeatPos == target.SeatPos)
+                {
+                    RulesList[i].TargetPlayerProhibited = true;
+                }
             }
         }
     }
