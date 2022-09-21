@@ -103,19 +103,19 @@ public class TableManager : MonoBehaviour
 
         switch(objTag)
         {
-            case "P1":
+            case "P0":
                 seatPos = 0;
                 break;
-            case "P2":
+            case "P1":
                 seatPos = 1;
                 break;
-            case "P3":
+            case "P2":
                 seatPos = 2;
                 break;
-            case "P4":
+            case "P3":
                 seatPos = 3;
                 break;
-            case "P5":
+            case "P4":
                 seatPos = 4;
                 break;
         }

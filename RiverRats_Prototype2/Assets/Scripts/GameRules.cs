@@ -50,6 +50,7 @@ public class GameRules : MonoBehaviour
                     else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroCheck.SetActive(true);
                     else if (rule == ChosenRules[2]) Services.UIManager.ruleOneCheck.SetActive(true);
                     else if (rule == ChosenRules[3]) Services.UIManager.ruleTwoCheck.SetActive(true);
+                    else if (rule == ChosenRules[4]) Services.UIManager.ruleThreeCheck.SetActive(true);
                     Debug.Log("Rule Completed: " + rule.RuleText);
                 }
                 else if (CheckRuleState(rule) == RuleState.Failed)
@@ -59,6 +60,7 @@ public class GameRules : MonoBehaviour
                     else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroFail.SetActive(true);
                     else if (rule == ChosenRules[2]) Services.UIManager.ruleOneFail.SetActive(true);
                     else if (rule == ChosenRules[3]) Services.UIManager.ruleTwoFail.SetActive(true);
+                    else if (rule == ChosenRules[4]) Services.UIManager.ruleThreeFail.SetActive(true);
                     Debug.Log("Rule Failed: " + rule.RuleText);
                     FailedRules.Add(rule);
                 }
@@ -336,7 +338,7 @@ public class GameRules : MonoBehaviour
             RuleText = "Player " + targetPlayer.SeatPos + " Must Win the Game"
         };
         ChosenRules.Add(VIP);
-        while (ChosenRules.Count < 4)
+        while (ChosenRules.Count < 5)
         {
             int randomNum = Random.Range(0, RulesList.Count);
             for(int i = 0; i < RulesList.Count; i++)

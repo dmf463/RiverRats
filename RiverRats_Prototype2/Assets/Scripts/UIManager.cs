@@ -58,15 +58,22 @@ public class UIManager : MonoBehaviour
     public GameObject VIP;
     public GameObject VIPSuccess;
     public GameObject VIPFail;
+
     public GameObject rule0;
-    public GameObject rule1;
-    public GameObject rule2;
     public GameObject ruleZeroCheck;
-    public GameObject ruleOneCheck;
-    public GameObject ruleTwoCheck;
     public GameObject ruleZeroFail;
+
+    public GameObject rule1;
+    public GameObject ruleOneCheck;
     public GameObject ruleOneFail;
+
+    public GameObject rule2;
+    public GameObject ruleTwoCheck;
     public GameObject ruleTwoFail;
+
+    public GameObject rule3;
+    public GameObject ruleThreeCheck;
+    public GameObject ruleThreeFail;
 
 
 
@@ -76,12 +83,19 @@ public class UIManager : MonoBehaviour
         InitializeBoardUI();
         VIPSuccess.SetActive(false);
         VIPFail.SetActive(false);
+
         ruleZeroCheck.SetActive(false);
-        ruleOneCheck.SetActive(false);
         ruleZeroFail.SetActive(false);
+
+        ruleOneCheck.SetActive(false);
         ruleOneFail.SetActive(false);
+
         ruleTwoCheck.SetActive(false);
         ruleTwoFail.SetActive(false);
+
+        ruleThreeCheck.SetActive(false);
+        ruleThreeFail.SetActive(false);
+
     }
 
     void Update()
@@ -171,6 +185,7 @@ public class UIManager : MonoBehaviour
             rule0.GetComponent<Text>().text = Services.GameRules.ChosenRules[1].RuleText;
             rule1.GetComponent<Text>().text = Services.GameRules.ChosenRules[2].RuleText;
             rule2.GetComponent<Text>().text = Services.GameRules.ChosenRules[3].RuleText;
+            rule3.GetComponent<Text>().text = Services.GameRules.ChosenRules[4].RuleText;
         }
     }
     
@@ -363,29 +378,29 @@ public class UIManager : MonoBehaviour
         {
             if (tm.players[i].SeatPos == 0)
             {
-                playerHoleCards[i].Add(GameObject.Find("P1_HoleCard1"));
-                playerHoleCards[i].Add(GameObject.Find("P1_HoleCard2"));
+                playerHoleCards[i].Add(GameObject.Find("P0_HoleCard1"));
+                playerHoleCards[i].Add(GameObject.Find("P0_HoleCard2"));
             }
             else if (tm.players[i].SeatPos == 1)
             {
-                playerHoleCards[i].Add(GameObject.Find("P2_HoleCard1"));
-                playerHoleCards[i].Add(GameObject.Find("P2_HoleCard2"));
+                playerHoleCards[i].Add(GameObject.Find("P1_HoleCard1"));
+                playerHoleCards[i].Add(GameObject.Find("P1_HoleCard2"));
 
             }
             else if (tm.players[i].SeatPos == 2)
             {
-                playerHoleCards[i].Add(GameObject.Find("P3_HoleCard1"));
-                playerHoleCards[i].Add(GameObject.Find("P3_HoleCard2"));
+                playerHoleCards[i].Add(GameObject.Find("P2_HoleCard1"));
+                playerHoleCards[i].Add(GameObject.Find("P2_HoleCard2"));
             }
             else if (tm.players[i].SeatPos == 3)
             {
-                playerHoleCards[i].Add(GameObject.Find("P4_HoleCard1"));
-                playerHoleCards[i].Add(GameObject.Find("P4_HoleCard2"));
+                playerHoleCards[i].Add(GameObject.Find("P3_HoleCard1"));
+                playerHoleCards[i].Add(GameObject.Find("P3_HoleCard2"));
             }
             else
             {
-                playerHoleCards[i].Add(GameObject.Find("P5_HoleCard1"));
-                playerHoleCards[i].Add(GameObject.Find("P5_HoleCard2"));
+                playerHoleCards[i].Add(GameObject.Find("P4_HoleCard1"));
+                playerHoleCards[i].Add(GameObject.Find("P4_HoleCard2"));
             }
         }
         for(int i = 0; i < Services.TableManager.numActivePlayers; i++)

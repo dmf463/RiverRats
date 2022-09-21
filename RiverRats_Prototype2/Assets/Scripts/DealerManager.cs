@@ -1438,6 +1438,7 @@ public class DealerManager : MonoBehaviour
 
     public void SplitChips(int PlayerRankPos, int potAmount)
     {
+        if (table.pot < 0) table.pot = 0;
         int amountToSplit = EndOfHand_PotAmount;
         //Debug.Log("Splitting" + amountToSplit + " chips");
         List<int> chipStacks = new List<int>(); //so we make a list of ChipStacks
