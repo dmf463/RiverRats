@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RuleType { TargetPlayer, Hate, Like, NoPositive, NoNegative, OutNegative, OutPositive, ShortToBig, BigToShort, RoundFiveChips, RoundTenChips }
+public enum RuleType { TargetPlayer, Hate, Like, NoPositive, NoNegative, OutNegative, OutPositive, ShortToBig, BigToShort, RoundFiveChips, RoundTenChips, FinalTwo, FirstOut, ThreeWayWin, ThreeWayLose }
 public enum RuleState { Active, Successful, Failed}
 
 public class Rule

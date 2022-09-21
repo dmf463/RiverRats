@@ -106,6 +106,18 @@ public class CSV_Parser : MonoBehaviour
             case "CHIP_TEN":
                 rule = RuleType.RoundTenChips;
                 break;
+            case "FINAL_TWO":
+                rule = RuleType.FinalTwo;
+                break;
+            case "FIRST_OUT":
+                rule = RuleType.FirstOut;
+                break;
+            case "THREE_WIN":
+                rule = RuleType.ThreeWayWin;
+                break;
+            case "THREE_LOSE":
+                rule = RuleType.ThreeWayLose;
+                break;
             default:
                 break;
         }

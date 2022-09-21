@@ -427,6 +427,12 @@ public class GameRules : MonoBehaviour
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should go from more than 6000 to less than 500 chips at some point in the game");
             }
+            else if (RulesList[i].RuleName == RuleType.FinalTwo)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should be in the final two");
+            }
         }
     }
 
