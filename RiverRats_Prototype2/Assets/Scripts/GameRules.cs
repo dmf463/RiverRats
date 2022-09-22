@@ -327,6 +327,38 @@ public class GameRules : MonoBehaviour
                 state = RuleState.Failed;
             }
         }
+        else if(rule.RuleName == RuleType.FinalTwo)
+        {
+            if(Services.DealerManager.LivePlayerCount() == 2)
+            {
+                if(rule.TargetPlayer0.PlayerState != PlayerState.Eliminated)
+                {
+                    state = RuleState.Successful;
+                }
+            }
+            else if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                if(Services.DealerManager.LivePlayerCount() > 2)
+                {
+                    state = RuleState.Failed;
+                }
+            }
+        }
+        else if(rule.RuleName == RuleType.FirstOut)
+        {
+            if(Services.DealerManager.EliminatedPlayerCount() == 1)
+            {
+                if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+        }
+        else if(rule.RuleName == RuleType.ThreeWayLose)
+        {
+
+        }
         
         return state;
     }
@@ -431,7 +463,26 @@ public class GameRules : MonoBehaviour
             {
                 RulesList[i].RuleText =
                     ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should be in the final two");
+                     " should be in the final two players of the game");
+            }
+            else if (RulesList[i].RuleName == RuleType.FirstOut)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                     " should be the first person eliminated from the game");
+                      
+            }
+            else if (RulesList[i].RuleName == RuleType.ThreeWayWin)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0 + 
+                     " should have the winning hand against three or more people");
+            }
+            else if (RulesList[i].RuleName == RuleType.ThreeWayLose)
+            {
+                RulesList[i].RuleText =
+                    ("Player " + RulesList[i].TargetPlayer0 +
+                     " should have a losing hand against three or more people");
             }
         }
     }

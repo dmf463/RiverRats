@@ -1730,6 +1730,34 @@ public class DealerManager : MonoBehaviour
         return activePlayers;
     }
 
+    public int LivePlayerCount()
+    {
+        TableManager tm = Services.TableManager;
+        int livePlayers = 0;
+        for (int i = 0; i < tm.players.Length; i++)
+        {
+            if (tm.players[i].PlayerState != PlayerState.Eliminated)
+            {
+                livePlayers++;
+            }
+        }
+        return livePlayers;
+    }
+
+    public int EliminatedPlayerCount()
+    {
+        TableManager tm = Services.TableManager;
+        int eliminated = 0;
+        for (int i = 0; i < tm.players.Length; i++)
+        {
+            if (tm.players[i].PlayerState == PlayerState.Eliminated)
+            {
+                eliminated++;
+            }
+        }
+        return eliminated;
+    }
+
     public List<Player> PlayersInGame()
     {
         List<Player> playersInGame = new List<Player>();
