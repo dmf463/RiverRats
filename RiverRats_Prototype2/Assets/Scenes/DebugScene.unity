@@ -4369,10 +4369,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
+    m_FontSize: 16
+    m_FontStyle: 1
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -7321,7 +7321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51efd7b6ebfbdd44197837f49282766c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rulesCSV: {fileID: 4900000, guid: 81fd7dce36e926e4ca1fa6aeb9a42181, type: 3}
+  rulesCSV: {fileID: 4900000, guid: 9fc44caa0e5bbee409b45f61e10d6682, type: 3}
   rawRules: []
 --- !u!1 &1088168033
 GameObject:

@@ -357,9 +357,94 @@ public class GameRules : MonoBehaviour
         }
         else if(rule.RuleName == RuleType.ThreeWayLose)
         {
-
+            if(Services.TableManager.gameState == GameState.CleanUp)
+            {
+                int winnerCount = 0;
+                int loserCount = 0;
+                for(int i = 0; i < Services.TableManager.players.Length; i++)
+                {
+                    if (Services.TableManager.players[i].PlayerState == PlayerState.Winner)
+                    {
+                        winnerCount += 1;
+                    }
+                    else if (Services.TableManager.players[i].PlayerState == PlayerState.Loser)
+                    {
+                        loserCount++;
+                    }
+                }
+                if((winnerCount + loserCount) >= 3)
+                {
+                    if (rule.TargetPlayer0.PlayerState == PlayerState.Loser)
+                    {
+                        state = RuleState.Successful;
+                    }
+                    else state = RuleState.Failed;
+                }
+            }
         }
-        
+        else if(rule.RuleName == RuleType.ThreeWayWin)
+        {
+            if (Services.TableManager.gameState == GameState.CleanUp)
+            {
+                int winnerCount = 0;
+                int loserCount = 0;
+                for (int i = 0; i < Services.TableManager.players.Length; i++)
+                {
+                    if (Services.TableManager.players[i].PlayerState == PlayerState.Winner)
+                    {
+                        winnerCount += 1;
+                    }
+                    else if (Services.TableManager.players[i].PlayerState == PlayerState.Loser)
+                    {
+                        loserCount++;
+                    }
+                }
+                if ((winnerCount + loserCount) >= 3 && winnerCount == 1)
+                {
+                    if (rule.TargetPlayer0.PlayerState == PlayerState.Winner)
+                    {
+                        state = RuleState.Successful;
+                    }
+                    else state = RuleState.Failed;
+                }
+            }
+        }
+        else if(rule.RuleName == RuleType.VIPBigWin)
+        {
+            if(Services.TableManager.gameState == GameState.CleanUp && Services.TableManager.pot == 0)
+            {
+                int winnerCount = 0;
+                int eliminatedCount = 0;
+                for (int i = 0; i < Services.TableManager.players.Length; i++)
+                {
+                    if (Services.TableManager.players[i].PlayerState == PlayerState.Winner)
+                    {
+                        winnerCount += 1;
+                    }
+                    else if (Services.TableManager.players[i].PlayerState == PlayerState.Loser &&
+                             Services.TableManager.players[i].ChipCount == 0)
+                    {
+                        eliminatedCount++;
+                    }
+                }
+                if(winnerCount + eliminatedCount >= 3)
+                {
+                    if(targetPlayer.PlayerState == PlayerState.Winner)
+                    {
+                        state = RuleState.Successful;
+                    }
+                }
+            }
+        }
+
+        if(rule.RuleState == RuleState.Active && rule.TargetPlayer0 != null)
+        {
+            if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+            }
+        }
+
         return state;
     }
 
@@ -367,7 +452,7 @@ public class GameRules : MonoBehaviour
     {
         Rule VIP = new Rule(RuleType.TargetPlayer)
         {
-            RuleText = "Player " + targetPlayer.SeatPos + " Must Win the Game"
+            RuleText = "Player " + targetPlayer.SeatPos + " MUST Win the Game, or it is Game Over"
         };
         ChosenRules.Add(VIP);
         while (ChosenRules.Count < 5)
@@ -475,14 +560,19 @@ public class GameRules : MonoBehaviour
             else if (RulesList[i].RuleName == RuleType.ThreeWayWin)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0 + 
-                     " should have the winning hand against three or more people");
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos + 
+                     " should have the only winning hand against three or more people");
             }
             else if (RulesList[i].RuleName == RuleType.ThreeWayLose)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0 +
+                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
                      " should have a losing hand against three or more people");
+            }
+            else if (RulesList[i].RuleName == RuleType.VIPBigWin)
+            {
+                RulesList[i].RuleText =
+                    ("VIP player should take two or more people out of the game in a single hand");
             }
         }
     }
@@ -491,18 +581,10 @@ public class GameRules : MonoBehaviour
     {
         for(int i = 0; i < RulesList.Count; i++)
         {
-            if (RulesList[i].RuleName == RuleType.Hate ||
-                RulesList[i].RuleName == RuleType.Like ||
-                RulesList[i].RuleName == RuleType.NoNegative ||
-                RulesList[i].RuleName == RuleType.NoPositive ||
-                RulesList[i].RuleName == RuleType.BigToShort ||
-                RulesList[i].RuleName == RuleType.ShortToBig ||
-                RulesList[i].RuleName == RuleType.RoundFiveChips ||
-                RulesList[i].RuleName == RuleType.RoundTenChips)
-            {
-                RulesList[i].TargetPlayerProhibited = false;
-            }
-            else if (RulesList[i].RuleName == RuleType.OutNegative || RulesList[i].RuleName == RuleType.OutPositive)
+            if (RulesList[i].RuleName == RuleType.OutNegative || 
+                RulesList[i].RuleName == RuleType.OutPositive ||
+                RulesList[i].RuleName == RuleType.FirstOut||
+                RulesList[i].RuleName == RuleType.FinalTwo)
             {
                 if (RulesList[i].TargetPlayer0.SeatPos == target.SeatPos)
                 {
@@ -514,8 +596,52 @@ public class GameRules : MonoBehaviour
 
     private void BanRules(int randomNum)
     {
-        //if we get a rule for a player to never be positive, we don't want to also get a rule saying to never be negative
+        //if we get a rule for a player to never be positive, we don't want to also get a rule saying to be negative at some point
         if (RulesList[randomNum].RuleName == RuleType.NoPositive)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.NoNegative &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+                else if(RulesList[banRule].RuleName == RuleType.Like &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+                else if (RulesList[banRule].RuleName == RuleType.OutPositive &&
+                         RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we get a rule for a player to never be negative, we don't want to also get a rule saying to be positive at some point
+        else if (RulesList[randomNum].RuleName == RuleType.NoNegative)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.NoPositive &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+                else if (RulesList[banRule].RuleName == RuleType.Hate &&
+                         RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+                else if (RulesList[banRule].RuleName == RuleType.OutNegative &&
+                         RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we ask the player to hate someone, we can't also ask them to never be negative
+        else if (RulesList[randomNum].RuleName == RuleType.Hate)
         {
             for (int banRule = 0; banRule < RulesList.Count; banRule++)
             {
@@ -526,8 +652,8 @@ public class GameRules : MonoBehaviour
                 }
             }
         }
-        //if we get a rule for a player to never be negative, we don't want to also get a rule saying to never be posiyive
-        else if (RulesList[randomNum].RuleName == RuleType.NoNegative)
+        //if we ask the player to like someone, we can't also ask them to never be positive
+        else if (RulesList[randomNum].RuleName == RuleType.Like)
         {
             for (int banRule = 0; banRule < RulesList.Count; banRule++)
             {
@@ -538,7 +664,7 @@ public class GameRules : MonoBehaviour
                 }
             }
         }
-        //if we ask for a player to go out on a negative, we can't ask them to go out on a positive!
+        //if we ask for a player to go out on a negative, we can't ask them to go out on a positive, or to never be negative
         else if (RulesList[randomNum].RuleName == RuleType.OutNegative)
         {
             for (int banRule = 0; banRule < RulesList.Count; banRule++)
@@ -548,14 +674,48 @@ public class GameRules : MonoBehaviour
                 {
                     RulesList[banRule].TargetPlayerProhibited = true;
                 }
+                else if (RulesList[banRule].RuleName == RuleType.NoNegative &&
+                         RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
             }
         }
-        //if we ask for a player to go out on a positive, we can't ask them to go out on a negative!
+        //if we ask for a player to go out on a positive, we can't ask them to go out on a negative, or to never be positive
         else if (RulesList[randomNum].RuleName == RuleType.OutPositive)
         {
             for (int banRule = 0; banRule < RulesList.Count; banRule++)
             {
                 if (RulesList[banRule].RuleName == RuleType.OutNegative &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+                else if (RulesList[banRule].RuleName == RuleType.NoPositive &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we say a player should be the first out, we can't ask them to also be in the final two
+        else if (RulesList[randomNum].RuleName == RuleType.FirstOut)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.FinalTwo &&
+                    RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
+                {
+                    RulesList[banRule].TargetPlayerProhibited = true;
+                }
+            }
+        }
+        //if we say a player should be the final two, we can't ask them to also be the first out
+        else if (RulesList[randomNum].RuleName == RuleType.FinalTwo)
+        {
+            for (int banRule = 0; banRule < RulesList.Count; banRule++)
+            {
+                if (RulesList[banRule].RuleName == RuleType.FirstOut &&
                     RulesList[banRule].TargetPlayer0.SeatPos == RulesList[randomNum].TargetPlayer0.SeatPos)
                 {
                     RulesList[banRule].TargetPlayerProhibited = true;

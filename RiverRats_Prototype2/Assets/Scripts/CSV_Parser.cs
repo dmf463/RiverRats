@@ -118,6 +118,9 @@ public class CSV_Parser : MonoBehaviour
             case "THREE_LOSE":
                 rule = RuleType.ThreeWayLose;
                 break;
+            case "VIP_WIN":
+                rule = RuleType.VIPBigWin;
+                break;
             default:
                 break;
         }
