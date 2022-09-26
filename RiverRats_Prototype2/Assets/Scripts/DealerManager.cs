@@ -710,6 +710,7 @@ public class DealerManager : MonoBehaviour
                             }
                             dealtCardIndex = 0;
                             cheatingTarget = null;
+                            BalanceTalkAndCheatScales();
                             cheating = false;
                             influencingTable = false;
                             cheatCards.Clear();
@@ -773,6 +774,7 @@ public class DealerManager : MonoBehaviour
                     }
                     dealtCardIndex = 0;
                     cheatingTarget = null;
+                    BalanceTalkAndCheatScales();
                     cheating = false;
                     influencingTable = false;
                     cheatCards.Clear();
@@ -818,6 +820,7 @@ public class DealerManager : MonoBehaviour
                 }
                 dealtCardIndex = 0;
                 cheatingTarget = null;
+                BalanceTalkAndCheatScales();
                 cheating = false;
                 influencingTable = false;
                 cheatCards.Clear();
@@ -885,6 +888,7 @@ public class DealerManager : MonoBehaviour
                 }
                 dealtCardIndex = 0;
                 cheatingTarget = null;
+                BalanceTalkAndCheatScales();
                 cheating = false;
                 influencingTable = false;
                 cheatCards.Clear();
@@ -946,6 +950,18 @@ public class DealerManager : MonoBehaviour
             }
             table.gameState++;
             SetAwardPlayer_Amount();
+        }
+    }
+
+    public void BalanceTalkAndCheatScales()
+    {
+        if (!cheating)
+        {
+            if(cheatCount != 0) cheatCount--;
+        }
+        if (!influencingTable)
+        {
+            if(talkCount != 0) talkCount--;
         }
     }
 
@@ -1787,8 +1803,6 @@ public class DealerManager : MonoBehaviour
             small = PlayerSeatsAwayFromDealerAmongstLivePlayers(1);
             big = PlayerSeatsAwayFromDealerAmongstLivePlayers(2);
         }
-
-
 
         CollectBlinds(small, table.smallBlind);
         CollectBlinds(big, table.bigBlind);

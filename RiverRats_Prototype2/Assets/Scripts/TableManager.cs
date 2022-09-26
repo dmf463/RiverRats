@@ -32,7 +32,7 @@ public class TableManager : MonoBehaviour
 
     void Update()
     {
-
+        IncreaseBlinds();
     }
 
     private void InitializeTable() //setting Services, creating platyers, and setting initial blind/round/gamestate
@@ -77,6 +77,30 @@ public class TableManager : MonoBehaviour
             }
         }
         Services.UIManager.SetPlayerHoleCards();
+    }
+
+    public void IncreaseBlinds()
+    {
+        if(Services.DealerManager.LivePlayerCount() == 5)
+        {
+            smallBlind = 25;
+            bigBlind = 50;
+        }
+        else if(Services.DealerManager.LivePlayerCount() == 4)
+        {
+            smallBlind = 50;
+            bigBlind = 100;
+        }
+        else if (Services.DealerManager.LivePlayerCount() == 3)
+        {
+            smallBlind = 100;
+            bigBlind = 200;
+        }
+        else if (Services.DealerManager.LivePlayerCount() == 2)
+        {
+            smallBlind = 200;
+            bigBlind = 400;
+        }
     }
 
     public void PlayersLookAtCards() //this is the call for players to evaluate their hands. 

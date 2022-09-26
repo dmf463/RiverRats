@@ -47,7 +47,11 @@ public class UIManager : MonoBehaviour
         new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>()
     };//these visualize each of the players 2 cards
     public GameObject cheatCounter;
+    public Slider cheatSlider;
+
     public GameObject talkCounter;
+    public Slider talkSlider;
+
     public GameObject avgScore_HS;
     public GameObject roundCount;
     public List<GameObject> playerToActBorder;
@@ -175,10 +179,17 @@ public class UIManager : MonoBehaviour
         gameState.GetComponent<Text>().text = table.gameState.ToString();
         blinds.GetComponent<Text>().text = table.blindRound.ToString();
         potSize.GetComponent<Text>().text = table.pot.ToString();
+
         cheatCounter.GetComponent<Text>().text = Services.DealerManager.cheatCount.ToString();
+        cheatSlider.value = Services.DealerManager.cheatCount;
+
         talkCounter.GetComponent<Text>().text = Services.DealerManager.talkCount.ToString();
+        talkSlider.value = Services.DealerManager.talkCount;
+
         avgScore_HS.GetComponent<Text>().text = Services.DealerManager.averageHS.ToString();
+
         roundCount.GetComponent<Text>().text = Services.DealerManager.roundCount.ToString();
+
         if (Services.GameRules.ChosenRules.Count != 0)
         {
             VIP.GetComponent<Text>().text = Services.GameRules.ChosenRules[0].RuleText;
