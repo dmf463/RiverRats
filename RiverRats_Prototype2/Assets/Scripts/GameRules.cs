@@ -436,8 +436,7 @@ public class GameRules : MonoBehaviour
                 }
             }
         }
-
-        if(rule.RuleState == RuleState.Active && rule.TargetPlayer0 != null)
+        else if(rule.RuleState == RuleState.Active && rule.TargetPlayer0 != null)
         {
             if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
