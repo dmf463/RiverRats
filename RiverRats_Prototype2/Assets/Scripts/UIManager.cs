@@ -46,6 +46,9 @@ public class UIManager : MonoBehaviour
     {
         new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>()
     };//these visualize each of the players 2 cards
+
+    public GameObject GameOverScreen;
+
     public GameObject cheatCounter;
     public Slider cheatSlider;
 
@@ -198,6 +201,8 @@ public class UIManager : MonoBehaviour
             rule2.GetComponent<Text>().text = Services.GameRules.ChosenRules[3].RuleText;
             rule3.GetComponent<Text>().text = Services.GameRules.ChosenRules[4].RuleText;
         }
+
+        if (Services.TableManager.gameState == GameState.GameOver) GameOverScreen.SetActive(true);
     }
     
     public void SetDealerPositionUI(int pos)

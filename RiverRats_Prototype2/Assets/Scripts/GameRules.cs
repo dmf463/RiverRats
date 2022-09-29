@@ -77,6 +77,7 @@ public class GameRules : MonoBehaviour
             if(targetPlayer.PlayerState == PlayerState.Eliminated)
             {
                 state = RuleState.Failed;
+                Services.TableManager.gameState = GameState.GameOver;
             }
             else if(Services.TableManager.gameState == GameState.GameOver)
             {

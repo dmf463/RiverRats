@@ -1353,6 +1353,7 @@ MonoBehaviour:
   burn3: {fileID: 220868372}
   Burn: []
   allGameCardObjs: []
+  GameOverScreen: {fileID: 1187163549}
   cheatCounter: {fileID: 1720281276}
   cheatSlider: {fileID: 1329701920}
   talkCounter: {fileID: 1270030738}
@@ -9275,12 +9276,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1187163550}
   m_Layer: 5
-  m_Name: Win/Lose Screen
+  m_Name: GameOverScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1187163550
 RectTransform:
   m_ObjectHideFlags: 0
