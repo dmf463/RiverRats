@@ -8,4 +8,6 @@ public static class Services
     public static DealerManager DealerManager { get; set; }
     public static PlayerBehaviour PlayerBehaviour { get; set; }
     public static GameRules GameRules { get; set; }
+    public static GameOverScreen GameOverScreen { get; set; }
+    public static PrefabDB PrefabDB { get; set; }
 }

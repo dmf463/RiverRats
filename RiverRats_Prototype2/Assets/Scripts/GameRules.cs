@@ -9,6 +9,7 @@ public class GameRules : MonoBehaviour
     public List<Rule> ChosenRules = new List<Rule>();
     public List<Rule> CompletedRules = new List<Rule>();
     public List<Rule> FailedRules = new List<Rule>();
+    private GameOverScreen gameOverScreen;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +37,7 @@ public class GameRules : MonoBehaviour
         UpdateRuleStatus();
     }
 
-    private void UpdateRuleStatus()
+    public void UpdateRuleStatus()
     {
         foreach (Rule rule in ChosenRules)
         {
@@ -46,6 +47,7 @@ public class GameRules : MonoBehaviour
                 {
                     CompletedRules.Add(rule);
                     rule.RuleCompleted = true;
+                    rule.RuleState = RuleState.Successful;
                     if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPSuccess.SetActive(true);
                     else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroCheck.SetActive(true);
                     else if (rule == ChosenRules[2]) Services.UIManager.ruleOneCheck.SetActive(true);
@@ -56,6 +58,7 @@ public class GameRules : MonoBehaviour
                 else if (CheckRuleState(rule) == RuleState.Failed)
                 {
                     rule.RuleCompleted = true;
+                    rule.RuleState = RuleState.Failed;
                     if (rule.RuleName == RuleType.TargetPlayer) Services.UIManager.VIPFail.SetActive(true);
                     else if (rule == ChosenRules[1]) Services.UIManager.ruleZeroFail.SetActive(true);
                     else if (rule == ChosenRules[2]) Services.UIManager.ruleOneFail.SetActive(true);
@@ -70,24 +73,9 @@ public class GameRules : MonoBehaviour
 
     private RuleState CheckRuleState(Rule rule)
     {
-        RuleState state = RuleState.Active;
+        RuleState state = rule.RuleState;
 
-        if(rule.RuleName == RuleType.TargetPlayer)
-        {
-            if(targetPlayer.PlayerState == PlayerState.Eliminated)
-            {
-                state = RuleState.Failed;
-                Services.TableManager.gameState = GameState.GameOver;
-            }
-            else if(Services.TableManager.gameState == GameState.GameOver)
-            {
-                if(targetPlayer.PlayerState != PlayerState.Eliminated)
-                {
-                    state = RuleState.Successful;
-                }
-            }
-        }
-        else if(rule.RuleName == RuleType.Hate)
+        if (rule.RuleName == RuleType.Hate)
         {
             PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
             PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
@@ -104,9 +92,13 @@ public class GameRules : MonoBehaviour
             {
                 state = RuleState.Successful;
             }
+            else if(Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
             else state = RuleState.Active;
         }
-        else if(rule.RuleName == RuleType.Like)
+        else if (rule.RuleName == RuleType.Like)
         {
             PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
             PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
@@ -146,14 +138,18 @@ public class GameRules : MonoBehaviour
             {
                 state = RuleState.Successful;
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
             else state = RuleState.Active;
         }
-        else if(rule.RuleName == RuleType.NoNegative)
+        else if (rule.RuleName == RuleType.NoNegative)
         {
             //if they hit a neg state, FAIL
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
-               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
-               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
             {
                 state = RuleState.Failed;
             }
@@ -162,9 +158,9 @@ public class GameRules : MonoBehaviour
             {
                 //but they're in a good mood, SUCCESS!
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
                 {
                     state = RuleState.Successful;
                 }
@@ -181,28 +177,28 @@ public class GameRules : MonoBehaviour
             {
                 //but they're in a good mood, SUCCESS!
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
                 {
                     state = RuleState.Successful;
                 }
                 //but they're in a bad mood, FAIL!
                 else if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
                 {
                     state = RuleState.Failed;
                 }
             }
             else state = RuleState.Active;
         }
-        else if(rule.RuleName == RuleType.NoPositive)
+        else if (rule.RuleName == RuleType.NoPositive)
         {
             //if they hit a POS state, FAIL
             if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
-               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
-               rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
             {
                 state = RuleState.Failed;
             }
@@ -211,9 +207,9 @@ public class GameRules : MonoBehaviour
             {
                 //but they're in a bad mood, SUCCESS!
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
                 {
                     state = RuleState.Successful;
                 }
@@ -230,60 +226,49 @@ public class GameRules : MonoBehaviour
             {
                 //but they're in a bad mood, SUCCESS!
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Content ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed)
                 {
                     state = RuleState.Successful;
                 }
                 //but they're in a good mood, FAIL!
                 else if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
-                     rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy)
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
+                        rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy)
                 {
                     state = RuleState.Failed;
                 }
             }
             else state = RuleState.Active;
         }
-        else if(rule.RuleName == RuleType.OutNegative)
+        else if (rule.RuleName == RuleType.OutNegative)
         {
-            if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Annoyed ||
-                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
-                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Angry ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.OnTilt)
                 {
                     state = RuleState.Successful;
                 }
                 else state = RuleState.Failed;
             }
         }
-        else if(rule.RuleName == RuleType.OutPositive)
+        else if (rule.RuleName == RuleType.OutPositive)
         {
             if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
                 if (rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Amused ||
-                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
-                   rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Happy ||
+                    rule.TargetPlayer0.PlayerEmotion == PlayerEmotion.Joyous)
                 {
                     state = RuleState.Successful;
                 }
                 else state = RuleState.Failed;
             }
         }
-        else if(rule.RuleName == RuleType.RoundFiveChips)
-        {
-            if(Services.DealerManager.roundCount == 6)
-            {
-                if (rule.TargetPlayer0.ChipCount >= 3000 && rule.TargetPlayer0.ChipCount <= 4000)
-                {
-                    state = RuleState.Successful;
-                }
-                else state = RuleState.Failed;
-            }
-        }
-        else if(rule.RuleName == RuleType.RoundTenChips)
+        else if (rule.RuleName == RuleType.RoundFiveChips)
         {
             if (Services.DealerManager.roundCount == 6)
             {
@@ -293,25 +278,44 @@ public class GameRules : MonoBehaviour
                 }
                 else state = RuleState.Failed;
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
-        else if(rule.RuleName == RuleType.ShortToBig)
+        else if (rule.RuleName == RuleType.RoundTenChips)
         {
-            if(rule.TargetPlayer0.shortStack && rule.TargetPlayer0.bigStack)
+            if (Services.DealerManager.roundCount == 6)
+            {
+                if (rule.TargetPlayer0.ChipCount >= 3000 && rule.TargetPlayer0.ChipCount <= 4000)
+                {
+                    state = RuleState.Successful;
+                }
+                else state = RuleState.Failed;
+            }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
+        }
+        else if (rule.RuleName == RuleType.ShortToBig)
+        {
+            if (rule.TargetPlayer0.shortStack && rule.TargetPlayer0.bigStack)
             {
                 state = RuleState.Successful;
                 rule.TargetPlayer0.shortStack = false;
                 rule.TargetPlayer0.bigStack = false;
             }
-            else if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            else if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
                 state = RuleState.Failed;
             }
-            else if(Services.TableManager.gameState == GameState.GameOver)
+            else if (Services.TableManager.gameState == GameState.GameOver)
             {
                 state = RuleState.Failed;
             }
         }
-        else if(rule.RuleName == RuleType.BigToShort)
+        else if (rule.RuleName == RuleType.BigToShort)
         {
             if (rule.TargetPlayer0.bigStack && rule.TargetPlayer0.shortStack)
             {
@@ -328,26 +332,30 @@ public class GameRules : MonoBehaviour
                 state = RuleState.Failed;
             }
         }
-        else if(rule.RuleName == RuleType.FinalTwo)
+        else if (rule.RuleName == RuleType.FinalTwo)
         {
-            if(Services.DealerManager.LivePlayerCount() == 2)
+            if (Services.DealerManager.LivePlayerCount() == 2)
             {
-                if(rule.TargetPlayer0.PlayerState != PlayerState.Eliminated)
+                if (rule.TargetPlayer0.PlayerState != PlayerState.Eliminated)
                 {
                     state = RuleState.Successful;
                 }
             }
-            else if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            else if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
             {
-                if(Services.DealerManager.LivePlayerCount() > 2)
+                if (Services.DealerManager.LivePlayerCount() > 2)
                 {
                     state = RuleState.Failed;
                 }
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
-        else if(rule.RuleName == RuleType.FirstOut)
+        else if (rule.RuleName == RuleType.FirstOut)
         {
-            if(Services.DealerManager.EliminatedPlayerCount() == 1)
+            if (Services.DealerManager.EliminatedPlayerCount() == 1)
             {
                 if (rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
                 {
@@ -355,14 +363,18 @@ public class GameRules : MonoBehaviour
                 }
                 else state = RuleState.Failed;
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
-        else if(rule.RuleName == RuleType.ThreeWayLose)
+        else if (rule.RuleName == RuleType.ThreeWayLose)
         {
-            if(Services.TableManager.gameState == GameState.CleanUp)
+            if (Services.TableManager.gameState == GameState.CleanUp)
             {
                 int winnerCount = 0;
                 int loserCount = 0;
-                for(int i = 0; i < Services.TableManager.players.Length; i++)
+                for (int i = 0; i < Services.TableManager.players.Length; i++)
                 {
                     if (Services.TableManager.players[i].PlayerState == PlayerState.Winner)
                     {
@@ -373,7 +385,7 @@ public class GameRules : MonoBehaviour
                         loserCount++;
                     }
                 }
-                if((winnerCount + loserCount) >= 3)
+                if ((winnerCount + loserCount) >= 3)
                 {
                     if (rule.TargetPlayer0.PlayerState == PlayerState.Loser)
                     {
@@ -382,8 +394,12 @@ public class GameRules : MonoBehaviour
                     else state = RuleState.Failed;
                 }
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
-        else if(rule.RuleName == RuleType.ThreeWayWin)
+        else if (rule.RuleName == RuleType.ThreeWayWin)
         {
             if (Services.TableManager.gameState == GameState.CleanUp)
             {
@@ -409,10 +425,14 @@ public class GameRules : MonoBehaviour
                     else state = RuleState.Failed;
                 }
             }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
         }
-        else if(rule.RuleName == RuleType.VIPBigWin)
+        else if (rule.RuleName == RuleType.VIPBigWin)
         {
-            if(Services.TableManager.gameState == GameState.CleanUp && Services.TableManager.pot == 0)
+            if (Services.TableManager.gameState == GameState.CleanUp && Services.TableManager.pot == 0)
             {
                 int winnerCount = 0;
                 int eliminatedCount = 0;
@@ -423,28 +443,46 @@ public class GameRules : MonoBehaviour
                         winnerCount += 1;
                     }
                     else if (Services.TableManager.players[i].PlayerState == PlayerState.Loser &&
-                             Services.TableManager.players[i].ChipCount == 0)
+                                Services.TableManager.players[i].ChipCount == 0)
                     {
                         eliminatedCount++;
                     }
                 }
-                if(winnerCount + eliminatedCount >= 3)
+                if (winnerCount + eliminatedCount >= 3)
                 {
-                    if(targetPlayer.PlayerState == PlayerState.Winner)
+                    if (targetPlayer.PlayerState == PlayerState.Winner)
                     {
                         state = RuleState.Successful;
                     }
                 }
             }
-        }
-        else if(rule.RuleState == RuleState.Active && rule.TargetPlayer0 != null)
-        {
-            if(rule.TargetPlayer0.PlayerState == PlayerState.Eliminated)
+            else if (Services.TableManager.gameState == GameState.GameOver)
             {
                 state = RuleState.Failed;
             }
         }
-
+        else if (rule.RuleName == RuleType.TargetPlayer)
+        {
+            if (targetPlayer.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+                if (Services.TableManager.gameState != GameState.GameOver)
+                {
+                    Services.GameOverScreen.GameOver(GameOverReasons.VIPEliminated);
+                }
+            }
+            else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                if (targetPlayer.PlayerState != PlayerState.Eliminated)
+                {
+                    state = RuleState.Successful;
+                    if (Services.TableManager.gameState != GameState.GameOver)
+                    {
+                        Services.GameOverScreen.GameOver(GameOverReasons.VIPWins);
+                    }
+                }
+            }
+        }
         return state;
     }
 

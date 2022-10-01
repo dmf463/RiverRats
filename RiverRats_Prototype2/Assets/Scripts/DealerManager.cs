@@ -1061,15 +1061,15 @@ public class DealerManager : MonoBehaviour
             }
             if (eliminatedPlayers == 4)
             {
-                table.gameState = GameState.GameOver;
+                //table.gameState = GameState.GameOver;
                 Debug.Log("GAME OVER");
-                for (int i = 0; i < table.players.Length; i++)
-                {
-                    if (table.players[i].PlayerState == PlayerState.Playing)
-                    {
-                        Debug.Log("The winner is player " + i + " and they have a chipstack of " + table.players[i].ChipCount);
-                    }
-                }
+                //for (int i = 0; i < table.players.Length; i++)
+                //{
+                //    if (table.players[i].PlayerState == PlayerState.Playing)
+                //    {
+                //        Debug.Log("The winner is player " + i + " and they have a chipstack of " + table.players[i].ChipCount);
+                //    }
+                //}
             }
             else
             {

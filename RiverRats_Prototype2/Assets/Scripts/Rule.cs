@@ -9,6 +9,7 @@ public class Rule
 {
     public RuleType RuleName;
     public string RuleText;
+    public int RuleScore;
     public RuleState RuleState;
     public bool RuleCompleted;
     public bool TargetPlayerProhibited;
@@ -23,6 +24,7 @@ public class Rule
         RuleName = ruleName;
         RuleState = RuleState.Active;
         RuleCompleted = false;
+        RuleScore = 100;
     }
     
     public Rule(RuleType ruleName, Player targetPlayer0)
@@ -31,6 +33,7 @@ public class Rule
         TargetPlayer0 = targetPlayer0;
         RuleState = RuleState.Active;
         RuleCompleted = false;
+        RuleScore = 100;
 
     }
 
@@ -41,5 +44,6 @@ public class Rule
         TargetPlayer1 = targetPlayer1;
         RuleState = RuleState.Active;
         RuleCompleted = false;
+        RuleScore = 100;
     }
 }

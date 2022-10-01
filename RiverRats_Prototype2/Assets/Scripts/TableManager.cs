@@ -37,6 +37,7 @@ public class TableManager : MonoBehaviour
 
     private void InitializeTable() //setting Services, creating platyers, and setting initial blind/round/gamestate
     {
+        Services.PrefabDB = Resources.Load<PrefabDB>("PrefabDB");
         Services.TableManager = this;
         Services.PlayerBehaviour = new PlayerBehaviour();
         Services.DealerManager = GameObject.Find("DealerManager").GetComponent<DealerManager>();
