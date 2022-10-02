@@ -1061,7 +1061,7 @@ public class DealerManager : MonoBehaviour
             }
             if (eliminatedPlayers == 4)
             {
-                //table.gameState = GameState.GameOver;
+                table.gameState = GameState.GameOver;
                 Debug.Log("GAME OVER");
                 //for (int i = 0; i < table.players.Length; i++)
                 //{

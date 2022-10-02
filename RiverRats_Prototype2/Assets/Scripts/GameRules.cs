@@ -27,13 +27,7 @@ public class GameRules : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-         * What I want to do is:
-         * Each frame, look through the game state and determine:
-         *        is this rule successful?
-         *        is it failed?
-         *        is it in progress?
-         */
+        CheckForCheatingTalking();
         UpdateRuleStatus();
     }
 
@@ -69,6 +63,12 @@ public class GameRules : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void CheckForCheatingTalking()
+    {
+        if (Services.DealerManager.cheatCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.CheatingTooMuch);
+        else if (Services.DealerManager.talkCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.TalkingTooMuch);
     }
 
     private RuleState CheckRuleState(Rule rule)
@@ -473,7 +473,7 @@ public class GameRules : MonoBehaviour
             }
             else if (Services.TableManager.gameState == GameState.GameOver)
             {
-                if (targetPlayer.PlayerState != PlayerState.Eliminated)
+                if (targetPlayer.PlayerState != PlayerState.Eliminated && Services.DealerManager.EliminatedPlayerCount() == 4)
                 {
                     state = RuleState.Successful;
                     if (Services.TableManager.gameState != GameState.GameOver)
