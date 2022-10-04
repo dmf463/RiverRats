@@ -52,7 +52,7 @@ public class CSV_Parser : MonoBehaviour
             {
                 OrganizedRules.Add(new Rule(GetRuleName(rule), ruleTargets[0], ruleTargets[1]));
             }
-            Debug.Log("Organized Rule Count = " + OrganizedRules.Count);
+            //Debug.Log("Organized Rule Count = " + OrganizedRules.Count);
         }
 
         //for (int i = 0; i < OrganizedRules.Count; i++)

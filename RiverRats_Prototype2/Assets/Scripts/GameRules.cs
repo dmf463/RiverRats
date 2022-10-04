@@ -19,8 +19,8 @@ public class GameRules : MonoBehaviour
         AddRuleDescription();
         targetPlayer = Services.TableManager.players[Random.Range(0, 5)];
         ProhibitTargePlayerRules(targetPlayer);
-        Debug.Log("VIP = Player" + targetPlayer.SeatPos);
-        Debug.Log("rules list count = " + RulesList.Count);
+        //Debug.Log("VIP = Player" + targetPlayer.SeatPos);
+        //Debug.Log("rules list count = " + RulesList.Count);
         ChooseRules();
     }
 
@@ -513,8 +513,8 @@ public class GameRules : MonoBehaviour
         }
         for (int i = 0; i < ChosenRules.Count; i++)
         {
-            Debug.Log("Rule " + i + " is " + ChosenRules[i].RuleName);
-            Debug.Log("Rule" + i + " = " + ChosenRules[i].RuleText);
+            //Debug.Log("Rule " + i + " is " + ChosenRules[i].RuleName);
+            //Debug.Log("Rule" + i + " = " + ChosenRules[i].RuleText);
         }
     }
 

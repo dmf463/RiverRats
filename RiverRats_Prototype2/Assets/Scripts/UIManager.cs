@@ -25,6 +25,18 @@ public class UIManager : MonoBehaviour
     public GameObject potSize; //obj visualizing the pot
     public GameObject gameState;
 
+
+    public List<Sprite> spadeSprites_simple;//all of these
+    public List<Sprite> heartSprites_simple;//sprites were dragged
+    public List<Sprite> diamondSprites_simple;//and dropped into the inspector from
+    public List<Sprite> clubSprites_simple;// various sprite sheets
+    public List<Sprite>[] cardSprites_simple;// they were then combined to form cards
+    public List<GameObject>[] playerHoleCards_simple = new List<GameObject>[5]
+    {
+        new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>()
+    };//these visualize each of the players 2 cards
+
+
     public List<Sprite> spadeSprites;//all of these
     public List<Sprite> heartSprites;//sprites were dragged
     public List<Sprite> diamondSprites;//and dropped into the inspector from
@@ -139,6 +151,13 @@ public class UIManager : MonoBehaviour
             diamondSprites,
             clubSprites
         };
+        cardSprites_simple = new List<Sprite>[4]
+        {
+            spadeSprites_simple,
+            heartSprites_simple,
+            diamondSprites_simple,
+            clubSprites_simple
+        };
         cardColor = flop1.GetComponent<Image>().color;
         Flop = new List<GameObject>
         {
@@ -223,6 +242,8 @@ public class UIManager : MonoBehaviour
                 {
                     playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack;
                     playerHoleCards[player][card].GetComponent<Image>().color = new Color(cardColor.r, cardColor.g, cardColor.b, 0);
+                    playerHoleCards_simple[player][card].GetComponent<Image>().sprite = cardBack;
+                    playerHoleCards_simple[player][card].GetComponent<Image>().color = new Color(cardColor.r, cardColor.g, cardColor.b, 0);
                 }
             }
         }
@@ -247,8 +268,10 @@ public class UIManager : MonoBehaviour
                     for (int card = 0; card < table.players[player].holeCards.Count; card++)
                     {
                         //playerHoleCards[player][card].GetComponent<Image>().sprite = GetCardImage(cards[card]);
-                        playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack;
-                        playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
+                        //playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack;
+                        //playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
+                        playerHoleCards_simple[player][card].GetComponent<Image>().sprite = GetCardImage_Simple(cards[card]);
+                        playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
                     }
                 }
             }
@@ -347,7 +370,7 @@ public class UIManager : MonoBehaviour
     private void FindAllCardGameObjects(GameObject obj) //goes through and adds cards to the list
     {
         allGameCardObjs.Add(obj);
-        foreach(GameObject o in allGameCardObjs)
+        foreach (GameObject o in allGameCardObjs)
         {
             o.GetComponent<Image>().color = new Color(cardColor.r, cardColor.b, cardColor.g, 0);
         }
@@ -383,6 +406,36 @@ public class UIManager : MonoBehaviour
         return sprite;
     }
 
+    public Sprite GetCardImage_Simple(CardType card) //so when we pass a card, it looks at the rank and the suit to find the card
+    {
+        Sprite sprite;
+        int suit = 0;
+        if (card.suit == SuitType.Spades) suit = 0;
+        else if (card.suit == SuitType.Hearts) suit = 1;
+        else if (card.suit == SuitType.Diamonds) suit = 2;
+        else suit = 3;
+
+        int rank = 0;
+        if (card.rank == RankType.Two) rank = 0;
+        else if (card.rank == RankType.Three) rank = 1;
+        else if (card.rank == RankType.Four) rank = 2;
+        else if (card.rank == RankType.Five) rank = 3;
+        else if (card.rank == RankType.Six) rank = 4;
+        else if (card.rank == RankType.Seven) rank = 5;
+        else if (card.rank == RankType.Eight) rank = 6;
+        else if (card.rank == RankType.Nine) rank = 7;
+        else if (card.rank == RankType.Ten) rank = 8;
+        else if (card.rank == RankType.Jack) rank = 9;
+        else if (card.rank == RankType.Queen) rank = 10;
+        else if (card.rank == RankType.King) rank = 11;
+        else rank = 12;
+
+
+        sprite = cardSprites_simple[suit][rank];
+
+        return sprite;
+    }
+
     public void SetPlayerHoleCards() //janky hard code to create the holecard player list
     {
         TableManager tm = Services.TableManager;
@@ -392,32 +445,46 @@ public class UIManager : MonoBehaviour
             {
                 playerHoleCards[i].Add(GameObject.Find("P0_HoleCard1"));
                 playerHoleCards[i].Add(GameObject.Find("P0_HoleCard2"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P0_Card1"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P0_Card2"));
             }
             else if (tm.players[i].SeatPos == 1)
             {
                 playerHoleCards[i].Add(GameObject.Find("P1_HoleCard1"));
                 playerHoleCards[i].Add(GameObject.Find("P1_HoleCard2"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P1_Card1"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P1_Card2"));
 
             }
             else if (tm.players[i].SeatPos == 2)
             {
                 playerHoleCards[i].Add(GameObject.Find("P2_HoleCard1"));
                 playerHoleCards[i].Add(GameObject.Find("P2_HoleCard2"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P2_Card1"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P2_Card2"));
             }
             else if (tm.players[i].SeatPos == 3)
             {
                 playerHoleCards[i].Add(GameObject.Find("P3_HoleCard1"));
                 playerHoleCards[i].Add(GameObject.Find("P3_HoleCard2"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P3_Card1"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P3_Card2"));
             }
             else
             {
                 playerHoleCards[i].Add(GameObject.Find("P4_HoleCard1"));
                 playerHoleCards[i].Add(GameObject.Find("P4_HoleCard2"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P4_Card1"));
+                playerHoleCards_simple[i].Add(GameObject.Find("P4_Card2"));
             }
         }
         for(int i = 0; i < Services.TableManager.numActivePlayers; i++)
         {
             foreach(GameObject obj in playerHoleCards[i])
+            {
+                FindAllCardGameObjects(obj);
+            }
+            foreach (GameObject obj in playerHoleCards_simple[i])
             {
                 FindAllCardGameObjects(obj);
             }

@@ -1244,7 +1244,7 @@ public class DealerManager : MonoBehaviour
             {
                 for (int j = 0; j < table.players[i].holeCards.Count; j++)
                 {
-                    Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                    //Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
                 }
             }
         }

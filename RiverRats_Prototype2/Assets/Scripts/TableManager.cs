@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /*
  * This script is the table script. It manages what goes ONTO the table, or what is on the table. It's more of a management class than anything. We have players at the table, money on the table. Basically if it's on the table, it'll probs be here. 
  */
-public enum Destination { player1, player2, player3, player4, player5, flop, turn, river, burn}
+public enum Destination { player0, player1, player2, player3, player4, flop, turn, river, burn}
 public enum GameState { PreFlop = 0, Flop, Turn, River, Showdown, CleanUp, GameOver };
 public enum Chips { Five = 5, Ten = 10, TwentyFive = 25, Fifty = 50, Hundred = 100, FiveHundred = 500, Thousand = 1000 };
 public class TableManager : MonoBehaviour
@@ -15,7 +15,7 @@ public class TableManager : MonoBehaviour
     public List<CardType> board = new List<CardType>(); //holds the board cards. Not currently used, but maybe one day.
     public List<CardType> burn = new List<CardType>(); //holds the burn cards. Used right now to determine UI.
     public List<Destination> playerDestinations = new List<Destination> //makes it easier to deal to players
-    { Destination.player1, Destination.player2, Destination.player3, Destination.player4, Destination.player5};
+    { Destination.player0, Destination.player1, Destination.player2, Destination.player3, Destination.player4};
     public int numActivePlayers; //how many players are in the hand
     public int blindRound; //what's the blind amount?
     public int smallBlind;
