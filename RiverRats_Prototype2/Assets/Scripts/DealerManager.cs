@@ -1212,6 +1212,7 @@ public class DealerManager : MonoBehaviour
                 foreach (Player player in table.players)
                 {
                     player.currentBet = 0;
+                    player.lastAction = PlayerAction.None;
                 }
                 if(table.gameState == GameState.PreFlop)
                 {

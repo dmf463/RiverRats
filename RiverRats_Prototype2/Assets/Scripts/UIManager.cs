@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /*
  * The whole point of this Script is to control the on screen UI. If it's about the UI it should be in here. We don't want to control any of the actual gameplay logic, just the visualization of that object. 
  */
+
 public class UIManager : MonoBehaviour
 {
     private TaskManager tm;
@@ -35,6 +36,7 @@ public class UIManager : MonoBehaviour
     {
         new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>(), new List<GameObject>()
     };//these visualize each of the players 2 cards
+    public List<GameObject> actionText = new List<GameObject>();
 
 
     public List<Sprite> spadeSprites;//all of these
@@ -124,9 +126,9 @@ public class UIManager : MonoBehaviour
 
     public void SetBorderImage()
     {
-        borderColor_on = playerToActBorder[0].GetComponent<Image>().color;
-        borderColor_off = new Color(borderColor_on.r, borderColor_on.g, borderColor_on.b, 0);
-        targetPlayerColor = Color.blue;
+        borderColor_on = Color.red;
+        borderColor_off = playerToActBorder[0].GetComponent<Image>().color;
+        targetPlayerColor = Color.cyan;
 
         foreach(GameObject obj in playerToActBorder)
         {
@@ -175,6 +177,10 @@ public class UIManager : MonoBehaviour
         FindAllCardGameObjects(turn);
         FindAllCardGameObjects(river);
         SetBorderImage();
+        foreach(GameObject text in actionText)
+        {
+            text.GetComponent<Text>().text = "";
+        }
     }
 
     private void UpdateTextOnScreen() //for all the things that need to update, keep them updated
@@ -185,9 +191,55 @@ public class UIManager : MonoBehaviour
             if (table.players[i].PlayerState != PlayerState.Eliminated)
             {
                 emotionalState[i].GetComponentInChildren<Text>().text = table.players[i].PlayerEmotion.ToString();
-                betAmounts[i].GetComponent<Text>().text = table.players[i].currentBet.ToString();
                 maxBets[i].GetComponent<Text>().text = table.players[i].MaxAmountToWin.ToString();
                 handStrengths[i].GetComponent<Text>().text = table.players[i].HandStrength.ToString();
+
+                //bets
+                if (Services.DealerManager.playerToAct != null && (Services.DealerManager.playerToAct.SeatPos == table.players[i].SeatPos) && table.players[i].lastAction == PlayerAction.None)
+                {
+                    betAmounts[i].GetComponent<Text>().text = (Services.DealerManager.lastBet - table.players[i].currentBet).ToString();
+                }
+                else if (table.players[i].lastAction == PlayerAction.Fold)
+                {
+                    betAmounts[i].GetComponent<Text>().text = "";
+                }
+                else if (table.players[i].lastAction == PlayerAction.None && table.players[i].currentBet != 0)
+                {
+                    betAmounts[i].GetComponent<Text>().text = table.players[i].currentBet.ToString();
+                }
+                else if (table.players[i].lastAction == PlayerAction.None)
+                {
+                    betAmounts[i].GetComponent<Text>().text = " ";
+                }
+                else if (table.players[i].currentBet < Services.DealerManager.lastBet)
+                {
+                    betAmounts[i].GetComponent<Text>().text = (Services.DealerManager.lastBet - table.players[i].currentBet).ToString();
+                }
+                else betAmounts[i].GetComponent<Text>().text = table.players[i].currentBet.ToString();
+
+                
+                //actions
+                if(Services.DealerManager.playerToAct == null && table.players[i].currentBet == 0)
+                {
+                    actionText[i].GetComponent<Text>().text = " ";
+                }
+                else if (Services.DealerManager.playerToAct != null && (Services.DealerManager.playerToAct.SeatPos == table.players[i].SeatPos))
+                {
+                    actionText[i].GetComponent<Text>().text = "To Call: ";
+                }
+                else if (table.players[i].lastAction == PlayerAction.Call && Services.DealerManager.lastBet == 0)
+                {
+                    actionText[i].GetComponent<Text>().text = "Checks";
+                }
+                else if (table.players[i].currentBet == table.smallBlind && table.players[i].lastAction == PlayerAction.None)
+                {
+                    actionText[i].GetComponent<Text>().text = "Small: ";
+                }
+                else if (table.players[i].currentBet == table.bigBlind && table.players[i].lastAction == PlayerAction.None)
+                {
+                    actionText[i].GetComponent<Text>().text = "Big: ";
+                }
+                else actionText[i].GetComponent<Text>().text = GetActionText(table.players[i].lastAction);
             }
             else
             {
@@ -218,6 +270,31 @@ public class UIManager : MonoBehaviour
             rule2.GetComponent<Text>().text = Services.GameRules.ChosenRules[3].RuleText;
             rule3.GetComponent<Text>().text = Services.GameRules.ChosenRules[4].RuleText;
         }
+    }
+
+    public string GetActionText(PlayerAction playerAction)
+    {
+        string action = "To Call: ";
+
+        switch (playerAction)
+        {
+            case PlayerAction.Fold:
+                action = "Folded";
+                break;
+            case PlayerAction.Call:
+                action = "Calls";
+                break;
+            case PlayerAction.Raise:
+                action = "Raises";
+                break;
+            case PlayerAction.None:
+                action = " ";
+                break;
+            default:
+                break;
+        }
+
+        return action;
     }
     
     public void SetDealerPositionUI(int pos)
