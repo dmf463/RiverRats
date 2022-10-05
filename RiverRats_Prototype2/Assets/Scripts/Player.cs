@@ -5,6 +5,7 @@ using UnityEngine;
 public enum PlayerState { Playing, NotPlaying, Winner, Loser, Eliminated } //what is the player doing
 public enum PlayerEmotion { Joyous, Happy, Amused, Content, Annoyed, Angry, OnTilt } //emotions of the player
 public enum PlayerAction { Fold, Call, Raise, None }
+public enum PlayerDecisionState { None, Fold, Call, Raise, AllIn, Check, ToCall, SmallBlind, BigBlind, Eliminated }
 public class Player
 {
     public int SeatPos { get; set; } //Where are they sitting at the table
