@@ -193,40 +193,15 @@ public class UIManager : MonoBehaviour
                 emotionalState[i].GetComponentInChildren<Text>().text = table.players[i].PlayerEmotion.ToString();
                 maxBets[i].GetComponent<Text>().text = table.players[i].MaxAmountToWin.ToString();
                 handStrengths[i].GetComponent<Text>().text = table.players[i].HandStrength.ToString();
-
-                betAmounts[i].GetComponent<Text>().text = GetBetText(table.players[i].decisionState, table.players[i]).ToString();
                 actionText[i].GetComponent<Text>().text = GetActionText(table.players[i].decisionState);
-
-                NotPlayerUI(table.players[i]);
-
-                ////bets
-                //if (Services.DealerManager.playerToAct != null && (Services.DealerManager.playerToAct.SeatPos == table.players[i].SeatPos) && table.players[i].lastAction == PlayerAction.None)
-                //{
-                //    betAmounts[i].GetComponent<Text>().text = (Services.DealerManager.lastBet - table.players[i].currentBet).ToString();
-                //}
-                //else if (table.players[i].lastAction == PlayerAction.Fold)
-                //{
-                //    betAmounts[i].GetComponent<Text>().text = "";
-                //}
-                //else if (table.players[i].lastAction == PlayerAction.None && table.players[i].currentBet != 0)
-                //{
-                //    betAmounts[i].GetComponent<Text>().text = table.players[i].currentBet.ToString();
-                //}
-                //else if (table.players[i].lastAction == PlayerAction.None)
-                //{
-                //    betAmounts[i].GetComponent<Text>().text = " ";
-                //}
-                //else if (table.players[i].currentBet < Services.DealerManager.lastBet)
-                //{
-                //    betAmounts[i].GetComponent<Text>().text = (Services.DealerManager.lastBet - table.players[i].currentBet).ToString();
-                //}
-                //else betAmounts[i].GetComponent<Text>().text = table.players[i].currentBet.ToString();
-            }
-            else
-            {
-                //emotionalState[i].GetComponentInChildren<Text>().text = "Eliminated";
-                //betAmounts[i].GetComponent<Text>().text = "0";
-                //maxBets[i].GetComponent<Text>().text = "0";
+                if (IsPlaying(table.players[i]))
+                {
+                    betAmounts[i].GetComponent<Text>().text = GetBetText(table.players[i].decisionState, table.players[i]).ToString();
+                }
+                else
+                {
+                    NotPlayingUI(table.players[i]);
+                }
             }
         }
         gameState.GetComponent<Text>().text = table.gameState.ToString();
@@ -253,20 +228,37 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void NotPlayerUI(Player player)
+    public void NotPlayingUI(Player player)
     {
-        if(player.PlayerState == PlayerState.Eliminated)
+        if (player.PlayerState == PlayerState.Eliminated)
         {
             player.decisionState = PlayerDecisionState.Eliminated;
             betAmounts[player.SeatPos].GetComponent<Text>().text = "";
         }
-        else if(player.decisionState == PlayerDecisionState.Fold ||
+        else if (player.decisionState == PlayerDecisionState.Fold ||
+                player.PlayerState == PlayerState.NotPlaying ||
                 player.decisionState == PlayerDecisionState.None ||
                 player.decisionState == PlayerDecisionState.Eliminated)
         {
             betAmounts[player.SeatPos].GetComponent<Text>().text = "";
 
         }
+    }
+
+    public bool IsPlaying(Player player)
+    {
+        bool playing = true;
+
+        if (player.PlayerState == PlayerState.Eliminated ||
+           player.PlayerState == PlayerState.NotPlaying ||
+           player.decisionState == PlayerDecisionState.Fold ||
+           player.decisionState == PlayerDecisionState.None ||
+           player.decisionState == PlayerDecisionState.Eliminated)
+        {
+            playing = false;
+        }
+
+        return playing;
     }
 
     public string GetActionText(PlayerDecisionState decisionState)
