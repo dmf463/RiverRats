@@ -940,7 +940,7 @@ public class DealerManager : MonoBehaviour
 
     public void ChooseWinner()
     {
-        if (table.gameState == GameState.Showdown)
+        if (table.gameState == GameState.CleanUp)
         {
             DetermineWinner();
             RevealCards();
@@ -955,7 +955,6 @@ public class DealerManager : MonoBehaviour
                               " and a handTotal of " + player.Hand.HandValues.Total);
                 }
             }
-            table.gameState++;
             SetAwardPlayer_Amount();
         }
     }
@@ -1213,19 +1212,26 @@ public class DealerManager : MonoBehaviour
                     break;
                 }
             }
-            if (OnlyAllInPlayersLeft()) RevealCards();
             if (roundFinished)
             {
-                //Debug.Log("round finished no one should do anything anymore, setting playerToAct = null");
+                Debug.Log("round finished no one should do anything anymore, setting playerToAct = null");
                 playerToAct = null;
                 lastBet = 0;
                 foreach (Player player in table.players)
                 {
                     player.currentBet = 0;
                     player.lastAction = PlayerAction.None;
-                    if(player.PlayerState == PlayerState.Eliminated) player.decisionState = PlayerDecisionState.Eliminated;
+                    if (player.PlayerState == PlayerState.Eliminated)
+                    {
+                        player.decisionState = PlayerDecisionState.Eliminated;
+                    }
+                    else player.decisionState = PlayerDecisionState.None;
                 }
-                if(table.gameState == GameState.PreFlop)
+                if (OnlyAllInPlayersLeft())
+                {
+                    RevealCards();
+                }
+                if (table.gameState == GameState.PreFlop)
                 {
                     table.gameState = GameState.Flop;
                 }
@@ -1239,7 +1245,8 @@ public class DealerManager : MonoBehaviour
                 }
                 else if(table.gameState == GameState.River)
                 {
-                    table.gameState = GameState.Showdown;
+                    table.gameState = GameState.CleanUp;
+                    Debug.Log("Entering cleanup");
                     //if players are in hand, reveal their cards
                     RevealCards();
                     ChooseWinner();
@@ -1252,11 +1259,11 @@ public class DealerManager : MonoBehaviour
     {
         for (int i = 0; i < table.players.Length; i++)
         {
-            if (table.players[i].PlayerState == PlayerState.Winner || table.players[i].PlayerState == PlayerState.Loser || table.players[i].PlayerState == PlayerState.Playing)
+            if (table.players[i].PlayerState != PlayerState.NotPlaying && table.players[i].PlayerState != PlayerState.Eliminated)
             {
-                for (int j = 0; j < table.players[i].holeCards.Count; j++)
+                for (int j = 0; j < 2; j++)
                 {
-                    //Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                    Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
                 }
             }
         }
@@ -1264,24 +1271,23 @@ public class DealerManager : MonoBehaviour
 
     public bool OnlyAllInPlayersLeft() //checks if it's only all in players, and returns true or false
     {
-        bool onlyAllinPlayersLeft;
         float allInPlayers = 0;
 
         for (int i = 0; i < table.players.Length; i++)
         {
             if (table.players[i].playerIsAllIn) allInPlayers++;
         }
+        Debug.Log("AllInPlayerCount = " + allInPlayers);
+        Debug.Log("ActivePlayerCount = " + ActivePlayerCount());
         if (allInPlayers == ActivePlayerCount())
         {
-            onlyAllinPlayersLeft = true;
+            return true;
         }
-        else if (ActivePlayerCount() - allInPlayers == 1 && playerToAct == null)
+        else if ((ActivePlayerCount() - allInPlayers) == 1)
         {
-            onlyAllinPlayersLeft = true;
+            return true;
         }
-        else onlyAllinPlayersLeft = false;
-
-        return onlyAllinPlayersLeft;
+        else return false;
     }
 
     public void InsultPlayer() //Click a button and it cycles through to the next emotion. Binary choice.

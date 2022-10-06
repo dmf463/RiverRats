@@ -7,7 +7,7 @@ using UnityEngine.UI;
  * This script is the table script. It manages what goes ONTO the table, or what is on the table. It's more of a management class than anything. We have players at the table, money on the table. Basically if it's on the table, it'll probs be here. 
  */
 public enum Destination { player0, player1, player2, player3, player4, flop, turn, river, burn}
-public enum GameState { PreFlop = 0, Flop, Turn, River, Showdown, CleanUp, GameOver };
+public enum GameState { PreFlop = 0, Flop, Turn, River, CleanUp, GameOver };
 public enum Chips { Five = 5, Ten = 10, TwentyFive = 25, Fifty = 50, Hundred = 100, FiveHundred = 500, Thousand = 1000 };
 public class TableManager : MonoBehaviour
 {

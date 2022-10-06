@@ -400,32 +400,31 @@ public class UIManager : MonoBehaviour
                 {
                     for (int card = 0; card < table.players[player].holeCards.Count; card++)
                     {
-                        //playerHoleCards[player][card].GetComponent<Image>().sprite = GetCardImage(cards[card]);
-                        //playerHoleCards[player][card].GetComponent<Image>().sprite = cardBack;
-                        //playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
+                        playerHoleCards_simple[player][card].GetComponent<Image>().sprite = cardBack;
+
+                        //playerHoleCards_simple[player][card].GetComponent<Image>().sprite = GetCardImage_Simple(cards[card]);
+                        playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
+                    }
+                }
+            }
+        }
+        if(round == GameState.CleanUp || Services.DealerManager.OnlyAllInPlayersLeft())
+        {
+            for (int player = 0; player < table.players.Length; player++)
+            {
+                if (des == table.playerDestinations[player])
+                {
+                    for (int card = 0; card < 2; card++)
+                    {
                         playerHoleCards_simple[player][card].GetComponent<Image>().sprite = GetCardImage_Simple(cards[card]);
                         playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
                     }
                 }
             }
         }
-        else if(round == GameState.CleanUp || round == GameState.Showdown)
-        {
-            for (int player = 0; player < table.players.Length; player++)
-            {
-                if (des == table.playerDestinations[player])
-                {
-                    for (int card = 0; card < table.players[player].holeCards.Count; card++)
-                    {
-                        playerHoleCards[player][card].GetComponent<Image>().sprite = GetCardImage(cards[card]);
-                        playerHoleCards[player][card].GetComponent<Image>().color = cardColor;
-                    }
-                }
-            }
-        }
         //on the burn, we just want to show we burned a card, so we just set it to a card back
         //but it DOES have a card associated with it
-        else if(des == Destination.burn)
+        if(des == Destination.burn)
         {
             int pos = table.burn.Count;
             Burn[pos].GetComponent<Image>().sprite = cardBack;

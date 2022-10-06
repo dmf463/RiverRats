@@ -151,6 +151,7 @@ public class Player
             if (ChipCount - betToRaise <= 0)
             {
                 playerIsAllIn = true;
+                decisionState = PlayerDecisionState.AllIn;
                 //Debug.Log("Player " + SeatPos + " didn't have enough chips and went all in for " + chipCount);
                 Debug.Log("player " + SeatPos + " raises " + ChipCount);
                 currentBet+= ChipCount; //made the change here
