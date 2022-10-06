@@ -912,17 +912,24 @@ public class DealerManager : MonoBehaviour
                     if (table.gameState == GameState.PreFlop)
                     {
                         playerToAct = PlayerSeatsAwayFromDealerAmongstLivePlayers(0);
+                        playerToAct.decisionState = PlayerDecisionState.ToCall;
                     }
-                    else playerToAct = PlayerSeatsAwayFromDealerAmongstLivePlayers(1);
+                    else
+                    {
+                        playerToAct = PlayerSeatsAwayFromDealerAmongstLivePlayers(1);
+                        playerToAct.decisionState = PlayerDecisionState.ToCall;
+                    }
                 }
                 else
                 {
                     playerToAct = PlayerSeatsAwayFromDealerAmongstLivePlayers(3);
+                    playerToAct.decisionState = PlayerDecisionState.ToCall;
                 }
             }
             else
             {
                 playerToAct = FindFirstPlayerToAct(1);
+                playerToAct.decisionState = PlayerDecisionState.ToCall;
             }
         }
         else
@@ -1048,11 +1055,13 @@ public class DealerManager : MonoBehaviour
                 if (table.players[i].PlayerState != PlayerState.Eliminated)
                 {
                     table.players[i].PlayerState = PlayerState.Playing;
+                    table.players[i].decisionState = PlayerDecisionState.None;
                     //Debug.Log("Player " + table.players[i].SeatPos + " has " + table.players[i].ChipCount + " at the top of the hand");
                 }
                 else
                 {
                     eliminatedPlayers++;
+                    table.players[i].decisionState = PlayerDecisionState.Eliminated;
                 }
             }
             foreach(Player player in table.players)
@@ -1200,6 +1209,7 @@ public class DealerManager : MonoBehaviour
                     //once we get a player that meets all the criteria, we set roundFinished to false, so we don't end the round
                     roundFinished = false;
                     playerToAct = nextPlayer; //and we set the playerToAct;
+                    playerToAct.decisionState = PlayerDecisionState.ToCall;
                     break;
                 }
             }
@@ -1213,6 +1223,7 @@ public class DealerManager : MonoBehaviour
                 {
                     player.currentBet = 0;
                     player.lastAction = PlayerAction.None;
+                    if(player.PlayerState == PlayerState.Eliminated) player.decisionState = PlayerDecisionState.Eliminated;
                 }
                 if(table.gameState == GameState.PreFlop)
                 {
@@ -1804,6 +1815,8 @@ public class DealerManager : MonoBehaviour
             small = PlayerSeatsAwayFromDealerAmongstLivePlayers(1);
             big = PlayerSeatsAwayFromDealerAmongstLivePlayers(2);
         }
+        small.decisionState = PlayerDecisionState.SmallBlind;
+        big.decisionState = PlayerDecisionState.BigBlind;
 
         CollectBlinds(small, table.smallBlind);
         CollectBlinds(big, table.bigBlind);

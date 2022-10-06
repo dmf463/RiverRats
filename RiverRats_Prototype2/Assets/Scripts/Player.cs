@@ -5,7 +5,7 @@ using UnityEngine;
 public enum PlayerState { Playing, NotPlaying, Winner, Loser, Eliminated } //what is the player doing
 public enum PlayerEmotion { Joyous, Happy, Amused, Content, Annoyed, Angry, OnTilt } //emotions of the player
 public enum PlayerAction { Fold, Call, Raise, None }
-public enum PlayerDecisionState { None, Fold, Call, Raise, AllIn, Check, ToCall, SmallBlind, BigBlind, Eliminated }
+public enum PlayerDecisionState { None, Fold, Call, Raise, AllIn, Check, ToCall, SmallBlind, BigBlind, Winner, Eliminated }
 public class Player
 {
     public int SeatPos { get; set; } //Where are they sitting at the table
@@ -33,6 +33,7 @@ public class Player
     public float percievedHandStrength;
     public PlayerEmotion PlayerEmotion; //Player's emotional state;
     public PlayerState PlayerState; //what's their current state in the game
+    public PlayerDecisionState decisionState; 
     public int amountToRaise;
 
     public Player(int seatPos, int chipCount, PlayerEmotion emotion, PlayerState state) //strcut to build new players
@@ -50,6 +51,7 @@ public class Player
         Cards.Clear();
         PlayerState = PlayerState.NotPlaying;
         lastAction = PlayerAction.Fold;
+        decisionState = PlayerDecisionState.Fold;
         Hand = null;
         Services.UIManager.TurnPlayerCardImageOff(Services.TableManager.playerDestinations[SeatPos]);
         Debug.Log("Player " + SeatPos + " folded!");
@@ -88,6 +90,7 @@ public class Player
             if (ChipCount - betToCall <= 0)
             {
                 playerIsAllIn = true;
+                decisionState = PlayerDecisionState.AllIn;
                 Debug.Log("Player " + SeatPos + " calls, going all in for " + ChipCount);
                 currentBet = ChipCount + currentBet;
                 Bet(ChipCount);
@@ -98,10 +101,12 @@ public class Player
                 //Debug.Log("betToCall = " + betToCall);
                 if (betToCall == 0)
                 {
+                    decisionState = PlayerDecisionState.Check;
                     Debug.Log("player " + SeatPos + " Checks");
                 }
                 else
                 {
+                    decisionState = PlayerDecisionState.Call;
                     Debug.Log("player " + SeatPos + " Calls"); 
                 }
                 Bet(betToCall);
@@ -122,6 +127,7 @@ public class Player
             //int raiseAmount = amountToRaise; //this is used when we're actually determining handStrength and really building the AI, but for now we'll just go directly to raising as a set amount.
             int raiseAmount = amountToRaise;
             lastAction = PlayerAction.Raise;
+            decisionState = PlayerDecisionState.Raise;
             timesRaisedThisRound++;
             Services.DealerManager.raisesInRound++;
             int betToRaise;
@@ -172,6 +178,11 @@ public class Player
             }
             actedThisRound = true;
         }
+    }
+
+    public int GetBetToCall()
+    {
+        return (Services.DealerManager.lastBet - currentBet); 
     }
 
     public void Bet(int betAmount)
