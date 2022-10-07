@@ -1225,7 +1225,7 @@ public class DealerManager : MonoBehaviour
                     {
                         player.decisionState = PlayerDecisionState.Eliminated;
                     }
-                    else player.decisionState = PlayerDecisionState.None;
+                    //else player.decisionState = PlayerDecisionState.None;
                 }
                 if (OnlyAllInPlayersLeft())
                 {

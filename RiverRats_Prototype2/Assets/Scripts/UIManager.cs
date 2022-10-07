@@ -194,7 +194,11 @@ public class UIManager : MonoBehaviour
                 maxBets[i].GetComponent<Text>().text = table.players[i].MaxAmountToWin.ToString();
                 handStrengths[i].GetComponent<Text>().text = table.players[i].HandStrength.ToString();
                 actionText[i].GetComponent<Text>().text = GetActionText(table.players[i].decisionState);
-                if (IsPlaying(table.players[i]))
+                if(Services.DealerManager.playerToAct == null)
+                {
+                    betAmounts[i].GetComponent<Text>().text = " ";
+                }
+                else if (IsPlaying(table.players[i]))
                 {
                     betAmounts[i].GetComponent<Text>().text = GetBetText(table.players[i].decisionState, table.players[i]).ToString();
                 }
@@ -271,13 +275,13 @@ public class UIManager : MonoBehaviour
                 action = "";
                 break;
             case PlayerDecisionState.Fold:
-                action = "Folds";
+                action = "Fold";
                 break;
             case PlayerDecisionState.Call:
-                action = "Calls";
+                action = "Call";
                 break;
             case PlayerDecisionState.Raise:
-                action = "Raises";
+                action = "Raise";
                 break;
             case PlayerDecisionState.AllIn:
                 action = "All In";
@@ -295,7 +299,7 @@ public class UIManager : MonoBehaviour
                 action = "Big";
                 break;
             case PlayerDecisionState.Eliminated:
-                action = "Eliminated";
+                action = "Out";
                 break;
             case PlayerDecisionState.Winner:
                 action = "Winner";
