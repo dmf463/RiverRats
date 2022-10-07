@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     private TaskManager tm;
     [HideInInspector]
     public bool dealPulseReady;
+    public Text winPercent;
     public GameObject dealButton;
     public GameObject dealBorder;
     

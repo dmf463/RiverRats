@@ -1731,6 +1731,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dealPulseReady: 0
+  winPercent: {fileID: 334269367}
   dealButton: {fileID: 101224887}
   dealBorder: {fileID: 310231696}
   table: {fileID: 0}

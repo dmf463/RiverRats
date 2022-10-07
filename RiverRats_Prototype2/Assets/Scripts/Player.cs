@@ -326,6 +326,7 @@ public class Player
         else
         {
             Services.DealerManager.StartCoroutine(RunHandStrengthLoopAfterFlop(myCard1, myCard2, Services.DealerManager.ActivePlayerCount()));
+            Services.DealerManager.StartCoroutine(OpenHandStrengthLoopAfterFlop(myCard1, myCard2, Services.DealerManager.ActivePlayerCount()));
         }
     }
 
@@ -623,5 +624,270 @@ public class Player
             eval.isTesting = false;
             return holeCards;
         }
+    }
+
+
+    IEnumerator OpenHandStrengthLoopAfterFlop(CardType myCard1, CardType myCard2, int activePlayers)
+    {
+        Services.DealerManager.pauseAutomation = true;
+        //set up all my empty lists to use 
+        List<CardType> testDeck = new List<CardType>();
+        #region populatingTheDeck
+        SuitType[] suits = new SuitType[4]
+        {
+            SuitType.Spades,
+            SuitType.Hearts,
+            SuitType.Diamonds,
+            SuitType.Clubs
+        };
+        RankType[] ranks = new RankType[13]
+        {
+            RankType.Two,
+            RankType.Three,
+            RankType.Four,
+            RankType.Five,
+            RankType.Six,
+            RankType.Seven,
+            RankType.Eight,
+            RankType.Nine,
+            RankType.Ten,
+            RankType.Jack,
+            RankType.Queen,
+            RankType.King,
+            RankType.Ace
+        };
+
+        foreach (SuitType suit in suits)
+        {
+            foreach (RankType rank in ranks)
+            {
+                testDeck.Add(new CardType(rank, suit));
+            }
+        }
+        #endregion
+        List<CardType> referenceDeck = new List<CardType>();
+        referenceDeck.AddRange(testDeck);
+        List<CardType> testBoard = new List<CardType>();
+        List<Player> testPlayers = new List<Player>();
+        List<List<CardType>> playerCards = new List<List<CardType>>();
+        List<HandEvaluator> testEvaluators = new List<HandEvaluator>();
+        for (int i = 0; i < activePlayers; i++)
+        {
+            testPlayers.Add(new Player(i, ChipCount, PlayerEmotion, PlayerState));
+            playerCards.Add(new List<CardType>());
+            testEvaluators.Add(new HandEvaluator());
+        }
+        Debug.Assert(testPlayers.Count == Services.DealerManager.ActivePlayerCount());
+        float numberOfWins = 0;
+        float handStrengthTestLoops = 0;
+        while (handStrengthTestLoops < 100)
+        {
+            #region 10x For-Loop for Hand Strength
+            for (int f = 0; f < 10; f++)
+            {
+                //clear everything
+                //clear each players hands
+                foreach (Player player in testPlayers)
+                {
+                    player.Hand = null;
+                }
+                //clear each players handEvaluators
+                foreach (HandEvaluator eval in testEvaluators)
+                {
+                    eval.ResetHandEvaluator();
+                }
+                //clear the deck
+                testDeck.Clear();
+                //add the deck
+                testDeck.AddRange(referenceDeck);
+                Debug.Assert(testDeck.Count == 52);
+                //clear the board
+                testBoard.Clear();
+                Debug.Assert(testBoard.Count == 0);
+                //clear each players cardList
+                foreach (List<CardType> cardList in playerCards)
+                {
+                    cardList.Clear();
+                    Debug.Assert(cardList.Count == 0);
+                }
+                //Start simulating the game
+                //remove my cards from the deck
+                for (int i = 0; i < testDeck.Count; i++)
+                {
+                    if (testDeck[i].rank == myCard1.rank)
+                    {
+                        if (testDeck[i].suit == myCard1.suit)
+                        {
+                            testDeck.RemoveAt(i);
+                            //Debug.Log("removing my cards " + testDeck[i].rank + " of " + testDeck[i].suit);
+                        }
+                    }
+                }
+                for (int i = 0; i < testDeck.Count; i++)
+                {
+                    if (testDeck[i].rank == myCard2.rank)
+                    {
+                        if (testDeck[i].suit == myCard2.suit)
+                        {
+                            testDeck.RemoveAt(i);
+                            //Debug.Log("removing " + testDeck[i].rank + " of " + testDeck[i].suit);
+                        }
+                    }
+                }
+                Debug.Assert(testDeck.Count == 50);
+                //remove the cards on the board from the deck and then add them to the fake board.
+                foreach (CardType boardCard in Services.TableManager.board)
+                {
+                    testDeck.Remove(boardCard);
+                    testBoard.Add(boardCard);
+                }
+                for (int i = 0; i < testDeck.Count; i++)
+                {
+                    if (testDeck[i].rank == Services.TableManager.board[0].rank)
+                    {
+                        if (testDeck[i].suit == Services.TableManager.board[0].suit)
+                        {
+                            testDeck.RemoveAt(i);
+                        }
+                    }
+                }
+                for (int i = 0; i < testDeck.Count; i++)
+                {
+                    if (testDeck[i].rank == Services.TableManager.board[1].rank)
+                    {
+                        if (testDeck[i].suit == Services.TableManager.board[1].suit)
+                        {
+                            testDeck.RemoveAt(i);
+                        }
+                    }
+                }
+                for (int i = 0; i < testDeck.Count; i++)
+                {
+                    if (testDeck[i].rank == Services.TableManager.board[2].rank)
+                    {
+                        if (testDeck[i].suit == Services.TableManager.board[2].suit)
+                        {
+                            testDeck.RemoveAt(i);
+                        }
+                    }
+                }
+                //set THIS as test player0
+                playerCards[0].Add(myCard1);
+                playerCards[0].Add(myCard2);
+                //Debug.Log("PlayerCards.count = " + playerCards.Count);
+                //give two cards two each other testPlayer, and then remove those cards from the deck
+                for (int i = 1; i < testPlayers.Count; i++)
+                {
+                    for (int realPlayers = 0; realPlayers < Services.TableManager.players.Length; realPlayers++)
+                    {
+                        Player player = Services.TableManager.players[realPlayers];
+                        if (testPlayers[i].SeatPos == player.SeatPos)
+                        {
+                            for (int card = 0; card < testDeck.Count; card++)
+                            {
+                                if (testDeck[card].rank == player.holeCards[0].rank)
+                                {
+                                    if (testDeck[card].suit == player.holeCards[0].suit)
+                                    {
+                                        testDeck.RemoveAt(card);
+                                        //Debug.Log("removing my cards " + testDeck[i].rank + " of " + testDeck[i].suit);
+                                    }
+                                }
+                            }
+                            for (int card = 0; card < testDeck.Count; card++)
+                            {
+                                if (testDeck[card].rank == player.holeCards[1].rank)
+                                {
+                                    if (testDeck[card].suit == player.holeCards[1].suit)
+                                    {
+                                        testDeck.RemoveAt(card);
+                                        //Debug.Log("removing " + testDeck[i].rank + " of " + testDeck[i].suit);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //for (int j = 0; j < 2; j++)
+                    //{
+                    //	int cardPos = Random.Range(0, testDeck.Count);
+                    //	CardType cardType = testDeck[cardPos];
+                    //	playerCards[i].Add(cardType);
+                    //	testDeck.Remove(cardType);
+                    //}
+                    
+                    //List<CardType> holeCards = GetPreFlopHand(testDeck);
+                    //foreach (CardType card in holeCards)
+                    //{
+                    //    playerCards[i].Add(card);
+                    //    testDeck.Remove(card);
+                    //}
+                }
+                //if we're on the flop, deal out two more card to the board
+                //and take those from the deck
+                if (Services.TableManager.board.Count == 3)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        int cardPos = Random.Range(0, testDeck.Count);
+                        CardType cardType = testDeck[cardPos];
+                        testDeck.Remove(cardType);
+                        testBoard.Add(cardType);
+                    }
+                }
+                //if we're on the turn, only take out one more card from the deck to the board
+                else if (Services.TableManager.board.Count == 4)
+                {
+                    int cardPos = Random.Range(0, testDeck.Count);
+                    CardType cardType = testDeck[cardPos];
+                    testDeck.Remove(cardType);
+                    testBoard.Add(cardType);
+                }
+                //for each player, add the board cards
+                //sort the hands
+                //assign them an evaluator
+                //set the evaluator
+                //evaluate the hand
+                //set the hand = to the evaluator
+                for (int i = 0; i < playerCards.Count; i++)
+                {
+                    playerCards[i].AddRange(testBoard);
+                    playerCards[i].Sort((cardLow, cardHigh) => cardLow.rank.CompareTo(cardHigh.rank));
+                    HandEvaluator testHand = testEvaluators[i];
+                    testHand.SetHandEvalutor(playerCards[i]);
+                    testHand.EvaluateHandAtRiver();
+                    testPlayers[i].Hand = testHand;
+                }
+                //compare all test players and find the winner
+                Services.DealerManager.EvaluatePlayersOnShowdown(testPlayers);
+                //if testPlayer[0] (this player) wins, we notch up the win score
+                if (testPlayers[0].PlayerState == PlayerState.Winner)
+                {
+                    float numberOfTestWinners = 0;
+                    foreach (Player player in testPlayers)
+                    {
+                        if (player.PlayerState == PlayerState.Winner)
+                        {
+                            numberOfTestWinners++;
+                        }
+                        else
+                        {
+                            //Debug.Log("losing player had a " + player.Hand.HandValues.PokerHand);
+                        }
+                    }
+                    numberOfWins += (1 / numberOfTestWinners);
+                }
+            }
+            #endregion
+            handStrengthTestLoops++;
+            yield return null;
+        }
+        float tempHandStrength = numberOfWins / 1000f;
+        //Debug.Log("Player " + SeatPos + " has a HandStrength of " + tempHandStrength + " and a numberOfWins of " + numberOfWins);
+        //HandStrength = Mathf.Pow(tempHandStrength, (float)Services.DealerManager.ActivePlayerCount());
+        Services.UIManager.winPercent.text = tempHandStrength.ToString();
+        //Debug.Log("Player " + SeatPos + " has a HS of " + HandStrength);
+        //rateOfReturn = FindRateOfReturn();
+        //FoldCallRaiseDecision(rateOfReturn, this);
+        yield break;
     }
 }
