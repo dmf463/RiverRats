@@ -11287,6 +11287,7 @@ GameObject:
   - component: {fileID: 1082088342}
   - component: {fileID: 1082088341}
   - component: {fileID: 1082088343}
+  - component: {fileID: 1082088344}
   m_Layer: 0
   m_Name: GameRules
   m_TagString: Untagged
@@ -11334,6 +11335,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rulesCSV: {fileID: 4900000, guid: 9fc44caa0e5bbee409b45f61e10d6682, type: 3}
   rawRules: []
+--- !u!114 &1082088344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1082088340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 695e793769af4af4e9339e07db5e8062, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1088168033
 GameObject:
   m_ObjectHideFlags: 0
