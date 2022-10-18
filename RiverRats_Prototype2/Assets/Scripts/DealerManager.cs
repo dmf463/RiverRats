@@ -654,6 +654,35 @@ public class DealerManager : MonoBehaviour
         return fakePlayers;
     }
 
+    public List<Player> CreateDuplicatePlayers()
+    {
+        List<Player> fakePlayers = new List<Player>();
+
+        for (int i = 0; i < table.players.Length; i++)
+        {
+            fakePlayers.Add(new Player(i, 0, PlayerEmotion.Content, PlayerState.Playing));
+        }
+        for (int i = 0; i < table.players.Length; i++)
+        {
+            fakePlayers[i].PlayerState = table.players[i].PlayerState;
+            fakePlayers[i].holeCards = CopyPlayerCards(table.players[i]);
+        }
+
+        return fakePlayers;
+    }
+
+    public List<CardType> CopyPlayerCards(Player player)
+    {
+        List<CardType> cards = new List<CardType>();
+
+        for(int i = 0; i < 2; i++)
+        {
+            cards.Add(new CardType(player.holeCards[i].rank, player.holeCards[i].suit));
+        }
+
+        return cards;
+    }
+
     public void DealCards() //happens on click of the button
     {
         /*Only deal cards if we have money from people && there is no current player that needs to act
@@ -1015,6 +1044,7 @@ public class DealerManager : MonoBehaviour
     {
         if (playerToAct != null)
         {
+            Services.PlayerUI.FindSuccessesInDeck(playerToAct);
             playerToAct.DetermineHandStrength(playerToAct.holeCards[0], playerToAct.holeCards[1]);
         }
     }
@@ -1692,6 +1722,43 @@ public class DealerManager : MonoBehaviour
                 cardsInDeck.Add(new CardType(rank, suit));
             }
         }
+    }
+
+    public List<CardType> CreateFakeDeck() //this creates a card deck. We don't shuffle the deck since we don't need to.
+    {
+        List<CardType> fakeDeck = new List<CardType>();
+        SuitType[] suits = new SuitType[4]
+        {
+            SuitType.Spades,
+            SuitType.Hearts,
+            SuitType.Diamonds,
+            SuitType.Clubs
+        };
+        RankType[] ranks = new RankType[13]
+        {
+            RankType.Two,
+            RankType.Three,
+            RankType.Four,
+            RankType.Five,
+            RankType.Six,
+            RankType.Seven,
+            RankType.Eight,
+            RankType.Nine,
+            RankType.Ten,
+            RankType.Jack,
+            RankType.Queen,
+            RankType.King,
+            RankType.Ace
+        };
+
+        foreach (SuitType suit in suits)
+        {
+            foreach (RankType rank in ranks)
+            {
+                fakeDeck.Add(new CardType(rank, suit));
+            }
+        }
+        return fakeDeck;
     }
 
     public Player FindFirstPlayerToAct(int distance) //this gives us the first player to act. We need this since the first player is going to change depending on blinds and who is in the pot.

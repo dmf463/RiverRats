@@ -152,4 +152,25 @@ public class TableManager : MonoBehaviour
     {
         return (DealerPosition + distance) % players.Length;
     }
+
+    public List<CardType> CreateFakeBurnCards()
+    {
+        List<CardType> fakeBurn = new List<CardType>();
+        for (int i = 0; i < burn.Count; i++)
+        {
+            fakeBurn.Add(new CardType(burn[i].rank, burn[i].suit));
+        }
+        return fakeBurn;
+    }
+
+    public List<CardType> CreateFakeBoardCards()
+    {
+        List<CardType> fakeBoard = new List<CardType>();
+        for (int i = 0; i < board.Count; i++)
+        {
+            fakeBoard.Add(new CardType(board[i].rank, board[i].suit));
+        }
+
+        return fakeBoard;
+    }
 }
