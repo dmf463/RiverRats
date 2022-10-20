@@ -13,7 +13,6 @@ public class PlayerUI : MonoBehaviour
     void Start()
     {
         Services.PlayerUI = this;
-        Debug.Log("Avg = " + GetCardDrawProbability(numCardsInDeck, numSuccessesinDeck, numOfDrawsToMake, successesInSample));
     }
 
     // Update is called once per frame
@@ -33,7 +32,7 @@ public class PlayerUI : MonoBehaviour
         return probability;
     }
 
-    public void FindSuccessesInDeck(Player targetPlayer)
+    public void FindSuccessesInDeck()
     {
         //So first thing we need to do is create our fake players (with cards), and fakeDeck, fakeBoard, and fakeBurn
         List<Player> duplicatePlayers = Services.DealerManager.CreateDuplicatePlayers();
@@ -41,17 +40,46 @@ public class PlayerUI : MonoBehaviour
         List<CardType> fakeBoard = Services.TableManager.CreateFakeBoardCards();
         List<CardType> fakeBurn = Services.TableManager.CreateFakeBurnCards();
 
-        Debug.Log("Players = " + duplicatePlayers.Count);
-        Debug.Log("FakeDeck = " + fakeDeck.Count);
-        Debug.Log("fakeBoard = " + fakeBoard.Count);
-        Debug.Log("fakeBurn = " + fakeBurn.Count);
+        //Debug.Log("Players = " + duplicatePlayers.Count);
+        //Debug.Log("FakeDeck = " + fakeDeck.Count);
+        //Debug.Log("fakeBoard = " + fakeBoard.Count);
+        //Debug.Log("fakeBurn = " + fakeBurn.Count);
 
         //next thing we want to do is remove all these cards from the deck
         RemovePlayerCardsFromDeck(fakeDeck, duplicatePlayers);
         RemoveTableCardsFromDeck(fakeDeck, fakeBoard);
         RemoveTableCardsFromDeck(fakeDeck, fakeBurn);
-        Debug.Log("FakeDeck Has " + fakeDeck.Count + " and RealDeck has " + Services.DealerManager.cardsInDeck.Count);
-        
+        //Debug.Log("FakeDeck Has " + fakeDeck.Count + " and RealDeck has " + Services.DealerManager.cardsInDeck.Count);
+
+        //then once we have an accurate account of what each player has, as well as how many cards are left in the deck, let's check the likelihood that player 0 will get a pair. 
+        //so the plan is that I'm going to run through each of player O's hole cards
+        //and compare them to each card in the deck
+        //and if they match rank, then add that card to a list of potential success
+        List<CardType> potentialSuccesses = new List<CardType>();
+
+        foreach (CardType card in duplicatePlayers[0].holeCards)
+        {
+            for(int i = 0; i < fakeDeck.Count; i++)
+            {
+                if (fakeDeck[i].rank == card.rank)
+                {
+                    potentialSuccesses.Add(fakeDeck[i]);
+                    Debug.Log("Adding " + fakeDeck[i].rank + " of " + fakeDeck[i].suit + "s");
+                }
+            }
+        }
+        Debug.Log("PotenialSuccesses = " + potentialSuccesses.Count);
+        Debug.Log("Avg to get a pair for Player 0 = " + GetCardDrawProbability(fakeDeck.Count, potentialSuccesses.Count, 2, 1));
+
+        //the above is all well and good, but these numbers and cards don't exist in a vacuum, and honestly if someone has a 15% chance to make a pair, but their playing against someone who has a full house, then their percent should be ZERO, since we want these numbers to reflect a percentage to win the hand. So what we need to do as well is determine
+        //focusing on Player0 we would  need to know
+        //1) What Poker Hand does each player currnently have
+        //2) What are the order of ranks of the hand, and how many steps below are you from that hand. 
+        //3) what type of hand would you need in order to beat the highest hand. 
+        //4) what cards are left in the deck that would give you that hand
+        //5) if that card came, would it inadvertently give somebody else the winning hand
+        //6 if yes, then 0%, if no then hypergeometric distribution
+
     }
 
     public void RemoveTableCardsFromDeck(List<CardType> deck, List<CardType> cards)

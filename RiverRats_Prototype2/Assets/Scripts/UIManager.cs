@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public bool ShowCardBacks;
     private TaskManager tm;
     [HideInInspector]
     public bool dealPulseReady;
@@ -405,10 +406,15 @@ public class UIManager : MonoBehaviour
                 {
                     for (int card = 0; card < table.players[player].holeCards.Count; card++)
                     {
-                        playerHoleCards_simple[player][card].GetComponent<Image>().sprite = cardBack;
-
-                        //playerHoleCards_simple[player][card].GetComponent<Image>().sprite = GetCardImage_Simple(cards[card]);
-                        playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
+                        if (ShowCardBacks)
+                        {
+                            playerHoleCards_simple[player][card].GetComponent<Image>().sprite = cardBack;
+                        }
+                        else
+                        {
+                            playerHoleCards_simple[player][card].GetComponent<Image>().sprite = GetCardImage_Simple(cards[card]);
+                            playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
+                        }
                     }
                 }
             }
@@ -431,9 +437,18 @@ public class UIManager : MonoBehaviour
         //but it DOES have a card associated with it
         if(des == Destination.burn)
         {
-            int pos = table.burn.Count;
-            Burn[pos].GetComponent<Image>().sprite = cardBack;
-            Burn[pos].GetComponent<Image>().color = cardColor;
+            int pos = table.burn.Count - 1;
+            Debug.Log("POS = " + pos);
+            if (ShowCardBacks)
+            {
+                Burn[pos].GetComponent<Image>().sprite = cardBack;
+                Burn[pos].GetComponent<Image>().color = cardColor;
+            }
+            else
+            {
+                Burn[pos].GetComponent<Image>().sprite = GetCardImage(Services.TableManager.burn[pos]);
+                Burn[pos].GetComponent<Image>().color = cardColor;
+            }
         }
         else if (des == Destination.flop)
         {

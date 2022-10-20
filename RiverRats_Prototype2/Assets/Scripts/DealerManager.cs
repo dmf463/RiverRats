@@ -808,6 +808,7 @@ public class DealerManager : MonoBehaviour
                     influencingTable = false;
                     cheatCards.Clear();
                     ChooseNextPlayer();
+                    Services.PlayerUI.FindSuccessesInDeck();
                 }
             }
             else if (table.gameState == GameState.Turn)
@@ -1044,7 +1045,7 @@ public class DealerManager : MonoBehaviour
     {
         if (playerToAct != null)
         {
-            Services.PlayerUI.FindSuccessesInDeck(playerToAct);
+            Services.PlayerUI.FindSuccessesInDeck();
             playerToAct.DetermineHandStrength(playerToAct.holeCards[0], playerToAct.holeCards[1]);
         }
     }
@@ -1307,8 +1308,8 @@ public class DealerManager : MonoBehaviour
         {
             if (table.players[i].playerIsAllIn) allInPlayers++;
         }
-        Debug.Log("AllInPlayerCount = " + allInPlayers);
-        Debug.Log("ActivePlayerCount = " + ActivePlayerCount());
+        //Debug.Log("AllInPlayerCount = " + allInPlayers);
+        //Debug.Log("ActivePlayerCount = " + ActivePlayerCount());
         if (allInPlayers == ActivePlayerCount())
         {
             return true;
@@ -1668,8 +1669,9 @@ public class DealerManager : MonoBehaviour
     public void BurnCard() //Throw a card into the burn
     {
         List<CardType> burnCard = new List<CardType> { TakeCardFromDeck() };
-        Services.UIManager.SetCardImage(Destination.burn, burnCard);
         table.burn.Add(burnCard[0]);
+        Services.UIManager.SetCardImage(Destination.burn, burnCard);
+
     }
 
     public void AddCardToBoard(List<CardType> board)
