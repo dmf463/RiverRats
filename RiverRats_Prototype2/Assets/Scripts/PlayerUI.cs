@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Accord.Statistics.Distributions.Univariate;
+using System.Linq;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -39,6 +40,12 @@ public class PlayerUI : MonoBehaviour
         List<CardType> fakeDeck = Services.DealerManager.CreateFakeDeck();
         List<CardType> fakeBoard = Services.TableManager.CreateFakeBoardCards();
         List<CardType> fakeBurn = Services.TableManager.CreateFakeBurnCards();
+
+        for(int i = 0; i < duplicatePlayers.Count; i++)
+        {
+            AddFakeCardsToPlayer(duplicatePlayers[i], fakeBoard);
+            AddFakeCardsToPlayer(duplicatePlayers[i], duplicatePlayers[i].holeCards);
+        }
 
         //Debug.Log("Players = " + duplicatePlayers.Count);
         //Debug.Log("FakeDeck = " + fakeDeck.Count);
@@ -79,6 +86,16 @@ public class PlayerUI : MonoBehaviour
         //4) what cards are left in the deck that would give you that hand
         //5) if that card came, would it inadvertently give somebody else the winning hand
         //6 if yes, then 0%, if no then hypergeometric distribution
+        foreach(Player player in duplicatePlayers)
+        {
+            player.EvaluateMyHand(Services.TableManager.gameState);
+        }
+        List<Player> sortedPlayers = new List<Player>(duplicatePlayers.
+                                  OrderByDescending(bestHand => bestHand.Hand.HandValues.PokerHand).
+                                  ThenByDescending(bestHand => bestHand.Hand.HandValues.Total).
+                                  ThenByDescending(bestHand => bestHand.Hand.HandValues.HighCard));
+        Debug.Log("Best Hand = Player " + sortedPlayers[0].SeatPos);
+
 
     }
 
@@ -106,7 +123,7 @@ public class PlayerUI : MonoBehaviour
         {
             if (players[i].holeCards.Count != 0)
             {
-                for (int card = 0; card < deck.Count; card++)
+                for (int card = deck.Count; card --> 0;)
                 {
                     for(int holeCard = 0; holeCard < 2; holeCard++)
                     {
@@ -123,5 +140,13 @@ public class PlayerUI : MonoBehaviour
             }
         }
         Debug.Log("Count = " + count);
+    }
+
+    public void AddFakeCardsToPlayer(Player fakePlayer, List<CardType> cards)
+    {
+        for (int i = 0; i < cards.Count; i++)
+        {
+            fakePlayer.Cards.Add(cards[i]);
+        }
     }
 }

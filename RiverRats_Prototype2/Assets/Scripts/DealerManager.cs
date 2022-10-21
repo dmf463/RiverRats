@@ -714,10 +714,13 @@ public class DealerManager : MonoBehaviour
                         //and pass them to the player, as well as our UI manager
                         //then we have the players look at the cards to evaluate their hands
                         //table.players[i].holeCards = new List<CardType> { TakeCardFromDeck(), TakeCardFromDeck() };
-                        CardType drawnCard = TakeCardFromDeck();
-                        table.players[i].Cards.Add(drawnCard);
-                        table.players[i].holeCards.Add(drawnCard);
-                        Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                        if (table.players[i].holeCards.Count <= 2)
+                        {
+                            CardType drawnCard = TakeCardFromDeck();
+                            table.players[i].Cards.Add(drawnCard);
+                            table.players[i].holeCards.Add(drawnCard);
+                            Services.UIManager.SetCardImage(table.playerDestinations[i], table.players[i].holeCards);
+                        }
                     }
                 }
                 //}
