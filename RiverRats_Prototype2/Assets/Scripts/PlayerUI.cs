@@ -94,7 +94,35 @@ public class PlayerUI : MonoBehaviour
                                   OrderByDescending(bestHand => bestHand.Hand.HandValues.PokerHand).
                                   ThenByDescending(bestHand => bestHand.Hand.HandValues.Total).
                                   ThenByDescending(bestHand => bestHand.Hand.HandValues.HighCard));
-        Debug.Log("Best Hand = Player " + sortedPlayers[0].SeatPos);
+
+        for (int i = sortedPlayers.Count; i --> 0;)
+        {
+            if (sortedPlayers[i].PlayerState == PlayerState.NotPlaying ||
+                sortedPlayers[i].PlayerState == PlayerState.Eliminated)
+            {
+                sortedPlayers.RemoveAt(i);
+            }
+        }
+        Debug.Log("sorted players count = " + sortedPlayers.Count);
+        Debug.Log("Best Hand = Player " + sortedPlayers[0].SeatPos + " with a " + sortedPlayers[0].Hand.HandValues.PokerHand);
+
+        for(int i = 1; i < sortedPlayers.Count; i++)
+        {
+            int stepsToHighestHand = (int)sortedPlayers[0].Hand.HandValues.PokerHand - (int)sortedPlayers[i].Hand.HandValues.PokerHand;
+            int cardRanksToHighCard = 0;
+            Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many hand ranks from the top hand " + stepsToHighestHand);
+            //if it's the hand is the SAME then we compare against the highcard
+            //this isn't going to work through cause of the way I have my high cards set up. 
+            //it's too much work to make it work
+            //have to find a different way around if it's the same hand.
+            if(stepsToHighestHand == 0)
+            {
+                cardRanksToHighCard = (int)sortedPlayers[0].Hand.HandValues.HighCard - (int)sortedPlayers[i].Hand.HandValues.HighCard;
+                Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many card ranks from the top hand " + cardRanksToHighCard);
+            }
+        }
+
+
 
 
     }
@@ -127,6 +155,9 @@ public class PlayerUI : MonoBehaviour
                 {
                     for(int holeCard = 0; holeCard < 2; holeCard++)
                     {
+                        Debug.Log("Deck.count = " + deck.Count + " and card = " + card);
+                        Debug.Log("Players.count = " + players.Count + " and i = " + i);
+                        Debug.Log("holecards.count = " + players[i].holeCards.Count + "and holecard = " + holeCard);
                         if (deck[card].rank == players[i].holeCards[holeCard].rank)
                         {
                             if (deck[card].suit == players[i].holeCards[holeCard].suit)
