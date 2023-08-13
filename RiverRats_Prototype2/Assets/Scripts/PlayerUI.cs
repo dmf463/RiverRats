@@ -71,12 +71,12 @@ public class PlayerUI : MonoBehaviour
                 if (fakeDeck[i].rank == card.rank)
                 {
                     potentialSuccesses.Add(fakeDeck[i]);
-                    Debug.Log("Adding " + fakeDeck[i].rank + " of " + fakeDeck[i].suit + "s");
+                    //Debug.Log("Adding " + fakeDeck[i].rank + " of " + fakeDeck[i].suit + "s");
                 }
             }
         }
-        Debug.Log("PotenialSuccesses = " + potentialSuccesses.Count);
-        Debug.Log("Avg to get a pair for Player 0 = " + GetCardDrawProbability(fakeDeck.Count, potentialSuccesses.Count, 2, 1));
+        //Debug.Log("PotenialSuccesses = " + potentialSuccesses.Count);
+        //Debug.Log("Avg to get a pair for Player 0 = " + GetCardDrawProbability(fakeDeck.Count, potentialSuccesses.Count, 2, 1));
 
         //the above is all well and good, but these numbers and cards don't exist in a vacuum, and honestly if someone has a 15% chance to make a pair, but their playing against someone who has a full house, then their percent should be ZERO, since we want these numbers to reflect a percentage to win the hand. So what we need to do as well is determine
         //focusing on Player0 we would  need to know
@@ -103,14 +103,14 @@ public class PlayerUI : MonoBehaviour
                 sortedPlayers.RemoveAt(i);
             }
         }
-        Debug.Log("sorted players count = " + sortedPlayers.Count);
-        Debug.Log("Best Hand = Player " + sortedPlayers[0].SeatPos + " with a " + sortedPlayers[0].Hand.HandValues.PokerHand);
+        //Debug.Log("sorted players count = " + sortedPlayers.Count);
+        //Debug.Log("Best Hand = Player " + sortedPlayers[0].SeatPos + " with a " + sortedPlayers[0].Hand.HandValues.PokerHand);
 
         for(int i = 1; i < sortedPlayers.Count; i++)
         {
             int stepsToHighestHand = (int)sortedPlayers[0].Hand.HandValues.PokerHand - (int)sortedPlayers[i].Hand.HandValues.PokerHand;
             int cardRanksToHighCard = 0;
-            Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many hand ranks from the top hand " + stepsToHighestHand);
+            //Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many hand ranks from the top hand " + stepsToHighestHand);
             //if it's the hand is the SAME then we compare against the highcard
             //this isn't going to work through cause of the way I have my high cards set up. 
             //it's too much work to make it work
@@ -118,7 +118,7 @@ public class PlayerUI : MonoBehaviour
             if(stepsToHighestHand == 0)
             {
                 cardRanksToHighCard = (int)sortedPlayers[0].Hand.HandValues.HighCard - (int)sortedPlayers[i].Hand.HandValues.HighCard;
-                Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many card ranks from the top hand " + cardRanksToHighCard);
+                //Debug.Log("Player " + sortedPlayers[i].SeatPos + " is this many card ranks from the top hand " + cardRanksToHighCard);
             }
         }
 
@@ -157,7 +157,7 @@ public class PlayerUI : MonoBehaviour
                     {
                         Debug.Log("Deck.count = " + deck.Count + " and card = " + card);
                         Debug.Log("Players.count = " + players.Count + " and i = " + i);
-                        Debug.Log("holecards.count = " + players[i].holeCards.Count + "and holecard = " + holeCard);
+                        Debug.Log("holecards.count = " + players[i].holeCards.Count + " and holecard = " + holeCard);
                         if (deck[card].rank == players[i].holeCards[holeCard].rank)
                         {
                             if (deck[card].suit == players[i].holeCards[holeCard].suit)
@@ -170,7 +170,7 @@ public class PlayerUI : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Count = " + count);
+        //Debug.Log("Count = " + count);
     }
 
     public void AddFakeCardsToPlayer(Player fakePlayer, List<CardType> cards)

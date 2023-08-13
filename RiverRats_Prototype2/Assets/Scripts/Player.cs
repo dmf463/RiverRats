@@ -54,7 +54,7 @@ public class Player
         decisionState = PlayerDecisionState.Fold;
         Hand = null;
         Services.UIManager.TurnPlayerCardImageOff(Services.TableManager.playerDestinations[SeatPos]);
-        Debug.Log("Player " + SeatPos + " folded!");
+        //Debug.Log("Player " + SeatPos + " folded!");
 
         //Debug.Log("Active player count = " + Services.DealerManager.ActivePlayerCount());
         if (Services.DealerManager.ActivePlayerCount() == 1)
@@ -102,12 +102,12 @@ public class Player
                 if (betToCall == 0)
                 {
                     decisionState = PlayerDecisionState.Check;
-                    Debug.Log("player " + SeatPos + " Checks");
+                    //Debug.Log("player " + SeatPos + " Checks");
                 }
                 else
                 {
                     decisionState = PlayerDecisionState.Call;
-                    Debug.Log("player " + SeatPos + " Calls");
+                    //Debug.Log("player " + SeatPos + " Calls");
                 }
                 Bet(betToCall);
                 currentBet = betToCall + currentBet;
@@ -153,7 +153,7 @@ public class Player
                 playerIsAllIn = true;
                 decisionState = PlayerDecisionState.AllIn;
                 //Debug.Log("Player " + SeatPos + " didn't have enough chips and went all in for " + chipCount);
-                Debug.Log("player " + SeatPos + " raises " + ChipCount);
+                //Debug.Log("player " + SeatPos + " raises " + ChipCount);
                 currentBet += ChipCount; //made the change here
                 Bet(ChipCount);
                 Services.DealerManager.lastBet = currentBet;
@@ -163,12 +163,12 @@ public class Player
                 if (Services.DealerManager.lastBet == 0)
                 {
                     //Debug.Log("Saying Bet");
-                    Debug.Log("player " + SeatPos + " bets " + betToRaise);
+                    //Debug.Log("player " + SeatPos + " bets " + betToRaise);
                 }
                 else
                 {
                     //Debug.Log("Saying Raise");
-                    Debug.Log("player " + SeatPos + " raises " + betToRaise);
+                    //Debug.Log("player " + SeatPos + " raises " + betToRaise);
                 }
                 Bet(betToRaise);
                 currentBet = betToRaise + currentBet;
@@ -236,7 +236,7 @@ public class Player
         }
         else
         {
-            Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
+            //Debug.Log("player" + player.SeatPos + " has a returnRate of " + returnRate);
             switch (PlayerEmotion)
             {
                 case PlayerEmotion.Joyous:
@@ -338,9 +338,9 @@ public class Player
         //yield return new WaitForSeconds(time);
         Services.DealerManager.pauseAutomation = true;
         HandStrength = Hand.HandValues.Total;
-        Debug.Log("Player " + SeatPos + " has a Pre-Flop HandStrength of " + HandStrength);
-        Debug.Log("Player " + SeatPos + " has a " + holeCards[0].rank + " of " + holeCards[0].suit +
-                                        " and a " + holeCards[1].rank + " of " + holeCards[1].suit);
+        //Debug.Log("Player " + SeatPos + " has a Pre-Flop HandStrength of " + HandStrength);
+        //Debug.Log("Player " + SeatPos + " has a " + holeCards[0].rank + " of " + holeCards[0].suit +
+        //                                " and a " + holeCards[1].rank + " of " + holeCards[1].suit);
         rateOfReturn = FindRateOfReturn();
         FoldCallRaiseDecision(rateOfReturn, this);
         yield break;
@@ -574,7 +574,7 @@ public class Player
         //Debug.Log("Player " + SeatPos + " has a HandStrength of " + tempHandStrength + " and a numberOfWins of " + numberOfWins);
         //HandStrength = Mathf.Pow(tempHandStrength, (float)Services.DealerManager.ActivePlayerCount());
         HandStrength = tempHandStrength;
-        Debug.Log("Player " + SeatPos + " has a HS of " + HandStrength);
+        //Debug.Log("Player " + SeatPos + " has a HS of " + HandStrength);
         rateOfReturn = FindRateOfReturn();
         FoldCallRaiseDecision(rateOfReturn, this);
         yield break;

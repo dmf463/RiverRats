@@ -438,7 +438,7 @@ public class UIManager : MonoBehaviour
         if(des == Destination.burn)
         {
             int pos = table.burn.Count - 1;
-            Debug.Log("POS = " + pos);
+            //Debug.Log("POS = " + pos);
             if (ShowCardBacks)
             {
                 Burn[pos].GetComponent<Image>().sprite = cardBack;

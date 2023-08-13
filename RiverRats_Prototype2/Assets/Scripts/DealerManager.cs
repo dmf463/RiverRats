@@ -39,6 +39,8 @@ public class DealerManager : MonoBehaviour
     public float averageHS = 0;
     public int roundCount = 1;
 
+    public bool clickedButton = false;
+
     void Start()
     {
         pauseAutomation = false;
@@ -675,7 +677,7 @@ public class DealerManager : MonoBehaviour
     {
         List<CardType> cards = new List<CardType>();
 
-        for(int i = 0; i < 2; i++)
+        for(int i = 0; i <= 1; i++)
         {
             cards.Add(new CardType(player.holeCards[i].rank, player.holeCards[i].suit));
         }
@@ -811,7 +813,7 @@ public class DealerManager : MonoBehaviour
                     influencingTable = false;
                     cheatCards.Clear();
                     ChooseNextPlayer();
-                    Services.PlayerUI.FindSuccessesInDeck();
+                    //Services.PlayerUI.FindSuccessesInDeck();
                 }
             }
             else if (table.gameState == GameState.Turn)
@@ -1048,7 +1050,10 @@ public class DealerManager : MonoBehaviour
     {
         if (playerToAct != null)
         {
-            Services.PlayerUI.FindSuccessesInDeck();
+            Debug.Log("holeCard Count = " + playerToAct.holeCards.Count);
+            Debug.Log("Player " + playerToAct.SeatPos + " has a " + playerToAct.holeCards[0].rank + " of " + playerToAct.holeCards[0].suit +
+                                         " and a " + playerToAct.holeCards[1].rank + " of " + playerToAct.holeCards[1].suit);
+            //Services.PlayerUI.FindSuccessesInDeck();
             playerToAct.DetermineHandStrength(playerToAct.holeCards[0], playerToAct.holeCards[1]);
         }
     }
@@ -1248,7 +1253,7 @@ public class DealerManager : MonoBehaviour
             }
             if (roundFinished)
             {
-                Debug.Log("round finished no one should do anything anymore, setting playerToAct = null");
+                //Debug.Log("round finished no one should do anything anymore, setting playerToAct = null");
                 playerToAct = null;
                 lastBet = 0;
                 foreach (Player player in table.players)
@@ -1425,9 +1430,9 @@ public class DealerManager : MonoBehaviour
                             int amountToAward = EndOfHand_PotAmount;
                             //table.pot -= amountToAward;
                             table.players[i].amountToAward += amountToAward;
-                            Debug.Log("Player " + table.players[i].SeatPos +
-                                      " is the winner and is recieving " + EndOfHand_PotAmount +
-                                      " and their chipCount + pot = " + table.players[i].ChipCount);
+                            //Debug.Log("Player " + table.players[i].SeatPos +
+                            //          " is the winner and is recieving " + EndOfHand_PotAmount +
+                            //          " and their chipCount + pot = " + table.players[i].ChipCount);
                             //table.pot = 0;
                         }
                     }
