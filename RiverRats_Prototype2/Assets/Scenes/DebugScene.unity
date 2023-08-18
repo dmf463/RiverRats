@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4039731
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2135,6 +2135,23 @@ MonoBehaviour:
   - {fileID: 707849797}
   - {fileID: 1737775022}
   - {fileID: 654992675}
+  maniuplateColor: {r: 0.9811321, g: 0.67105734, b: 0.67105734, a: 1}
+  ButtonList:
+  - {fileID: 1418594684}
+  - {fileID: 2004993764}
+  - {fileID: 380856160}
+  - {fileID: 1309878620}
+  - {fileID: 1182373184}
+  - {fileID: 1070165395}
+  - {fileID: 1895387465}
+  - {fileID: 14029351}
+  - {fileID: 1594990982}
+  - {fileID: 910413719}
+  - {fileID: 695279698}
+  - {fileID: 1967126446}
+  - {fileID: 135813024}
+  - {fileID: 913267833}
+  - {fileID: 979192009}
   VIP: {fileID: 639476684}
   VIPSuccess: {fileID: 2036494136}
   VIPFail: {fileID: 1458301587}
@@ -3802,8 +3819,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'This is the awareness of how much you''ve been manipulating players. If
-    this reaches the top, you lose. '
+  m_Text: 'This is a count of how often you''ve chosen the wrong player as a winner.
+    If this reaches the top, you lose. '
 --- !u!222 &283443773
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3909,7 +3926,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &304890902
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5960,7 +5977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &440401144
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8041,7 +8058,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &655228313
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12692,14 +12709,13 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "Despite your best efforts, your eyes dart across the room to the Pit Boss.
     You hoped he wouldn\u2019t notice, but his eyes lock with yours and you see everything
-    you need to know in his stone cold gaze. Mess this night up, and they own you.
-    It still aches from when they broke each toe on your left foot last year. Do
-    well, and you\u2019re one step closer to freedom. \r\n\r\nYou\u2019ve got your
-    mark, they HAVE to win. They look nice enough. You don\u2019t know what brought
-    them to this game, but you hope they\u2019ll be in good hands tonight. You\u2019ve
-    also got your list of \u201Cfun extras\u201D from the boss. Sometimes he just
-    likes to see you squirm, but it\u2019s extra money if you make him happy. \r\n\r\nYou
-    take a deep breath and start the game. \r\n"
+    you need to know in his stone cold gaze. You can't believe you're able to keep
+    your hands steady. \n\nYou look across the table and look at the player to the
+    far left. They're your mark. No matter what happens tonight, they have to go
+    home happy. \n\r\nYou\u2019ve also got your list of \u201Cfun extras\u201D from
+    the boss. Sometimes he just likes to see you squirm. If you make him happy, though,
+    his mood gets a bit more forgiving.\n\r\nYou take a deep breath and start the
+    game. \r\n"
 --- !u!222 &1045778281
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -22521,7 +22537,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1950638688
 RectTransform:
   m_ObjectHideFlags: 0

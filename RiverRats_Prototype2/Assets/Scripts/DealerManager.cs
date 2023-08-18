@@ -1019,14 +1019,14 @@ public class DealerManager : MonoBehaviour
 
     public void BalanceTalkAndCheatScales()
     {
-        if (!cheating)
-        {
-            if(cheatCount != 0) cheatCount--;
-        }
-        if (!influencingTable)
-        {
-            if(talkCount != 0) talkCount--;
-        }
+        //if (!cheating)
+        //{
+        //    if(cheatCount != 0) cheatCount--;
+        //}
+        //if (!influencingTable)
+        //{
+        //    if(talkCount != 0) talkCount--;
+        //}
     }
 
     public void AwardPlayer()

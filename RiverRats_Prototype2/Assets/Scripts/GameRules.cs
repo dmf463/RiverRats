@@ -491,7 +491,7 @@ public class GameRules : MonoBehaviour
     {
         Rule VIP = new Rule(RuleType.TargetPlayer)
         {
-            RuleText = "Player " + targetPlayer.SeatPos + " MUST Win the Game, or it is Game Over"
+            RuleText = targetPlayer.name + " is the VIP and MUST Win the Game, or it is Game Over"
         };
         ChosenRules.Add(VIP);
         while (ChosenRules.Count < 5)
@@ -526,86 +526,86 @@ public class GameRules : MonoBehaviour
             if (RulesList[i].RuleName == RuleType.Hate)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should hate player " + RulesList[i].TargetPlayer1.SeatPos + " at some point in the game");
+                    (RulesList[i].TargetPlayer0.name +
+                     " should hate " + RulesList[i].TargetPlayer1.name + " at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.Like)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
-                     " should like player " + RulesList[i].TargetPlayer1.SeatPos + " at some point in the game");
+                    (RulesList[i].TargetPlayer0.name +
+                     " should like " + RulesList[i].TargetPlayer1.name + " at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.NoNegative)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should never be in a negative emotional state");
             }
             else if (RulesList[i].RuleName == RuleType.NoPositive)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should never be in a positive emotional state");
             }
             else if (RulesList[i].RuleName == RuleType.OutNegative)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should be eliminated while in a negative emotional state");
             }
             else if (RulesList[i].RuleName == RuleType.OutPositive)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should be eliminated while in a positive emotional state");
             }
             else if (RulesList[i].RuleName == RuleType.RoundFiveChips)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should have between 3000-4000 chips by the end of ROUND 5");
             }
             else if (RulesList[i].RuleName == RuleType.RoundTenChips)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should have between 3000-4000 chips by the end of ROUND 10");
             }
             else if (RulesList[i].RuleName == RuleType.ShortToBig)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should go from having less than 500 chips to more than 6000 at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.BigToShort)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should go from more than 6000 to less than 500 chips at some point in the game");
             }
             else if (RulesList[i].RuleName == RuleType.FinalTwo)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should be in the final two players of the game");
             }
             else if (RulesList[i].RuleName == RuleType.FirstOut)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should be the first person eliminated from the game");
                       
             }
             else if (RulesList[i].RuleName == RuleType.ThreeWayWin)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos + 
+                    (RulesList[i].TargetPlayer0.name + 
                      " should have the only winning hand against three or more people");
             }
             else if (RulesList[i].RuleName == RuleType.ThreeWayLose)
             {
                 RulesList[i].RuleText =
-                    ("Player " + RulesList[i].TargetPlayer0.SeatPos +
+                    (RulesList[i].TargetPlayer0.name +
                      " should have a losing hand against three or more people");
             }
             else if (RulesList[i].RuleName == RuleType.VIPBigWin)

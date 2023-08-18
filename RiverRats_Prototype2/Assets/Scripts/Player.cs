@@ -8,6 +8,7 @@ public enum PlayerAction { Fold, Call, Raise, None }
 public enum PlayerDecisionState { None, Fold, Call, Raise, AllIn, Check, ToCall, SmallBlind, BigBlind, Winner, Eliminated }
 public class Player
 {
+    public string name; 
     public int SeatPos { get; set; } //Where are they sitting at the table
     public int ChipCount; //How many chips do they have?
     public int ChipCountToCheckWhenWinning; //At the time of winning, how many chips do they have?
@@ -43,6 +44,11 @@ public class Player
         PlayerEmotion = emotion;
         PlayerState = state;
         maxChips = Services.DealerManager.startingChipStack * 5;
+        if (seatPos == 0) name = "Dan";
+        else if (seatPos == 1) name = "Taylor";
+        else if (seatPos == 2) name = "Mary";
+        else if (seatPos == 3) name = "Jason";
+        else if (seatPos == 4) name = "Jem";
     }
 
     public void Fold()

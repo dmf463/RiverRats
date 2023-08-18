@@ -83,6 +83,9 @@ public class UIManager : MonoBehaviour
     private Color borderColor_on;
     private Color borderColor_off;
     private Color targetPlayerColor;
+    public Color maniuplateColor;
+
+    public List<GameObject> ButtonList;
 
     public GameObject VIP;
     public GameObject VIPSuccess;
@@ -139,6 +142,35 @@ public class UIManager : MonoBehaviour
         tm.Update();
         UpdateTextOnScreen();
         PlayerToActUI();
+        for (int i = 0; i < ButtonList.Count; i++)
+        {
+            if(Services.TableManager.gameState == GameState.PreFlop && 
+                Services.DealerManager.cardsInDeck.Count == 52 && 
+                !Services.DealerManager.influencingTable)
+            {
+                ButtonList[2].GetComponent<Image>().color = maniuplateColor;
+                ButtonList[5].GetComponent<Image>().color = maniuplateColor;
+                ButtonList[8].GetComponent<Image>().color = maniuplateColor;
+                ButtonList[11].GetComponent<Image>().color = maniuplateColor;
+                ButtonList[14].GetComponent<Image>().color = maniuplateColor;
+            }
+            else if(Services.DealerManager.influencingTable)
+            {
+                ButtonList[i].GetComponent<Image>().color = Color.white;
+            }
+            else
+            {
+                int buttonSeatPos = Services.TableManager.GetSeatPosFromTag(ButtonList[i]);
+                if (Services.TableManager.players[buttonSeatPos].PlayerState == PlayerState.Playing)
+                {
+                    ButtonList[i].GetComponent<Image>().color = maniuplateColor;
+                }
+                else
+                {
+                    ButtonList[i].GetComponent<Image>().color = Color.white;
+                }
+            }
+        }
     }
 
     public void SetBorderImage()
