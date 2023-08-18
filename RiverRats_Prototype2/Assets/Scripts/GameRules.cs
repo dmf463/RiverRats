@@ -27,7 +27,7 @@ public class GameRules : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckForCheatingTalking();
+        CheckForCheatingTalkingAwardMistakes();
         UpdateRuleStatus();
     }
 
@@ -65,10 +65,11 @@ public class GameRules : MonoBehaviour
         }
     }
 
-    private void CheckForCheatingTalking()
+    private void CheckForCheatingTalkingAwardMistakes()
     {
         if (Services.DealerManager.cheatCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.CheatingTooMuch);
         else if (Services.DealerManager.talkCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.TalkingTooMuch);
+        else if (Services.DealerManager.awardCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.AwardMistakes);
     }
 
     private RuleState CheckRuleState(Rule rule)
@@ -476,10 +477,10 @@ public class GameRules : MonoBehaviour
                 if (targetPlayer.PlayerState != PlayerState.Eliminated && Services.DealerManager.EliminatedPlayerCount() == 4)
                 {
                     state = RuleState.Successful;
-                    if (Services.TableManager.gameState != GameState.GameOver)
-                    {
+                    //if (Services.TableManager.gameState != GameState.GameOver)
+                    //{
                         Services.GameOverScreen.GameOver(GameOverReasons.VIPWins);
-                    }
+                    //}
                 }
             }
         }

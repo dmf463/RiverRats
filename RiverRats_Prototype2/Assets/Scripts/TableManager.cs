@@ -24,10 +24,12 @@ public class TableManager : MonoBehaviour
     public int DealerPosition; //this is the dealer button
     public Chips lowestChipDenomination;
     public GameState gameState; //what part of the round are we in?
+    public GameObject rules;
 
     void Start()
     {
         InitializeTable();
+        rules.SetActive(true);
     }
 
     void Update()

@@ -12,11 +12,16 @@ public class UIManager : MonoBehaviour
     public bool ShowCardBacks;
     private TaskManager tm;
     [HideInInspector]
-    public bool dealPulseReady;
     public Text winPercent;
     public GameObject dealButton;
-    public GameObject dealBorder;
-    
+    public GameObject promptPlayerButton;
+    public GameObject cleanUpButton;
+    public GameObject awardPO;
+    public GameObject awardP1;
+    public GameObject awardP2;
+    public GameObject awardP3;
+    public GameObject awardP4;
+
     [HideInInspector]
     public TableManager table; //easy reference to the table, since the UI is doing that LABOR
     public List<GameObject> chipHolders = new List<GameObject>(); //list of objs where we visualize player chip amount.
@@ -69,6 +74,9 @@ public class UIManager : MonoBehaviour
     public GameObject talkCounter;
     public Slider talkSlider;
 
+    public GameObject awardCounter;
+    public Slider awardSlider;
+
     public GameObject avgScore_HS;
     public GameObject roundCount;
     public List<GameObject> playerToActBorder;
@@ -96,7 +104,14 @@ public class UIManager : MonoBehaviour
     public GameObject ruleThreeCheck;
     public GameObject ruleThreeFail;
 
+    public GameObject player0;
+    public GameObject player1;
+    public GameObject player2;
+    public GameObject player3;
+    public GameObject player4;
 
+    public bool toggleTooltip = true;
+    public Toggle toggle;
 
     void Start()
     {
@@ -138,13 +153,85 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void DealPulse()
+    public void DealerButtonRed()
     {
-        LerpObjectColor_Image lerpUp = new LerpObjectColor_Image(dealButton, Color.white, Color.red, Easing.FunctionType.Linear, 1f);
 
-        tm.Do(lerpUp);
+        dealButton.GetComponent<Image>().color = Color.red;
     }
-    
+
+    public void DealerButtonWhite()
+    {
+
+        dealButton.GetComponent<Image>().color = Color.white;
+    }
+
+    public void PlayerPromtRed()
+    {
+        promptPlayerButton.GetComponent<Image>().color = Color.red;
+    }
+
+    public void PlayerPromtWhite()
+    {
+        promptPlayerButton.GetComponent<Image>().color = Color.white;
+    }
+
+    public void CleanUpPromptRed()
+    {
+        cleanUpButton.GetComponent<Image>().color = Color.red;
+    }
+
+    public void CleanUpPromptWhite()
+    {
+        cleanUpButton.GetComponent<Image>().color = Color.white;
+    }
+
+    public void SetAwardColorRed(int seatPos)
+    {
+        if(seatPos == 0)
+        {
+            awardPO.GetComponent<Image>().color = Color.red;
+        }
+        else if (seatPos == 1)
+        {
+            awardP1.GetComponent<Image>().color = Color.red;
+        }
+        else if (seatPos == 2)
+        {
+            awardP2.GetComponent<Image>().color = Color.red;
+        }
+        else if (seatPos == 3)
+        {
+            awardP3.GetComponent<Image>().color = Color.red;
+        }
+        else if (seatPos == 4)
+        {
+            awardP4.GetComponent<Image>().color = Color.red;
+        }
+    }
+    public void SetAwardColorWhite(int seatPos)
+    {
+        if (seatPos == 0)
+        {
+            awardPO.GetComponent<Image>().color = Color.white;
+        }
+        else if (seatPos == 1)
+        {
+            awardP1.GetComponent<Image>().color = Color.white;
+        }
+        else if (seatPos == 2)
+        {
+            awardP2.GetComponent<Image>().color = Color.white;
+        }
+        else if (seatPos == 3)
+        {
+            awardP3.GetComponent<Image>().color = Color.white;
+        }
+        else if (seatPos == 4)
+        {
+            awardP4.GetComponent<Image>().color = Color.white;
+        }
+    }
+
     private void InitializeBoardUI() //combine all the sprites, set gameobjects
     {
         table = Services.TableManager;
@@ -204,10 +291,10 @@ public class UIManager : MonoBehaviour
                 {
                     betAmounts[i].GetComponent<Text>().text = GetBetText(table.players[i].decisionState, table.players[i]).ToString();
                 }
-                else
-                {
-                    NotPlayingUI(table.players[i]);
-                }
+            }
+            else
+            {
+                NotPlayingUI(table.players[i]);
             }
         }
         gameState.GetComponent<Text>().text = table.gameState.ToString();
@@ -219,6 +306,9 @@ public class UIManager : MonoBehaviour
 
         talkCounter.GetComponent<Text>().text = Services.DealerManager.talkCount.ToString();
         talkSlider.value = Services.DealerManager.talkCount;
+
+        //awardCounter.GetComponent<Text>().text = Services.DealerManager.awardCount.ToString();
+        awardSlider.value = Services.DealerManager.awardCount;
 
         avgScore_HS.GetComponent<Text>().text = Services.DealerManager.averageHS.ToString();
 
@@ -240,6 +330,11 @@ public class UIManager : MonoBehaviour
         {
             player.decisionState = PlayerDecisionState.Eliminated;
             betAmounts[player.SeatPos].GetComponent<Text>().text = "";
+            if (player.SeatPos == 0) player0.SetActive(false);
+            else if (player.SeatPos == 1) player1.SetActive(false);
+            else if (player.SeatPos == 2) player2.SetActive(false);
+            else if (player.SeatPos == 3) player3.SetActive(false);
+            else if (player.SeatPos == 4) player4.SetActive(false);
         }
         else if (player.decisionState == PlayerDecisionState.Fold ||
                 player.PlayerState == PlayerState.NotPlaying ||
@@ -249,6 +344,7 @@ public class UIManager : MonoBehaviour
             betAmounts[player.SeatPos].GetComponent<Text>().text = "";
 
         }
+
     }
 
     public bool IsPlaying(Player player)
@@ -476,6 +572,7 @@ public class UIManager : MonoBehaviour
     {
         if (Services.DealerManager.playerToAct != null)
         {
+            PlayerPromtRed();
             for (int i = 0; i < chipHolders.Count; i++)
             {
                 if (i == Services.DealerManager.playerToAct.SeatPos)
@@ -500,6 +597,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            PlayerPromtWhite();
             foreach(GameObject obj in chipHolders)
             {
                 obj.GetComponent<Text>().color = Color.white;
@@ -526,6 +624,15 @@ public class UIManager : MonoBehaviour
         {
             o.GetComponent<Image>().color = new Color(cardColor.r, cardColor.b, cardColor.g, 0);
         }
+    }
+
+    public void ToggleTooltips()
+    {
+        if (toggle.isOn)
+        {
+            toggleTooltip = true;
+        }
+        else toggleTooltip = false;
     }
 
     public Sprite GetCardImage(CardType card) //so when we pass a card, it looks at the rank and the suit to find the card

@@ -8,7 +8,7 @@ public class MouseOverScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -19,8 +19,8 @@ public class MouseOverScript : MonoBehaviour
 
     public void ShowUI()
     {
-        //Debug.Log("Hovering");
-        message.SetActive(true);
+        
+        if(Services.UIManager.toggleTooltip)message.SetActive(true);
     }
 
     public void HideUI()

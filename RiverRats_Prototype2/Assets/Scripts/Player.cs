@@ -73,6 +73,7 @@ public class Player
                     Services.TableManager.gameState = GameState.CleanUp;
                     Services.DealerManager.SetAwardPlayer_Amount();
                     Services.DealerManager.RevealCards();
+                    Services.UIManager.SetAwardColorRed(i);
                 }
             }
         }

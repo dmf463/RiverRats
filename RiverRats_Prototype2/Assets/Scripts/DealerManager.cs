@@ -27,6 +27,7 @@ public class DealerManager : MonoBehaviour
     public Player cheatingTarget;
     public int cheatCount = 0;
     public int talkCount = 0;
+    public int awardCount = 0;
     public bool influencingTable = false;
     #region forcing card hands
     //private List<CardType> straightFlush;
@@ -40,12 +41,14 @@ public class DealerManager : MonoBehaviour
     public int roundCount = 1;
 
     public bool clickedButton = false;
+    public bool noManipulation;
 
     void Start()
     {
         pauseAutomation = false;
         InitializeDealer();
-
+        noManipulation = true;
+        Services.UIManager.DealerButtonRed();
         #region creating fake card hands
         //string test = "";
         //straightFlush = new List<CardType> //player 0
@@ -144,22 +147,25 @@ public class DealerManager : MonoBehaviour
         if (playerToAct == null & !influencingTable)
         {
             influencingTable = true;
-            cheatCount++;
             if (table.gameState == GameState.PreFlop)
             {
                 Cheat_PreFlop();
+                cheatCount++;
             }
             else if (table.gameState == GameState.Flop)
             {
                 Cheat_Flop();
+                cheatCount++;
             }
             else if(table.gameState == GameState.Turn)
             {
                 Cheat_TurnV2();
+                cheatCount++;
             }
             else if(table.gameState == GameState.River)
             {
                 Cheat_RiverV2();
+                cheatCount++;
             }
         }
     }
@@ -747,8 +753,14 @@ public class DealerManager : MonoBehaviour
                             BalanceTalkAndCheatScales();
                             cheating = false;
                             influencingTable = false;
+                            noManipulation = false;
                             cheatCards.Clear();
                             ChooseNextPlayer();
+                            if (OnlyAllInPlayersLeft())
+                            {
+                                Services.UIManager.DealerButtonRed();
+                            }
+                            else Services.UIManager.DealerButtonWhite();
                         }
                     }
                 }
@@ -813,6 +825,11 @@ public class DealerManager : MonoBehaviour
                     influencingTable = false;
                     cheatCards.Clear();
                     ChooseNextPlayer();
+                    if (OnlyAllInPlayersLeft())
+                    {
+                        Services.UIManager.DealerButtonRed();
+                    }
+                    else Services.UIManager.DealerButtonWhite();
                     //Services.PlayerUI.FindSuccessesInDeck();
                 }
             }
@@ -860,6 +877,11 @@ public class DealerManager : MonoBehaviour
                 influencingTable = false;
                 cheatCards.Clear();
                 ChooseNextPlayer();
+                if (OnlyAllInPlayersLeft())
+                {
+                    Services.UIManager.DealerButtonRed();
+                }
+                else Services.UIManager.DealerButtonWhite();
             }
             else if (table.gameState == GameState.River)
             {
@@ -928,6 +950,7 @@ public class DealerManager : MonoBehaviour
                 influencingTable = false;
                 cheatCards.Clear();
                 ChooseNextPlayer();
+                Services.UIManager.DealerButtonWhite();
                 if (playerToAct == null)
                 {
                     ChooseWinner();
@@ -1031,12 +1054,19 @@ public class DealerManager : MonoBehaviour
                 table.players[seatPos].ChipCount += table.players[seatPos].amountToAward;
                 table.pot -= table.players[seatPos].amountToAward;
                 table.players[seatPos].amountToAward = 0;
+                Services.UIManager.SetAwardColorWhite(seatPos);
+            }
+            else
+            {
+                awardCount++;
             }
             if (table.pot == 0)
             {
                 ChangeEmotions();
+                Services.UIManager.CleanUpPromptRed();
                 for (int i = 0; i < table.players.Length; i++)
                 {
+                    Services.UIManager.SetAwardColorWhite(i);
                     if (table.players[i].ChipCount <= 0)
                     {
                         table.players[i].PlayerState = PlayerState.Eliminated;
@@ -1050,9 +1080,9 @@ public class DealerManager : MonoBehaviour
     {
         if (playerToAct != null)
         {
-            Debug.Log("holeCard Count = " + playerToAct.holeCards.Count);
-            Debug.Log("Player " + playerToAct.SeatPos + " has a " + playerToAct.holeCards[0].rank + " of " + playerToAct.holeCards[0].suit +
-                                         " and a " + playerToAct.holeCards[1].rank + " of " + playerToAct.holeCards[1].suit);
+            //Debug.Log("holeCard Count = " + playerToAct.holeCards.Count);
+            //Debug.Log("Player " + playerToAct.SeatPos + " has a " + playerToAct.holeCards[0].rank + " of " + playerToAct.holeCards[0].suit +
+            //                             " and a " + playerToAct.holeCards[1].rank + " of " + playerToAct.holeCards[1].suit);
             //Services.PlayerUI.FindSuccessesInDeck();
             playerToAct.DetermineHandStrength(playerToAct.holeCards[0], playerToAct.holeCards[1]);
         }
@@ -1075,7 +1105,9 @@ public class DealerManager : MonoBehaviour
             dealtCardIndex = 0;
             cheating = false;
             influencingTable = false;
+            noManipulation = true;
             cheatCards.Clear();
+            Services.UIManager.CleanUpPromptWhite();
             int eliminatedPlayers = 0;
             for (int i = 0; i < table.players.Length; i++)
             {
@@ -1124,6 +1156,7 @@ public class DealerManager : MonoBehaviour
                 PassDealerButton();
                 SetBlinds();
                 playerToAct = null;
+                Services.UIManager.DealerButtonRed();
             }
         }
     }
@@ -1153,6 +1186,7 @@ public class DealerManager : MonoBehaviour
             if (table.players[i].PlayerState == PlayerState.Playing)
             {
                 playersInHand.Add(table.players[i]);
+                Services.UIManager.SetAwardColorRed(i);
             }
         }
         EvaluatePlayersOnShowdown(playersInHand);
@@ -1273,14 +1307,17 @@ public class DealerManager : MonoBehaviour
                 if (table.gameState == GameState.PreFlop)
                 {
                     table.gameState = GameState.Flop;
+                    Services.UIManager.DealerButtonRed();
                 }
                 else if (table.gameState == GameState.Flop)
                 {
                     table.gameState = GameState.Turn;
+                    Services.UIManager.DealerButtonRed();
                 }
                 else if(table.gameState == GameState.Turn)
                 {
                     table.gameState = GameState.River;
+                    Services.UIManager.DealerButtonRed();
                 }
                 else if(table.gameState == GameState.River)
                 {
@@ -1331,7 +1368,7 @@ public class DealerManager : MonoBehaviour
 
     public void InsultPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        if (!influencingTable)
+        if (!influencingTable && !noManipulation)
         {
             influencingTable = true;
             int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
@@ -1354,7 +1391,7 @@ public class DealerManager : MonoBehaviour
 
     public void FlatterPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        if (!influencingTable)
+        if (!influencingTable && !noManipulation)
         {
             influencingTable = true;
             int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum GameOverReasons { VIPWins, VIPEliminated, CheatingTooMuch, TalkingTooMuch}
+public enum GameOverReasons { VIPWins, VIPEliminated, CheatingTooMuch, TalkingTooMuch, AwardMistakes}
 
 public class GameOverScreen : MonoBehaviour
 {
@@ -16,6 +16,7 @@ public class GameOverScreen : MonoBehaviour
     const string VIP_LOSE_REASON_TEXT = "The VIP Lost the Game";
     const string TALK_LOSE_REASON_TEXT = "You Were Caught Trying to Manipulate Players";
     const string CHEAT_LOSE_REASON_TEXT = "You Were Caught Cheating";
+    const string AWARD_LOSE_REASON_TEST = "You made too many mistakes Awarding Players";
 
     public Text score;
     public Text vipRule;
@@ -58,8 +59,13 @@ public class GameOverScreen : MonoBehaviour
 
     public void SetGameOverScreen(GameOverReasons gameOver)
     {
-        if (gameOver == GameOverReasons.VIPWins) winLoseText.text = WIN_TEXT;
+        if (gameOver == GameOverReasons.VIPWins)
+        {
+            Services.GameRules.ChosenRules[0].RuleState = RuleState.Successful;
+            winLoseText.text = WIN_TEXT;
+        }
         else winLoseText.text = LOSE_TEXT;
+
 
         gameOverReason.text = GetWinLoseReasonText(gameOver);
 
@@ -146,6 +152,9 @@ public class GameOverScreen : MonoBehaviour
                 break;
             case GameOverReasons.TalkingTooMuch:
                 winLoseText = TALK_LOSE_REASON_TEXT;
+                break;
+            case GameOverReasons.AwardMistakes:
+                winLoseText = AWARD_LOSE_REASON_TEST;
                 break;
             default:
                 break;
