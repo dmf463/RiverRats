@@ -144,8 +144,8 @@ public class UIManager : MonoBehaviour
         PlayerToActUI();
         for (int i = 0; i < ButtonList.Count; i++)
         {
-            if(Services.TableManager.gameState == GameState.PreFlop && 
-                Services.DealerManager.cardsInDeck.Count == 52 && 
+            if (Services.TableManager.gameState == GameState.PreFlop &&
+                Services.DealerManager.cardsInDeck.Count == 52 &&
                 !Services.DealerManager.influencingTable)
             {
                 ButtonList[2].GetComponent<Image>().color = maniuplateColor;
@@ -154,16 +154,25 @@ public class UIManager : MonoBehaviour
                 ButtonList[11].GetComponent<Image>().color = maniuplateColor;
                 ButtonList[14].GetComponent<Image>().color = maniuplateColor;
             }
-            else if(Services.DealerManager.influencingTable)
+            else if ((Services.DealerManager.influencingTable || Services.DealerManager.dealingCards || Services.TableManager.gameState == GameState.CleanUp) || Services.DealerManager.playerToAct != null)
             {
                 ButtonList[i].GetComponent<Image>().color = Color.white;
             }
             else
             {
                 int buttonSeatPos = Services.TableManager.GetSeatPosFromTag(ButtonList[i]);
-                if (Services.TableManager.players[buttonSeatPos].PlayerState == PlayerState.Playing)
+                if (Services.TableManager.players[buttonSeatPos].PlayerState != PlayerState.Eliminated)
                 {
-                    ButtonList[i].GetComponent<Image>().color = maniuplateColor;
+                    if ((i == 2 ||
+                       i == 5 ||
+                       i == 8 ||
+                       i == 11 ||
+                       i == 14) &&
+                       (Services.TableManager.players[buttonSeatPos].PlayerState == PlayerState.NotPlaying))
+                    {
+                        ButtonList[i].GetComponent<Image>().color = Color.white;
+                    }
+                    else ButtonList[i].GetComponent<Image>().color = maniuplateColor;
                 }
                 else
                 {

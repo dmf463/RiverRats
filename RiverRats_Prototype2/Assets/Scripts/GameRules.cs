@@ -68,7 +68,7 @@ public class GameRules : MonoBehaviour
     private void CheckForCheatingTalkingAwardMistakes()
     {
         if (Services.DealerManager.cheatCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.CheatingTooMuch);
-        else if (Services.DealerManager.talkCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.TalkingTooMuch);
+        else if (Services.DealerManager.talkCount >= 20) Services.GameOverScreen.GameOver(GameOverReasons.TalkingTooMuch);
         else if (Services.DealerManager.awardCount >= 10) Services.GameOverScreen.GameOver(GameOverReasons.AwardMistakes);
     }
 
@@ -78,8 +78,10 @@ public class GameRules : MonoBehaviour
 
         if (rule.RuleName == RuleType.Hate)
         {
-            PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
-            PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
+            Player player0 = rule.TargetPlayer0;
+            Player player1 = rule.TargetPlayer1;
+            PlayerEmotion target0 = player0.PlayerEmotion;
+            PlayerEmotion target1 = player1.PlayerEmotion;
 
             if (target0 == PlayerEmotion.OnTilt && target1 == PlayerEmotion.Joyous)
             {
@@ -97,12 +99,19 @@ public class GameRules : MonoBehaviour
             {
                 state = RuleState.Failed;
             }
+            else if(player0.PlayerState == PlayerState.Eliminated || player1.PlayerState == PlayerState.Eliminated)
+            {
+                state = RuleState.Failed;
+            }
             else state = RuleState.Active;
         }
         else if (rule.RuleName == RuleType.Like)
         {
-            PlayerEmotion target0 = rule.TargetPlayer0.PlayerEmotion;
-            PlayerEmotion target1 = rule.TargetPlayer1.PlayerEmotion;
+            Player player0 = rule.TargetPlayer0;
+            Player player1 = rule.TargetPlayer1;
+            PlayerEmotion target0 = player0.PlayerEmotion;
+            PlayerEmotion target1 = player1.PlayerEmotion;
+
             if (target0 == PlayerEmotion.Amused && target1 == PlayerEmotion.Amused) //Ammused:Amused
             {
                 state = RuleState.Successful;
@@ -140,6 +149,10 @@ public class GameRules : MonoBehaviour
                 state = RuleState.Successful;
             }
             else if (Services.TableManager.gameState == GameState.GameOver)
+            {
+                state = RuleState.Failed;
+            }
+            else if (player0.PlayerState == PlayerState.Eliminated || player1.PlayerState == PlayerState.Eliminated)
             {
                 state = RuleState.Failed;
             }

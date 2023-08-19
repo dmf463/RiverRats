@@ -34,6 +34,8 @@ public class GameOverScreen : MonoBehaviour
     public Text rule3;
     public GameObject rule3Image;
 
+    public Text roundCount;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +64,7 @@ public class GameOverScreen : MonoBehaviour
         if (gameOver == GameOverReasons.VIPWins)
         {
             Services.GameRules.ChosenRules[0].RuleState = RuleState.Successful;
+            Services.GameRules.CompletedRules.Add(Services.GameRules.ChosenRules[0]);
             winLoseText.text = WIN_TEXT;
         }
         else winLoseText.text = LOSE_TEXT;
@@ -77,6 +80,7 @@ public class GameOverScreen : MonoBehaviour
         rule3.text = GetRuleText(4);
 
         score.text = GetScore();
+        roundCount.text = Services.DealerManager.roundCount.ToString();
         SetSuccessFailImages();
     }
 

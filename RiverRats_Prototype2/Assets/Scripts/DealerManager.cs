@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /*
  * The idea of this script is that if it's the job of the dealer at the table, it should be in this script. That DOES mean that quite a bit of logic is going on in here, but that's fine. 
@@ -42,6 +43,7 @@ public class DealerManager : MonoBehaviour
 
     public bool clickedButton = false;
     public bool noManipulation;
+    public bool dealingCards;
 
     void Start()
     {
@@ -144,7 +146,8 @@ public class DealerManager : MonoBehaviour
 
     public void Cheat()
     {
-        if (playerToAct == null & !influencingTable)
+        int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+        if (playerToAct == null & !influencingTable && (Services.TableManager.players[seatPos].PlayerState == PlayerState.Playing))
         {
             influencingTable = true;
             if (table.gameState == GameState.PreFlop)
@@ -702,6 +705,7 @@ public class DealerManager : MonoBehaviour
         {
             if (table.gameState == GameState.PreFlop)
             {
+                dealingCards = true;
                 //cycle through the players
                 int i = SeatsAwayFromDealerAmongstLivePlayers(1 + dealtCardIndex); //) % ActivePlayerCount();
                 //for (int i = 0; i < table.numActivePlayers; i++)
@@ -749,6 +753,7 @@ public class DealerManager : MonoBehaviour
                                 }
                             }
                             dealtCardIndex = 0;
+                            dealingCards = false;
                             cheatingTarget = null;
                             BalanceTalkAndCheatScales();
                             cheating = false;
@@ -769,6 +774,7 @@ public class DealerManager : MonoBehaviour
             {
                 //we do the same thing as the above for the Flop, except this time we burn a card first
                 //the only difference now is that we send the cards to the flop outside the For Loop
+                dealingCards = true;
                 if(dealtCardIndex == 0)
                 {
                     BurnCard();
@@ -819,6 +825,7 @@ public class DealerManager : MonoBehaviour
                         }
                     }
                     dealtCardIndex = 0;
+                    dealingCards = false;
                     cheatingTarget = null;
                     BalanceTalkAndCheatScales();
                     cheating = false;
@@ -837,6 +844,7 @@ public class DealerManager : MonoBehaviour
             {
                 //the turn and the river are both more simplified versions of the above
                 //since they represent only one card
+                dealingCards = true;
                 BurnCard();
                 if (cheating)
                 {
@@ -871,6 +879,7 @@ public class DealerManager : MonoBehaviour
                     Services.UIManager.SetCardImage(Destination.turn, turn);
                 }
                 dealtCardIndex = 0;
+                dealingCards = false;
                 cheatingTarget = null;
                 BalanceTalkAndCheatScales();
                 cheating = false;
@@ -885,6 +894,7 @@ public class DealerManager : MonoBehaviour
             }
             else if (table.gameState == GameState.River)
             {
+                dealingCards = true;
                 BurnCard();
                 if (cheating)
                 {
@@ -944,6 +954,7 @@ public class DealerManager : MonoBehaviour
                     Services.UIManager.SetCardImage(Destination.river, river);
                 }
                 dealtCardIndex = 0;
+                dealingCards = false;
                 cheatingTarget = null;
                 BalanceTalkAndCheatScales();
                 cheating = false;
@@ -1368,7 +1379,7 @@ public class DealerManager : MonoBehaviour
 
     public void InsultPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        if (!influencingTable && !noManipulation)
+        if (!influencingTable && !noManipulation && playerToAct == null)
         {
             influencingTable = true;
             int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
@@ -1391,7 +1402,7 @@ public class DealerManager : MonoBehaviour
 
     public void FlatterPlayer() //Click a button and it cycles through to the next emotion. Binary choice.
     {
-        if (!influencingTable && !noManipulation)
+        if (!influencingTable && !noManipulation && playerToAct == null)
         {
             influencingTable = true;
             int seatPos = table.GetSeatPosFromTag(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
@@ -1680,6 +1691,22 @@ public class DealerManager : MonoBehaviour
                 }
             }
         }
+        if(!CountAllChipsAndCOrrect() && table.pot < 0)
+        {
+            PlayerRank[0][0].ChipCount -= 5;
+            table.pot = 0;
+        }
+    }
+
+    public bool CountAllChipsAndCOrrect()
+    {
+        int chipCount = 0;
+        for (int i = 0; i < Services.TableManager.players.Length; i++)
+        {
+            chipCount += Services.TableManager.players[i].ChipCount;
+        }
+
+        return (chipCount == startingChipStack * Services.TableManager.players.Length);
     }
 
     public void PassDealerButton() //This Passes the dealer button to the next player using a series of functions
@@ -1958,6 +1985,11 @@ public class DealerManager : MonoBehaviour
         //{
         //    lastBet = bet;
         //}
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }
