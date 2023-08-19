@@ -52,6 +52,7 @@ public class UIManager : MonoBehaviour
     public List<Sprite> clubSprites;// various sprite sheets
     public List<Sprite>[] cardSprites;// they were then combined to form cards
     public Sprite cardBack; //the back of a card
+    public Color cardbackColor;
     private Color cardColor; //color of the card to control transparency
 
     public List<GameObject> dealerPositions; //This holds all the places the dealer button can be
@@ -114,7 +115,8 @@ public class UIManager : MonoBehaviour
     public GameObject player4;
 
     public bool toggleTooltip = true;
-    public Toggle toggle;
+    public Toggle toolTipToggle;
+    public Toggle hardModeToggle;
 
     void Start()
     {
@@ -546,6 +548,7 @@ public class UIManager : MonoBehaviour
                         if (ShowCardBacks)
                         {
                             playerHoleCards_simple[player][card].GetComponent<Image>().sprite = cardBack;
+                            playerHoleCards_simple[player][card].GetComponent<Image>().color = cardColor;
                         }
                         else
                         {
@@ -669,7 +672,7 @@ public class UIManager : MonoBehaviour
 
     public void ToggleTooltips()
     {
-        if (toggle.isOn)
+        if (toolTipToggle.isOn)
         {
             toggleTooltip = true;
         }
@@ -736,6 +739,18 @@ public class UIManager : MonoBehaviour
         return sprite;
     }
 
+    public void ToggleHardMode()
+    {
+        if (hardModeToggle.isOn)
+        {
+            ShowCardBacks = true;
+        }
+        else
+        {
+            ShowCardBacks = false;
+        }
+    }
+    
     public void SetPlayerHoleCards() //janky hard code to create the holecard player list
     {
         TableManager tm = Services.TableManager;

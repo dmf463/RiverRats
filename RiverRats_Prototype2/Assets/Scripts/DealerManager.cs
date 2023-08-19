@@ -44,9 +44,11 @@ public class DealerManager : MonoBehaviour
     public bool clickedButton = false;
     public bool noManipulation;
     public bool dealingCards;
+    public bool hardMode;
 
     void Start()
     {
+        hardMode = false;
         pauseAutomation = false;
         InitializeDealer();
         noManipulation = true;
